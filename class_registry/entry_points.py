@@ -36,7 +36,7 @@ class EntryPointClassRegistry(BaseRegistry):
         """
 
     def __len__(self):
-        return sum(1 for _ in self.keys())
+        return len(self._get_cache())
 
     def get_class(self, key):
         try:
