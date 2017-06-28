@@ -32,12 +32,15 @@ class EntryPointClassRegistryTestCase(TestCase):
 
         fire = registry['fire']
         self.assertIsInstance(fire, Charmander)
+        self.assertIsNone(fire.name)
 
         grass = registry.get('grass')
         self.assertIsInstance(grass, Bulbasaur)
+        self.assertIsNone(grass.name)
 
         water = registry.get('water', name='archibald')
         self.assertIsInstance(water, Squirtle)
+        self.assertEqual(water.name, 'archibald')
 
     def test_len(self):
         """

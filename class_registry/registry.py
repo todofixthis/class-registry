@@ -167,24 +167,29 @@ class BaseRegistry(with_metaclass(ABCMeta, Mapping)):
         for item in self.items():
             yield item[1]
 
+    # Add some compatibility aliases to make class registries behave
+    # more like dicts in Python 2.
     if PY2:
-        iteritems = items
-        """
-        Included for compatibility with :py:data:`six.iteritems`.
-        Do not invoke directly!
-        """
+        def iteritems(self):
+            """
+            Included for compatibility with :py:data:`six.iteritems`.
+            Do not invoke directly!
+            """
+            return self.items()
 
-        iterkeys = keys
-        """
-        Included for compatibility with :py:data:`six.iterkeys`.
-        Do not invoke directly!
-        """
+        def iterkeys(self):
+            """
+            Included for compatibility with :py:data:`six.iterkeys`.
+            Do not invoke directly!
+            """
+            return self.keys()
 
-        itervalues = values
-        """
-        Included for compatibility with :py:data:`six.itervalues`.
-        Do not invoke directly!
-        """
+        def itervalues(self):
+            """
+            Included for compatibility with :py:data:`six.itervalues`.
+            Do not invoke directly!
+            """
+            return self.values()
 
 
 class MutableRegistry(with_metaclass(ABCMeta, BaseRegistry, MutableMapping)):
