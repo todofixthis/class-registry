@@ -4,5 +4,4 @@ from __future__ import absolute_import, division, print_function, \
 
 from .registry import *
 from .cache import *
-from .entry_points import *
 from .patcher import *
