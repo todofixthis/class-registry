@@ -2,9 +2,10 @@
 from __future__ import absolute_import, division, print_function, \
     unicode_literals
 
-from typing import Text, Generator
+from typing import Dict, Optional, Text
 
-from pkg_resources import EntryPoint, iter_entry_points
+from pkg_resources import iter_entry_points
+from six import iteritems
 
 from class_registry import BaseRegistry
 
@@ -28,28 +29,45 @@ class EntryPointClassRegistry(BaseRegistry):
 
         self.group = group
 
+        self._cache = None # type: Optional[Dict[Text, type]]
+        """
+        Caches registered classes locally, so that we don't have to
+        keep iterating over entry points.
+        """
+
     def __len__(self):
         return sum(1 for _ in self.keys())
 
     def get_class(self, key):
-        for e in self._iter_entry_points():
-            if e.name == key:
-                return e.load()
-
-        return self.__missing__(key)
+        try:
+            return self._get_cache()[key]
+        except KeyError:
+            return self.__missing__(key)
 
     def items(self):
-        for e in self._iter_entry_points():
-            yield e.name, e.load()
+        return iteritems(self._get_cache())
 
-    def keys(self):
-        for e in self._iter_entry_points():
-            yield e.name
+    def refresh(self):
+        """
+        Purges the local cache.
+        The next access attempt will reload all entry points.
 
-    def _iter_entry_points(self):
-        # type: () -> Generator[EntryPoint]
+        This is useful if you load a distribution at runtime.
+        Otherwise, it probably serves no useful purpose.
+        """
+        self._cache = None
+
+    def _get_cache(self):
+        # type: () -> Dict[Text, type]
         """
         Iterates over all entry points assigned to the registry's group
         name.
         """
-        return iter_entry_points(self.group)
+        if self._cache is None:
+            self._cache = {
+                e.name: e.load()
+                    for e in iter_entry_points(self.group)
+            }
+
+        # noinspection PyTypeChecker
+        return self._cache
