@@ -1,0 +1,11 @@
+Metadata-Version: 1.1
+Name: dummy_package
+Version: 1.0.0
+Summary: Dummy package loaded during unit tests for EntryPointClassRegistry.
+Home-page: https://class-registry.readthedocs.io/
+Author: Phoenix Zerin
+Author-email: phoenix.zerin@eflglobal.com
+License: MIT
+Description: Dummy package loaded during unit tests for EntryPointClassRegistry.
+Keywords: test
+Platform: UNKNOWN

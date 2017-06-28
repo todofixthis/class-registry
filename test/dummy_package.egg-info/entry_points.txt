@@ -1,0 +1,4 @@
+[pokemon]
+fire = test:Charmander
+grass = test:Bulbasaur
+water = test:Squirtle

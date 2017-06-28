@@ -21,6 +21,9 @@ parts/
 sdist/
 var/
 *.egg-info/
+# This directory is used by unit tests.
+# See `test/entry_points_test.py` for more info.
+!test/dummy_package.egg-info
 .installed.cfg
 *.egg
 
