@@ -2,7 +2,7 @@
 from __future__ import absolute_import, division, print_function, \
     unicode_literals
 
-from typing import Text
+from typing import Text, Generator
 
 from pkg_resources import EntryPoint, iter_entry_points
 
@@ -32,16 +32,20 @@ class EntryPointClassRegistry(BaseRegistry):
         return sum(1 for _ in self.keys())
 
     def get_class(self, key):
-        for e in iter_entry_points(self.group): # type: EntryPoint
+        for e in self._iter_entry_points():
             if e.name == key:
                 return e.load()
 
         return self.__missing__(key)
 
     def _items(self):
-        for e in iter_entry_points(self.group): # type: EntryPoint
+        for e in self._iter_entry_points():
             yield e.name, e.load()
 
     def keys(self):
-        for e in iter_entry_points(self.group): # type: EntryPoint
+        for e in self._iter_entry_points():
             yield e.name
+
+    def _iter_entry_points(self):
+        # type: () -> Generator[EntryPoint]
+        return iter_entry_points(self.group)
