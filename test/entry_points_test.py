@@ -16,9 +16,9 @@ def setUpModule():
     # Install a fake distribution that we can use to inject entry
     # points at runtime.
     #
-    # The side effects from this are pretty severe, but they only
-    # impact this test, and they are undone as soon as the process
-    # terminates.
+    # The side effects from this are pretty severe, but they (very
+    # probably) only impact this test, and they are undone as soon as
+    # the process terminates.
     #
     working_set.add_entry(dirname(__file__))
 
