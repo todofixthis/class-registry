@@ -48,4 +48,8 @@ class EntryPointClassRegistry(BaseRegistry):
 
     def _iter_entry_points(self):
         # type: () -> Generator[EntryPoint]
+        """
+        Iterates over all entry points assigned to the registry's group
+        name.
+        """
         return iter_entry_points(self.group)
