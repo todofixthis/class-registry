@@ -4,26 +4,10 @@ from __future__ import absolute_import, division, print_function, \
 
 from unittest import TestCase
 
-from class_registry import ClassRegistry, ClassRegistryInstanceCache, \
-    RegistryKeyError, RegistryPatcher, SortedClassRegistry
-
-
-class Pokemon(object):
-    element = None
-
-    def __init__(self, name=None):
-        super(Pokemon, self).__init__()
-
-        self.name = name
-
-
-# Define some classes that we can register.
-class Charmander(Pokemon):   element = 'fire'
-class Charmeleon(Pokemon):   element = 'fire'
-class Squirtle(Pokemon):     element = 'water'
-class Wartortle(Pokemon):    element = 'water'
-class Bulbasaur(Pokemon):    element = 'grass'
-class Ivysaur(Pokemon):      element = 'grass'
+from class_registry.registry import RegistryKeyError, ClassRegistry, \
+    SortedClassRegistry
+from test import Bulbasaur, Charmander, Charmeleon, Pokemon, \
+    Squirtle, Wartortle
 
 
 class ClassRegistryTestCase(TestCase):
@@ -208,63 +192,6 @@ class ClassRegistryTestCase(TestCase):
         self.assertEqual(poke.name, 'trogdor')
 
 
-class RegistryPatcherTestCase(TestCase):
-    def setUp(self):
-        super(RegistryPatcherTestCase, self).setUp()
-
-        self.registry = ClassRegistry(attr_name='element')
-
-    def test_patch_detect_keys(self):
-        """
-        Patching a registry in a context, with registry keys detected
-        automatically.
-        """
-        self.registry.register(Charmander)
-        self.registry.register(Squirtle)
-
-        with RegistryPatcher(self.registry, Charmeleon, Bulbasaur):
-            self.assertIsInstance(self.registry['fire'], Charmeleon)
-            self.assertIsInstance(self.registry['water'], Squirtle)
-
-            # Nesting contexts?  You betcha!
-            with RegistryPatcher(self.registry, Ivysaur):
-                self.assertIsInstance(self.registry['grass'], Ivysaur)
-
-            self.assertIsInstance(self.registry['grass'], Bulbasaur)
-
-        # Save file corrupted.  Restoring previous save...
-        self.assertIsInstance(self.registry['fire'], Charmander)
-        self.assertIsInstance(self.registry['water'], Squirtle)
-
-        with self.assertRaises(RegistryKeyError):
-            self.registry.get('grass')
-
-    def test_patch_manual_keys(self):
-        """
-        Patching a registry in a context, specifying registry keys
-        manually.
-        """
-        self.registry.register('sparky')(Charmander)
-        self.registry.register('chad')(Squirtle)
-
-        with RegistryPatcher(self.registry, sparky=Charmeleon, rex=Bulbasaur):
-            self.assertIsInstance(self.registry['sparky'], Charmeleon)
-            self.assertIsInstance(self.registry['chad'], Squirtle)
-
-            # Don't worry Chad; your day will come!
-            with RegistryPatcher(self.registry, rex=Ivysaur):
-                self.assertIsInstance(self.registry['rex'], Ivysaur)
-
-            self.assertIsInstance(self.registry['rex'], Bulbasaur)
-
-        # Save file corrupted.  Restoring previous save...
-        self.assertIsInstance(self.registry['sparky'], Charmander)
-        self.assertIsInstance(self.registry['chad'], Squirtle)
-
-        with self.assertRaises(RegistryKeyError):
-            self.registry.get('jodie')
-
-
 class SortedClassRegistryTestCase(TestCase):
     def test_sorted_classes(self):
         """
@@ -301,82 +228,4 @@ class SortedClassRegistryTestCase(TestCase):
         self.assertListEqual(
             list(registry.values()),
             [BravoWidget, CharlieWidget, AlphaWidget],
-        )
-
-
-class ClassRegistryInstanceCacheTestCase(TestCase):
-    def setUp(self):
-        super(ClassRegistryInstanceCacheTestCase, self).setUp()
-
-        self.registry = ClassRegistry(attr_name='element')
-        self.cache = ClassRegistryInstanceCache(self.registry)
-
-    def test_get(self):
-        """
-        When an instance is returned from
-        :py:meth:`ClassRegistryInstanceCache.get`, future invocations
-        return the same instance.
-        """
-        # Register a few classes with the ClassRegistry.
-        self.registry.register(Bulbasaur)
-        self.registry.register(Charmander)
-        self.registry.register(Squirtle)
-
-        poke_1 = self.cache['grass']
-        self.assertIsInstance(poke_1, Bulbasaur)
-
-        # Same key = exact same instance.
-        poke_2 = self.cache['grass']
-        self.assertIs(poke_2, poke_1)
-
-        poke_3 = self.cache['water']
-        self.assertIsInstance(poke_3, Squirtle)
-
-        # If we pull a class directly from the wrapped registry, we get
-        # a new instance.
-        poke_4 = self.registry['water']
-        self.assertIsInstance(poke_4, Squirtle)
-        self.assertIsNot(poke_3, poke_4)
-
-    def test_template_args(self):
-        """
-        Extra params passed to the cache constructor are passed to the
-        template function when creating new instances.
-        """
-        self.registry.register(Charmeleon)
-        self.registry.register(Wartortle)
-
-        # Add an extra init param to the cache.
-        cache = ClassRegistryInstanceCache(self.registry, name='Bruce')
-
-        # The cache parameters are automatically applied to the class'
-        # initializer.
-        poke_1 = cache['fire']
-        self.assertIsInstance(poke_1, Charmeleon)
-        self.assertEqual(poke_1.name, 'Bruce')
-
-        poke_2 = cache['water']
-        self.assertIsInstance(poke_2, Wartortle)
-        self.assertEqual(poke_2.name, 'Bruce')
-
-    def test_iterator(self):
-        """
-        Creating an iterator using :py:func:`iter`.
-        """
-        self.registry.register(Bulbasaur)
-        self.registry.register(Charmander)
-        self.registry.register(Squirtle)
-
-        # The cache's iterator only operates over cached instances.
-        self.assertListEqual(list(iter(self.cache)), [])
-
-        poke_1 = self.cache['water']
-        poke_2 = self.cache['grass']
-        poke_3 = self.cache['fire']
-
-        # The order that values are yielded depends on the ordering of
-        # the wrapped registry.
-        self.assertListEqual(
-            list(iter(self.cache)),
-            [poke_2, poke_3, poke_1],
         )
