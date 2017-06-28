@@ -1,0 +1,13 @@
+language: python
+python:
+  - '2.7'
+  - '3.5'
+  - '3.6'
+install: pip install .
+script: python setup.py test
+deploy:
+  on:
+    branch: master
+  provider: pypi
+  distributions: "sdist bdist_wheel"
+  user: efl_phx
