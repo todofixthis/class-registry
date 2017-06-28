@@ -60,8 +60,7 @@ class EntryPointClassRegistry(BaseRegistry):
     def _get_cache(self):
         # type: () -> Dict[Text, type]
         """
-        Iterates over all entry points assigned to the registry's group
-        name.
+        Populates the cache (if necessary) and returns it.
         """
         if self._cache is None:
             self._cache = {
