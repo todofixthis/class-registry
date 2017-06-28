@@ -38,7 +38,7 @@ class EntryPointClassRegistry(BaseRegistry):
 
         return self.__missing__(key)
 
-    def _items(self):
+    def items(self):
         for e in self._iter_entry_points():
             yield e.name, e.load()
 

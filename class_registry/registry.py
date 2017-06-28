@@ -129,17 +129,19 @@ class BaseRegistry(with_metaclass(ABCMeta, Mapping)):
         """
         return class_(*args, **kwargs)
 
+    @abstract_method
     def items(self):
         # type: () -> Generator[Tuple[Hashable, type]]
         """
         Iterates over registered classes and their corresponding keys,
         in the order that they were registered.
 
-        Note: For compatibility with Python 3, this method returns a
-        generator.
+        Note: For compatibility with Python 3, this method should
+        return a generator.
         """
-        for item in self._items():
-            yield item
+        raise NotImplementedError(
+            'Not implemented in {cls}.'.format(cls=type(self).__name__),
+        )
 
     def keys(self):
         # type: () -> Generator[Hashable]
@@ -147,10 +149,10 @@ class BaseRegistry(with_metaclass(ABCMeta, Mapping)):
         Returns a generator for iterating over registry keys, in the
         order that they were registered.
 
-        Note: For compatibility with Python 3, this method returns a
-        generator.
+        Note: For compatibility with Python 3, this method should
+        return a generator.
         """
-        for item in self._items():
+        for item in self.items():
             yield item[0]
 
     def values(self):
@@ -159,22 +161,11 @@ class BaseRegistry(with_metaclass(ABCMeta, Mapping)):
         Returns a generator for iterating over registered classes, in
         the order that they were registered.
 
-        Note: For compatibility with Python 3, this method returns a
-        generator.
+        Note: For compatibility with Python 3, this method should
+        return a generator.
         """
-        for item in self._items():
+        for item in self.items():
             yield item[1]
-
-    @abstract_method
-    def _items(self):
-        # type: () -> Iterator[Tuple[Hashable, type]]
-        """
-        Iterates over all registered classes, in the order they were
-        added.
-        """
-        raise NotImplementedError(
-            'Not implemented in {cls}.'.format(cls=type(self).__name__),
-        )
 
     if PY2:
         iteritems = items
@@ -349,7 +340,7 @@ class ClassRegistry(MutableRegistry):
         except KeyError:
             return self.__missing__(key)
 
-    def _items(self):
+    def items(self):
         # type: () -> Iterator[Tuple[Hashable, type]]
         """
         Iterates over all registered classes, in the order they were
@@ -421,6 +412,6 @@ class SortedClassRegistry(ClassRegistry):
 
         self._sort_key = sort_key
 
-    def _items(self):
+    def items(self):
         # type: () -> Iterator[Tuple[Hashable, type]]
         return sorted(iteritems(self._registry), key=self._sort_key)
