@@ -17,9 +17,20 @@ class Pokemon(object):
 
 
 # Define some classes that we can register.
-class Charmander(Pokemon):   element = 'fire'
-class Charmeleon(Pokemon):   element = 'fire'
-class Squirtle(Pokemon):     element = 'water'
-class Wartortle(Pokemon):    element = 'water'
-class Bulbasaur(Pokemon):    element = 'grass'
-class Ivysaur(Pokemon):      element = 'grass'
+class Charmander(Pokemon):  element = 'fire'
+class Charmeleon(Pokemon):  element = 'fire'
+class Squirtle(Pokemon):    element = 'water'
+class Wartortle(Pokemon):   element = 'water'
+class Bulbasaur(Pokemon):   element = 'grass'
+class Ivysaur(Pokemon):     element = 'grass'
+class Mew(Pokemon):         element = 'psychic'
+
+
+class PokemonFactory(object):
+    """
+    A factory that can produce new pokémon on demand.  Used to test how
+    registries behave when a function is registered instead of a class.
+    """
+    @classmethod
+    def create_psychic_pokemon(cls, name=None):
+        return Mew(name)

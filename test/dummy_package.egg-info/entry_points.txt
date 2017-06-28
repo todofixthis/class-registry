@@ -1,4 +1,5 @@
 [pokemon]
 fire = test:Charmander
 grass = test:Bulbasaur
+psychic = test:PokemonFactory.create_psychic_pokemon
 water = test:Squirtle

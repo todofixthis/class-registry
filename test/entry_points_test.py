@@ -5,10 +5,10 @@ from __future__ import absolute_import, division, print_function, \
 from os.path import dirname
 from unittest import TestCase
 
-from pkg_resources import working_set, iter_entry_points
+from pkg_resources import iter_entry_points, working_set
 
 from class_registry import EntryPointClassRegistry, RegistryKeyError
-from test import Bulbasaur, Charmander, Squirtle
+from test import Bulbasaur, Charmander, Mew, Squirtle
 
 
 def setUpModule():
@@ -27,6 +27,8 @@ class EntryPointClassRegistryTestCase(TestCase):
     def test_happy_path(self):
         """
         Loading classes automatically via entry points.
+
+        See ``dummy_package.egg-info/entry_points.txt`` for more info.
         """
         registry = EntryPointClassRegistry('pokemon')
 
@@ -42,6 +44,12 @@ class EntryPointClassRegistryTestCase(TestCase):
         self.assertIsInstance(water, Squirtle)
         self.assertEqual(water.name, 'archibald')
 
+        # The 'psychic' entry point actually references a function, but
+        # it works exactly the same as a class.
+        psychic = registry.get('psychic', 'snuggles')
+        self.assertIsInstance(psychic, Mew)
+        self.assertEqual(psychic.name, 'snuggles')
+
     def test_len(self):
         """
         Getting the length of an entry point class registry.
@@ -52,7 +60,7 @@ class EntryPointClassRegistryTestCase(TestCase):
 
         # Quick sanity check, to make sure our test pokémon are
         # registered correctly.
-        self.assertGreaterEqual(expected, 3)
+        self.assertGreaterEqual(expected, 4)
 
         registry = EntryPointClassRegistry('pokemon')
         self.assertEqual(len(registry), expected)
