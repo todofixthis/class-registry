@@ -4,7 +4,7 @@ from __future__ import absolute_import, division, print_function, \
 
 from six import iteritems
 
-from class_registry.registry import RegistryKeyError
+from class_registry.registry import MutableRegistry, RegistryKeyError
 
 __all__ = [
     'RegistryPatcher',
@@ -15,6 +15,8 @@ class RegistryPatcher(object):
     """
     Creates a context in which classes are temporarily registered with
     a class registry, then removed when the context exits.
+
+    Note: only mutable registries can be patched!
     """
     class DoesNotExist(object):
         """
@@ -23,9 +25,10 @@ class RegistryPatcher(object):
         pass
 
     def __init__(self, registry, *args, **kwargs):
+        # type: (MutableRegistry, ...) -> None
         """
         :param registry:
-            The :py:class:`ClassRegistry` instance to patch.
+            A :py:class:`MutableRegistry` instance to patch.
 
         :param args:
             Classes to add to the registry.
