@@ -38,6 +38,12 @@ class EntryPointClassRegistry(BaseRegistry):
     def __len__(self):
         return len(self._get_cache())
 
+    def __repr__(self):
+        return '{type}(group={group!r})'.format(
+            group   = self.group,
+            type    = type(self).__name__,
+        )
+
     def get_class(self, key):
         try:
             return self._get_cache()[key]

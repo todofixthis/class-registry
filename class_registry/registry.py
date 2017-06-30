@@ -36,6 +36,9 @@ class BaseRegistry(with_metaclass(ABCMeta, Mapping)):
     def __init__(self):
         super(BaseRegistry, self).__init__()
 
+    def __dir__(self):
+        return list(self.keys())
+
     def __getitem__(self, key):
         """
         Shortcut for calling :py:meth:`get` with empty args/kwargs.
@@ -197,24 +200,16 @@ class MutableRegistry(with_metaclass(ABCMeta, BaseRegistry, MutableMapping)):
     Extends :py:class:`BaseRegistry` with methods that can be used to
     modify the registered classes.
     """
-    def __init__(self, attr_name=None, unique=False):
-        # type: (Optional[Text], bool) -> None
+    def __init__(self, attr_name=None):
+        # type: (Optional[Text]) -> None
         """
         :param attr_name:
             If provided, :py:meth:`register` will automatically detect
             the key to use when registering new classes.
-
-        :param unique:
-            Determines what happens when two classes are registered with
-            the same key:
-
-            - ``True``: The second class will replace the first one.
-            - ``False``: A ``ValueError`` will be raised.
         """
         super(MutableRegistry, self).__init__()
 
-        self.attr_name  = attr_name
-        self.unique     = unique
+        self.attr_name = attr_name
 
     def __delitem__(self, key):
         # type: (Hashable) -> None
@@ -222,6 +217,12 @@ class MutableRegistry(with_metaclass(ABCMeta, BaseRegistry, MutableMapping)):
         Provides alternate syntax for unregistering a class.
         """
         self._unregister(key)
+
+    def __repr__(self):
+        return '{type}({attr_name!r})'.format(
+            attr_name   = self.attr_name,
+            type        = type(self).__name__,
+        )
 
     def __setitem__(self, key, class_):
         # type: (Text, type) -> None
@@ -323,7 +324,9 @@ class ClassRegistry(MutableRegistry):
             - ``True``: The second class will replace the first one.
             - ``False``: A ``ValueError`` will be raised.
         """
-        super(ClassRegistry, self).__init__(attr_name, unique)
+        super(ClassRegistry, self).__init__(attr_name)
+
+        self.unique = unique
 
         self._registry = OrderedDict()
 
@@ -333,6 +336,13 @@ class ClassRegistry(MutableRegistry):
         Returns the number of registered classes.
         """
         return len(self._registry)
+
+    def __repr__(self):
+        return '{type}(attr_name={attr_name!r}, unique={unique!r})'.format(
+            attr_name   = self.attr_name,
+            type        = type(self).__name__,
+            unique      = self.unique,
+        )
 
     def get_class(self, key):
         """
