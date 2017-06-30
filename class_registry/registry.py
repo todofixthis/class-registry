@@ -406,6 +406,7 @@ class SortedClassRegistry(ClassRegistry):
             sort_key,                   # type: Union[Text, Callable[[Tuple[Hashable, type], Tuple[Hashable, type]], int]]
             attr_name       = None,     # type: Optional[Text]
             unique          = False,    # type: bool
+            reverse         = False,    # type: bool
     ):
         """
         :param sort_key:
@@ -423,6 +424,9 @@ class SortedClassRegistry(ClassRegistry):
 
             - ``True``: The second class will replace the first one.
             - ``False``: A ``ValueError`` will be raised.
+
+        :param reverse:
+            Whether to reverse the sort ordering.
         """
         super(SortedClassRegistry, self).__init__(attr_name, unique)
 
@@ -432,9 +436,15 @@ class SortedClassRegistry(ClassRegistry):
                 else self.create_sorter(sort_key)
         )
 
+        self.reverse = reverse
+
     def items(self):
         # type: () -> Iterator[Tuple[Hashable, type]]
-        return sorted(iteritems(self._registry), key=self._sort_key)
+        return sorted(
+            iteritems(self._registry),
+                key     = self._sort_key,
+                reverse = self.reverse,
+        )
 
     @staticmethod
     def create_sorter(sort_key):

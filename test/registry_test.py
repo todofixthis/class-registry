@@ -194,7 +194,7 @@ class ClassRegistryTestCase(TestCase):
 
 
 class SortedClassRegistryTestCase(TestCase):
-    def test_sorted_classes(self):
+    def test_sort_key(self):
         """
         When iterating over a SortedClassRegistry, classes are returned
         in sorted order rather than inclusion order.
@@ -225,6 +225,39 @@ class SortedClassRegistryTestCase(TestCase):
         self.assertListEqual(
             list(registry.values()),
             [Bellsprout, Machop, Geodude],
+        )
+
+    def test_sort_key_reverse(self):
+        """
+        Reversing the order of a sort key.
+        """
+        registry =\
+            SortedClassRegistry(
+                attr_name   = 'element',
+                sort_key    = 'weight',
+                reverse     = True,
+            )
+
+        @registry.register
+        class Geodude(Pokemon):
+            element = 'rock'
+            weight  = 100
+
+        @registry.register
+        class Machop(Pokemon):
+            element = 'fighting'
+            weight = 75
+
+        @registry.register
+        class Bellsprout(Pokemon):
+            element = 'grass'
+            weight = 15
+
+        # The registry iterates over registered classes in descending
+        # order by ``weight``.
+        self.assertListEqual(
+            list(registry.values()),
+            [Geodude, Machop, Bellsprout],
         )
 
     def test_cmp_to_key(self):
