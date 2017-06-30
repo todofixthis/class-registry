@@ -36,12 +36,9 @@ if version_info[0] < 3:
 ##
 # Off we go!
 setup(
-    name = 'ClassRegistry',
+    name = 'class-registry',
+    description = 'Factory+Registry pattern for Python classes.',
     url = 'https://class-registry.readthedocs.io/',
-
-    description =
-        'Registry pattern for Python classes, '
-        'with setuptools entry points support!',
 
     version = '2.0.0',
 
