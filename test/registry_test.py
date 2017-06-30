@@ -2,9 +2,10 @@
 from __future__ import absolute_import, division, print_function, \
     unicode_literals
 
+from functools import cmp_to_key
 from unittest import TestCase
 
-from class_registry.registry import RegistryKeyError, ClassRegistry, \
+from class_registry.registry import ClassRegistry, RegistryKeyError, \
     SortedClassRegistry
 from test import Bulbasaur, Charmander, Charmeleon, Pokemon, \
     Squirtle, Wartortle
@@ -198,34 +199,70 @@ class SortedClassRegistryTestCase(TestCase):
         When iterating over a SortedClassRegistry, classes are returned
         in sorted order rather than inclusion order.
         """
-        registry = SortedClassRegistry(
-            # Use the ``widget_type`` attribute to identify each class.
-            attr_name = 'widget_type',
-
-            # Compare the ``weight`` attribute to determine the sort
-            # order.
-            sort_key = lambda t: t[1].weight,
-        )
+        registry =\
+            SortedClassRegistry(
+                attr_name   = 'element',
+                sort_key    = 'weight',
+            )
 
         @registry.register
-        class AlphaWidget(object):
-            widget_type = 'alpha'
-            weight      = 30
+        class Geodude(Pokemon):
+            element = 'rock'
+            weight  = 100
 
         @registry.register
-        class BravoWidget(object):
-            widget_type = 'bravo'
-            weight      = -20
+        class Machop(Pokemon):
+            element = 'fighting'
+            weight = 75
 
         @registry.register
-        class CharlieWidget(object):
-            widget_type = 'charlie'
-            weight      = 0
+        class Bellsprout(Pokemon):
+            element = 'grass'
+            weight = 15
 
-        # When calling one of the iterator functions, the result is
-        # ordered by weight because of the ``cmp_func`` we specified
-        # when creating the SortedClassRegistry.
+        # The registry iterates over registered classes in ascending
+        # order by ``weight``.
         self.assertListEqual(
             list(registry.values()),
-            [BravoWidget, CharlieWidget, AlphaWidget],
+            [Bellsprout, Machop, Geodude],
+        )
+
+    def test_cmp_to_key(self):
+        """
+        If you want to use a ``cmp`` function to define the ordering,
+        you must use the :py:func:`cmp_to_key` function.
+        """
+        def compare_pokemon(a, b):
+            # ``a`` and ``b`` are tuples of ``(key, class)``.
+            return (
+                    (a[1].popularity < b[1].popularity)
+                -   (a[1].popularity > b[1].popularity)
+            )
+
+        registry =\
+            SortedClassRegistry(
+                attr_name   = 'element',
+                sort_key    = cmp_to_key(compare_pokemon),
+            )
+
+        @registry.register
+        class Onix(Pokemon):
+            element = 'rock'
+            popularity = 50
+
+        @registry.register
+        class Cubone(Pokemon):
+            element = 'water'
+            popularity = 100
+
+        @registry.register
+        class Exeggcute(Pokemon):
+            element = 'grass'
+            popularity = 10
+
+        # The registry iterates over registered classes in descending
+        # order by ``popularity``.
+        self.assertListEqual(
+            list(registry.values()),
+            [Cubone, Onix, Exeggcute],
         )

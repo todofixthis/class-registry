@@ -4,6 +4,7 @@ from __future__ import absolute_import, division, print_function, \
 
 from abc import ABCMeta, abstractmethod as abstract_method
 from collections import OrderedDict
+from functools import cmp_to_key
 from inspect import isclass as is_class
 from typing import Any, Callable, Generator, Hashable, Iterator, \
     Mapping, MutableMapping, Optional, Text, Tuple, Union
@@ -402,7 +403,7 @@ class SortedClassRegistry(ClassRegistry):
     """
     def __init__(
             self,
-            sort_key,                   # type: Union[Text, Callable[[Tuple[Hashable, type]], int]]
+            sort_key,                   # type: Union[Text, Callable[[Tuple[Hashable, type], Tuple[Hashable, type]], int]]
             attr_name       = None,     # type: Optional[Text]
             unique          = False,    # type: bool
     ):
@@ -410,7 +411,7 @@ class SortedClassRegistry(ClassRegistry):
         :param sort_key:
             Attribute name or callable, used to determine the sort value.
 
-            If callable, must accept a tuple of (key, class).
+            If callable, must accept two tuples of (key, class).
 
         :param attr_name:
             If provided, :py:meth:`register` will automatically detect
@@ -425,8 +426,27 @@ class SortedClassRegistry(ClassRegistry):
         """
         super(SortedClassRegistry, self).__init__(attr_name, unique)
 
-        self._sort_key = sort_key
+        self._sort_key = (
+            sort_key
+                if callable(sort_key)
+                else self.create_sorter(sort_key)
+        )
 
     def items(self):
         # type: () -> Iterator[Tuple[Hashable, type]]
         return sorted(iteritems(self._registry), key=self._sort_key)
+
+    @staticmethod
+    def create_sorter(sort_key):
+        """
+        Given a sort key, creates a function that can be used to sort
+        items when iterating over the registry.
+        """
+        def sorter(a, b):
+            # type: (Tuple[Hashable, type], Tuple[Hashable, type]) -> int
+            a_attr = getattr(a[1], sort_key)
+            b_attr = getattr(b[1], sort_key)
+
+            return (a_attr > b_attr) - (a_attr < b_attr)
+
+        return cmp_to_key(sorter)
