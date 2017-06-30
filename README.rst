@@ -21,6 +21,8 @@ decorate any classes that you wish to register with its ``register`` method:
 
 .. code-block:: python
 
+   from class_registry import ClassRegistry
+
    pokedex = ClassRegistry()
 
    @pokedex.register('fire')
