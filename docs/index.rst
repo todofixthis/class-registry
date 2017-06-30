@@ -6,7 +6,8 @@ ClassRegistry
    :caption: Contents:
 
    getting_started
-   service_registries
+   factories_vs_registries
+   iterating_over_registries
    entry_points
    advanced_topics
 

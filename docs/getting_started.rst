@@ -165,4 +165,4 @@ corresponding class' initializer.
 
    You can create a registry that always returns the same instance per registry
    key by wrapping it in a :py:class:`ClassRegistryInstanceCache`.  See
-   :doc:`service_registries` for more information.
+   :doc:`factories_vs_registries` for more information.
