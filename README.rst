@@ -1,3 +1,8 @@
+.. image:: https://travis-ci.org/eflglobal/class-registry.svg?branch=master
+   :target: https://travis-ci.org/eflglobal/class-registry
+.. image:: https://readthedocs.org/projects/class-registry/badge/?version=latest
+   :target: http://class-registry.readthedocs.io/
+
 =============
 ClassRegistry
 =============
@@ -29,11 +34,11 @@ decorate any classes that you wish to register with its ``register`` method:
    class Charizard(Pokemon):
      ...
 
-   @pokedex.register('grass'):
+   @pokedex.register('grass')
    class Bulbasaur(Pokemon):
      ...
 
-   @pokedex.register('water'):
+   @pokedex.register('water')
    class Squirtle(Pokemon):
      ...
 
