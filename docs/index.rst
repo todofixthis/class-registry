@@ -43,11 +43,11 @@ decorate any classes that you wish to register with its ``register`` method:
    class Charizard(Pokemon):
      ...
 
-   @pokedex.register('grass'):
+   @pokedex.register('grass')
    class Bulbasaur(Pokemon):
      ...
 
-   @pokedex.register('water'):
+   @pokedex.register('water')
    class Squirtle(Pokemon):
      ...
 
