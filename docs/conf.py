@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# ClassRegistry documentation build configuration file, created by
+# class-registry documentation build configuration file, created by
 # sphinx-quickstart on Wed Jun 28 17:10:35 2017.
 #
 # This file is execfile()d with the current directory set to its
@@ -83,7 +83,7 @@ todo_include_todos = False
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'alabaster'
+# html_theme = 'alabaster'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -100,7 +100,7 @@ html_static_path = ['_static']
 # -- Options for HTMLHelp output ------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'ClassRegistrydoc'
+htmlhelp_basename = 'class-registrydoc'
 
 
 # -- Options for LaTeX output ---------------------------------------------
@@ -127,7 +127,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'ClassRegistry.tex', 'ClassRegistry Documentation',
+    (master_doc, 'class-registry.tex', 'class-registry Documentation',
      'Phoenix Zerin', 'manual'),
 ]
 
@@ -137,7 +137,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'classregistry', 'ClassRegistry Documentation',
+    (master_doc, 'classregistry', 'class-registry Documentation',
      [author], 1)
 ]
 
@@ -148,8 +148,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'ClassRegistry', 'ClassRegistry Documentation',
-     author, 'ClassRegistry', 'One line description of project.',
+    (master_doc, 'class-registry', 'class-registry Documentation',
+     author, 'class-registry', 'One line description of project.',
      'Miscellaneous'),
 ]
 
