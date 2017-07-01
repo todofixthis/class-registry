@@ -354,7 +354,7 @@ class ClassRegistry(MutableRegistry):
         try:
             return self._registry[lookup_key]
         except KeyError:
-            return self.__missing__(key)
+            return self.__missing__(lookup_key)
 
     def items(self):
         # type: () -> Iterator[Tuple[Hashable, type]]
@@ -393,7 +393,12 @@ class ClassRegistry(MutableRegistry):
         """
         Unregisters the class at the specified key.
         """
-        return self._registry.pop(key)
+        return (
+            self._registry.pop(key)
+                if key in self._registry
+                else self.__missing__(key)
+        )
+
 
 
 class SortedClassRegistry(ClassRegistry):

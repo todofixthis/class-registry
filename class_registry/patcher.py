@@ -74,9 +74,11 @@ class RegistryPatcher(object):
 
         # Patch values.
         for key, value in iteritems(self._new_values):
-            if value is self.DoesNotExist:
-                self._del_value(key)
-            else:
+            # Remove the existing value first (prevents issues if the
+            # registry has ``unique=True``).
+            self._del_value(key)
+
+            if value is not self.DoesNotExist:
                 self._set_value(key, value)
 
     def restore(self):
@@ -85,9 +87,11 @@ class RegistryPatcher(object):
         """
         # Restore previous settings.
         for key, value in iteritems(self._prev_values):
-            if value is self.DoesNotExist:
-                self._del_value(key)
-            else:
+            # Remove the existing value first (prevents issues if the
+            # registry has ``unique=True``).
+            self._del_value(key)
+
+            if value is not self.DoesNotExist:
                 self._set_value(key, value)
 
     def _get_value(self, key, default=None):
@@ -100,4 +104,7 @@ class RegistryPatcher(object):
         self.target.register(key)(value)
 
     def _del_value(self, key):
-        self.target.unregister(key)
+        try:
+            self.target.unregister(key)
+        except RegistryKeyError:
+            pass

@@ -4,8 +4,8 @@ from __future__ import absolute_import, division, print_function, \
 
 from unittest import TestCase
 
-from class_registry.registry import RegistryKeyError, ClassRegistry
 from class_registry.patcher import RegistryPatcher
+from class_registry.registry import ClassRegistry, RegistryKeyError
 from test import Bulbasaur, Charmander, Charmeleon, Ivysaur, Squirtle
 
 
@@ -13,7 +13,7 @@ class RegistryPatcherTestCase(TestCase):
     def setUp(self):
         super(RegistryPatcherTestCase, self).setUp()
 
-        self.registry = ClassRegistry(attr_name='element')
+        self.registry = ClassRegistry(attr_name='element', unique=True)
 
     def test_patch_detect_keys(self):
         """
