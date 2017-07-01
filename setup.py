@@ -40,7 +40,7 @@ setup(
     description = 'Factory+Registry pattern for Python classes.',
     url = 'https://class-registry.readthedocs.io/',
 
-    version = '2.0.0',
+    version = '2.0.1',
 
     packages = ['class_registry'],
 
