@@ -5,7 +5,6 @@ from __future__ import absolute_import, division, print_function
 
 from codecs import StreamReader, open
 from os.path import dirname, join, realpath
-from sys import version_info
 
 from setuptools import setup
 
@@ -15,22 +14,6 @@ cwd = dirname(realpath(__file__))
 # Load long description for PyPi.
 with open(join(cwd, 'README.rst'), 'r', 'utf-8') as f: # type: StreamReader
     long_description = f.read()
-
-
-##
-# For compatibility with versions of pip < 9, we will determine
-# dependencies at runtime.
-# Maybe once Travis upgrades their containers to use a newer version,
-# we'll switch to the newer syntax (:
-dependencies = [
-    'six',
-]
-
-if version_info[0] < 3:
-    # noinspection SpellCheckingInspection
-    dependencies.extend([
-        'typing', # 'typing; python_version < "3.0"',
-    ])
 
 
 ##
@@ -46,7 +29,10 @@ setup(
 
     long_description = long_description,
 
-    install_requires = dependencies,
+    install_requires = [
+        'six',
+        'typing; python_version < "3.0"',
+    ],
 
     test_suite    = 'test',
     test_loader   = 'nose.loader:TestLoader',
