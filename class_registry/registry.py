@@ -34,9 +34,6 @@ class BaseRegistry(with_metaclass(ABCMeta, Mapping)):
     """
     Base functionality for registries.
     """
-    def __init__(self):
-        super(BaseRegistry, self).__init__()
-
     def __dir__(self):
         return list(self.keys())
 
