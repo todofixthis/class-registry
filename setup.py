@@ -5,7 +5,6 @@ from __future__ import absolute_import, division, print_function
 
 from codecs import StreamReader, open
 from os.path import dirname, join, realpath
-from sys import version_info
 
 from setuptools import setup
 
@@ -18,35 +17,22 @@ with open(join(cwd, 'README.rst'), 'r', 'utf-8') as f: # type: StreamReader
 
 
 ##
-# For compatibility with versions of pip < 9, we will determine
-# dependencies at runtime.
-# Maybe once Travis upgrades their containers to use a newer version,
-# we'll switch to the newer syntax (:
-dependencies = [
-    'six',
-]
-
-if version_info[0] < 3:
-    # noinspection SpellCheckingInspection
-    dependencies.extend([
-        'typing', # 'typing; python_version < "3.0"',
-    ])
-
-
-##
 # Off we go!
 setup(
     name = 'class-registry',
     description = 'Factory+Registry pattern for Python classes.',
     url = 'https://class-registry.readthedocs.io/',
 
-    version = '2.0.1',
+    version = '2.0.2',
 
     packages = ['class_registry'],
 
     long_description = long_description,
 
-    install_requires = dependencies,
+    install_requires = [
+        'six',
+        'typing; python_version < "3.0"',
+    ],
 
     test_suite    = 'test',
     test_loader   = 'nose.loader:TestLoader',

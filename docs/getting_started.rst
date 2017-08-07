@@ -26,7 +26,7 @@ corresponding registry key:
    sparky = pokedex['fire']
    assert isinstance(sparky, Charizard)
 
-Note in the above example that ``sparky`` is an _instance_ of ``Charizard``.
+Note in the above example that ``sparky`` is an `instance` of ``Charizard``.
 
 If you try to access a registry key that has no classes registered, it will
 raise a :py:class:`class_registry.RegistryKeyError`:
