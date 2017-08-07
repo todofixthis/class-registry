@@ -18,16 +18,25 @@ class EntryPointClassRegistry(BaseRegistry):
     """
     A class registry that loads classes using setuptools entry points.
     """
-    def __init__(self, group):
-        # type: (Text) -> None
+    def __init__(self, group, attr_name=None):
+        # type: (Text, Optional[Text]) -> None
         """
         :param group:
             The name of the entry point group that will be used to load
             new classes.
+
+        :param attr_name:
+            If set, the registry will "brand" each class with its
+            corresponding registry key.  This makes it easier to
+            perform reverse lookups later.
+
+            Note: if a class already defines this attribute, the
+            registry will overwrite it!
         """
         super(EntryPointClassRegistry, self).__init__()
 
-        self.group = group
+        self.attr_name  = attr_name
+        self.group      = group
 
         self._cache = None # type: Optional[Dict[Text, type]]
         """
@@ -46,9 +55,14 @@ class EntryPointClassRegistry(BaseRegistry):
 
     def get_class(self, key):
         try:
-            return self._get_cache()[key]
+            cls = self._get_cache()[key]
         except KeyError:
-            return self.__missing__(key)
+            cls = self.__missing__(key)
+
+        if self.attr_name:
+            setattr(cls, self.attr_name, key)
+
+        return cls
 
     def items(self):
         return iteritems(self._get_cache())

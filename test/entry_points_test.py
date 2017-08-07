@@ -50,6 +50,19 @@ class EntryPointClassRegistryTestCase(TestCase):
         self.assertIsInstance(psychic, Mew)
         self.assertEqual(psychic.name, 'snuggles')
 
+    def test_branding(self):
+        """
+        Configuring the registry to "brand" each class with its
+        corresponding key.
+        """
+        registry = EntryPointClassRegistry('pokemon', attr_name='poke_type')
+
+        fire_type = registry.get_class('fire')
+        self.assertEqual(getattr(fire_type, 'poke_type'), 'fire')
+
+        water = registry['water']
+        self.assertEqual(getattr(water, 'poke_type'), 'water')
+
     def test_len(self):
         """
         Getting the length of an entry point class registry.
