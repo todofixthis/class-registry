@@ -75,7 +75,7 @@ class ClassRegistryInstanceCache(object):
         return self._cache[cache_key]
 
     def __iter__(self):
-        # type: () -> Generator[Hashable]
+        # type: () -> Generator[Any]
         """
         Returns a generator for iterating over cached instances, using
         the wrapped registry to determine sort order.
