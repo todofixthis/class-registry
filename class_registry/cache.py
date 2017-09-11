@@ -55,24 +55,24 @@ class ClassRegistryInstanceCache(object):
         """
         Returns the cached instance associated with the specified key.
         """
-        cache_key = self.gen_cache_key(key)
+        instance_key = self.get_instance_key(key)
 
-        if cache_key not in self._cache:
-            lookup_key = self.gen_lookup_key(key)
+        if instance_key not in self._cache:
+            class_key = self.get_class_key(key)
 
             # Map lookup keys to cache keys so that we can iterate over
             # them in the correct order.
             # :py:meth:`__iter__`
-            self._key_map[lookup_key].append(cache_key)
+            self._key_map[class_key].append(instance_key)
 
-            self._cache[cache_key] =\
+            self._cache[instance_key] =\
                 self._registry.get(
-                    lookup_key,
+                    class_key,
                     *self._template_args,
                     **self._template_kwargs
                 )
 
-        return self._cache[cache_key]
+        return self._cache[instance_key]
 
     def __iter__(self):
         # type: () -> Generator[Any]
@@ -97,7 +97,7 @@ class ClassRegistryInstanceCache(object):
         for key in iterkeys(self._registry):
             self.__getitem__(key)
 
-    def gen_cache_key(self, key):
+    def get_instance_key(self, key):
         # type: (Any) -> Hashable
         """
         Generates a key that can be used to store/lookup values in the
@@ -106,9 +106,9 @@ class ClassRegistryInstanceCache(object):
         :param key:
             Value provided to :py:meth:`__getitem__`.
         """
-        return self.gen_lookup_key(key)
+        return self.get_class_key(key)
 
-    def gen_lookup_key(self, key):
+    def get_class_key(self, key):
         # type: (Any) -> Hashable
         """
         Generates a key that can be used to store/lookup values in the
