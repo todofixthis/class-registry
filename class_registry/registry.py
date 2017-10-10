@@ -112,7 +112,7 @@ class BaseRegistry(with_metaclass(ABCMeta, Mapping)):
 
     @staticmethod
     def create_instance(class_, *args, **kwargs):
-        # type: (type, ...) -> Any
+        # type: (type, *Any, **Any) -> Any
         """
         Prepares the return value for :py:meth:`get`.
 

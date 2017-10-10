@@ -2,6 +2,8 @@
 from __future__ import absolute_import, division, print_function, \
     unicode_literals
 
+from typing import Any
+
 from six import iteritems
 
 from class_registry.registry import MutableRegistry, RegistryKeyError
@@ -25,7 +27,7 @@ class RegistryPatcher(object):
         pass
 
     def __init__(self, registry, *args, **kwargs):
-        # type: (MutableRegistry, ...) -> None
+        # type: (MutableRegistry, *Any, **Any) -> None
         """
         :param registry:
             A :py:class:`MutableRegistry` instance to patch.

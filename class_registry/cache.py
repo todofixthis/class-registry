@@ -28,7 +28,7 @@ class ClassRegistryInstanceCache(object):
     both the ClassRegistry and the ClassRegistryInstanceCache.
     """
     def __init__(self, class_registry, *args, **kwargs):
-        # type: (ClassRegistry, ...) -> None
+        # type: (ClassRegistry, *Any, **Any) -> None
         """
         :param class_registry:
             The wrapped ClassRegistry.
