@@ -7,8 +7,9 @@ python:
 install: pip install .
 script: python setup.py test
 deploy:
-  on:
-    branch: master
+- on:
+    python: '3.6'
+    tags: true
   provider: pypi
   distributions: 'bdist_wheel sdist'
   user: efl_phx
