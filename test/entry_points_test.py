@@ -52,7 +52,7 @@ class EntryPointClassRegistryTestCase(TestCase):
 
     def test_branding(self):
         """
-        Configuring the registry to "brand" each instance with its
+        Configuring the registry to "brand" each class/instance with its
         corresponding key.
         """
         registry = EntryPointClassRegistry('pokemon', attr_name='poke_type')
