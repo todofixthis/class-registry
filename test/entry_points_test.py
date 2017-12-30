@@ -8,7 +8,7 @@ from unittest import TestCase
 from pkg_resources import iter_entry_points, working_set
 
 from class_registry import EntryPointClassRegistry, RegistryKeyError
-from test import Bulbasaur, Charmander, Mew, Squirtle, PokemonFactory
+from test import Bulbasaur, Charmander, Mew, PokemonFactory, Squirtle
 
 
 def setUpModule():
