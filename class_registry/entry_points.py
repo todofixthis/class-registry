@@ -49,17 +49,6 @@ class EntryPointClassRegistry(BaseRegistry):
         if self.attr_name:
             self._get_cache()
 
-    def __getitem__(self, key):
-        instance = super(EntryPointClassRegistry, self).__getitem__(key)
-
-        if self.attr_name:
-            # Apply branding to the instance explicitly.
-            # This is particularly important if the corresponding entry
-            # point references a function or method.
-            setattr(instance, self.attr_name, key)
-
-        return instance
-
     def __len__(self):
         return len(self._get_cache())
 
@@ -68,6 +57,18 @@ class EntryPointClassRegistry(BaseRegistry):
             group   = self.group,
             type    = type(self).__name__,
         )
+
+    def get(self, key, *args, **kwargs):
+        instance =\
+            super(EntryPointClassRegistry, self).get(key, *args, **kwargs)
+
+        if self.attr_name:
+            # Apply branding to the instance explicitly.
+            # This is particularly important if the corresponding entry
+            # point references a function or method.
+            setattr(instance, self.attr_name, key)
+
+        return instance
 
     def get_class(self, key):
         try:

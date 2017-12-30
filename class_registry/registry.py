@@ -226,7 +226,7 @@ class MutableRegistry(with_metaclass(ABCMeta, BaseRegistry, MutableMapping)):
     def __delitem__(self, key):
         # type: (Hashable) -> None
         """
-        Provides alternate syntax for unregistering a class.
+        Provides alternate syntax for un-registering a class.
         """
         self._unregister(key)
 
