@@ -61,16 +61,19 @@ class EntryPointClassRegistryTestCase(TestCase):
             self.assertEqual(getattr(Charmander, 'poke_type'), 'fire')
             self.assertEqual(getattr(Squirtle, 'poke_type'), 'water')
 
+            # Instances, too!
+            self.assertEqual(registry['fire'].poke_type, 'fire')
+            self.assertEqual(registry.get('water', 'phil').poke_type, 'water')
+
             # Registered functions and methods can't be branded this
-            # way...
+            # way, though...
             self.assertFalse(
                 hasattr(PokemonFactory.create_psychic_pokemon, 'poke_type'),
             )
 
-            # ... but we can still brand individual instances.
-            self.assertEqual(registry['fire'].poke_type, 'fire')
-            self.assertEqual(registry['water'].poke_type, 'water')
+            # ... but we can brand the resulting instances.
             self.assertEqual(registry['psychic'].poke_type, 'psychic')
+            self.assertEqual(registry.get('psychic').poke_type, 'psychic')
         finally:
             # Clean up after ourselves.
             for cls in registry.values():
