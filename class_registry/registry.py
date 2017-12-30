@@ -34,6 +34,20 @@ class BaseRegistry(with_metaclass(ABCMeta, Mapping)):
     """
     Base functionality for registries.
     """
+    def __contains__(self, key):
+        """
+        Returns whether the specified key is registered.
+        """
+        try:
+            # Use :py:meth:`get_class` instead of :py:meth:`__getitem__`
+            # in case the registered class' initializer requires
+            # arguments.
+            self.get_class(key)
+        except RegistryKeyError:
+            return False
+        else:
+            return True
+
     def __dir__(self):
         return list(self.keys())
 
