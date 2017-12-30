@@ -192,6 +192,22 @@ class ClassRegistryTestCase(TestCase):
         self.assertIsInstance(poke, Charmeleon)
         self.assertEqual(poke.name, 'trogdor')
 
+    def test_contains_when_class_init_requires_arguments(self):
+        """
+        Special case when checking if a class is registered, and that class'
+        initializer requires arguments.
+        """
+        registry = ClassRegistry(attr_name='element')
+
+        @registry.register
+        class Butterfree(Pokemon):
+            element = 'bug'
+
+            def __init__(self, name):
+                super(Butterfree, self).__init__(name)
+
+        self.assertTrue('bug' in registry)
+
 
 class SortedClassRegistryTestCase(TestCase):
     def test_sort_key(self):

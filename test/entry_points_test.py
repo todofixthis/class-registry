@@ -8,7 +8,7 @@ from unittest import TestCase
 from pkg_resources import iter_entry_points, working_set
 
 from class_registry import EntryPointClassRegistry, RegistryKeyError
-from test import Bulbasaur, Charmander, Mew, Squirtle
+from test import Bulbasaur, Charmander, Mew, PokemonFactory, Squirtle
 
 
 def setUpModule():
@@ -52,16 +52,33 @@ class EntryPointClassRegistryTestCase(TestCase):
 
     def test_branding(self):
         """
-        Configuring the registry to "brand" each class with its
+        Configuring the registry to "brand" each class/instance with its
         corresponding key.
         """
         registry = EntryPointClassRegistry('pokemon', attr_name='poke_type')
+        try:
+            # Branding is applied immediately to each registered class.
+            self.assertEqual(getattr(Charmander, 'poke_type'), 'fire')
+            self.assertEqual(getattr(Squirtle, 'poke_type'), 'water')
 
-        fire_type = registry.get_class('fire')
-        self.assertEqual(getattr(fire_type, 'poke_type'), 'fire')
+            # Registered functions and methods can't be branded this
+            # way...
+            self.assertFalse(
+                hasattr(PokemonFactory.create_psychic_pokemon, 'poke_type'),
+            )
 
-        water = registry['water']
-        self.assertEqual(getattr(water, 'poke_type'), 'water')
+            # ... but we can still brand individual instances.
+            self.assertEqual(registry['fire'].poke_type, 'fire')
+            self.assertEqual(registry['water'].poke_type, 'water')
+            self.assertEqual(registry['psychic'].poke_type, 'psychic')
+        finally:
+            # Clean up after ourselves.
+            for cls in registry.values():
+                if isinstance(cls, type):
+                    try:
+                        delattr(cls, 'poke_type')
+                    except AttributeError:
+                        pass
 
     def test_len(self):
         """
