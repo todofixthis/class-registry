@@ -34,6 +34,11 @@ setup(
         'typing; python_version < "3.0"',
     ],
 
+    extras_require = {
+        'docs-builder': ['sphinx', 'sphinx_rtd_theme'],
+        'test-runner': ['detox'],
+    },
+
     test_suite    = 'test',
     test_loader   = 'nose.loader:TestLoader',
     tests_require = ['nose'],
