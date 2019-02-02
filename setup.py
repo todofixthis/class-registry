@@ -30,7 +30,7 @@ setup(
     long_description = long_description,
 
     install_requires = [
-        'six',
+        'six >= 1.4.0',
         'typing; python_version < "3.0"',
     ],
 
