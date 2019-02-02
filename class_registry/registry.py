@@ -6,10 +6,10 @@ from abc import ABCMeta, abstractmethod as abstract_method
 from collections import OrderedDict
 from functools import cmp_to_key
 from inspect import isclass as is_class
-from typing import Any, Callable, Generator, Hashable, Iterator, \
-    Optional, Text, Tuple, Union
+from typing import Any, Callable, Generator, Hashable, Iterator, Mapping, \
+    MutableMapping, Optional, Text, Tuple, Union
 
-from six import PY2, iteritems, with_metaclass
+from six import PY2, add_metaclass, iteritems
 
 __all__ = [
     'BaseRegistry',
@@ -30,13 +30,9 @@ class RegistryKeyError(KeyError):
     pass
 
 
-# This class "should" also derive from Mapping, but this causes a
-# conflict in Python 3.7 because ``with_metaclass()`` creates a type
-# dynamically.
-#
-# See https://bugs.python.org/issue33188 for more information.
 # https://github.com/eflglobal/class-registry/issues/9
-class BaseRegistry(with_metaclass(ABCMeta)):
+@add_metaclass(ABCMeta)
+class BaseRegistry(Mapping):
     """
     Base functionality for registries.
     """
@@ -213,13 +209,9 @@ class BaseRegistry(with_metaclass(ABCMeta)):
             return self.values()
 
 
-# This class "should" also derive from MutableMapping, but this causes a
-# conflict in Python 3.7 because ``with_metaclass()`` creates a type
-# dynamically.
-#
-# See https://bugs.python.org/issue33188 for more information.
 # https://github.com/eflglobal/class-registry/issues/9
-class MutableRegistry(with_metaclass(ABCMeta, BaseRegistry)):
+@add_metaclass(ABCMeta)
+class MutableRegistry(BaseRegistry, MutableMapping):
     """
     Extends :py:class:`BaseRegistry` with methods that can be used to
     modify the registered classes.
