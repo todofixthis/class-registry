@@ -73,7 +73,7 @@ For more advanced usage, check out the documentation on `ReadTheDocs`_!
 Requirements
 ------------
 
-ClassRegistry is compatible with Python versions 3.6, 3.5 and 2.7.
+ClassRegistry is compatible with Python versions 3.7, 3.6, 3.5 and 2.7.
 
 
 Installation
@@ -97,11 +97,20 @@ To run the unit tests, it is recommended that you use the `detox`_ library.
 detox speeds up the tests by running them in parallel.
 
 Install the package with the ``test-runner`` extra to set up the necessary
-dependencies, and then you can run the tests with the ``detox`` command::
+dependencies, and then you can run the tests with the ``tox`` command::
 
   pip install -e .[test-runner]
-  detox -v
+  tox
 
+.. tip::
+  To run tests for multiple Python versions in parallel::
+
+    # Python 3.7 only
+    tox -p all
+
+    # Python 3.6 or earlier
+    pip install detox
+    detox
 
 Documentation
 -------------

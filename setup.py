@@ -36,7 +36,7 @@ setup(
 
     extras_require = {
         'docs-builder': ['sphinx', 'sphinx_rtd_theme'],
-        'test-runner': ['detox'],
+        'test-runner': ['tox'],
     },
 
     test_suite    = 'test',
@@ -54,6 +54,7 @@ setup(
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
         'Topic :: Software Development :: Libraries :: Python Modules',
     ],
 
