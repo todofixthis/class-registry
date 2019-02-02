@@ -6,10 +6,10 @@ from abc import ABCMeta, abstractmethod as abstract_method
 from collections import OrderedDict
 from functools import cmp_to_key
 from inspect import isclass as is_class
-from typing import Any, Callable, Generator, Hashable, Iterator, \
-    Mapping, MutableMapping, Optional, Text, Tuple, Union
+from typing import Any, Callable, Generator, Hashable, Iterator, Mapping, \
+    MutableMapping, Optional, Text, Tuple, Union
 
-from six import PY2, iteritems, with_metaclass
+from six import PY2, add_metaclass, iteritems
 
 __all__ = [
     'BaseRegistry',
@@ -30,7 +30,9 @@ class RegistryKeyError(KeyError):
     pass
 
 
-class BaseRegistry(with_metaclass(ABCMeta, Mapping)):
+# https://github.com/eflglobal/class-registry/issues/9
+@add_metaclass(ABCMeta)
+class BaseRegistry(Mapping):
     """
     Base functionality for registries.
     """
@@ -207,7 +209,9 @@ class BaseRegistry(with_metaclass(ABCMeta, Mapping)):
             return self.values()
 
 
-class MutableRegistry(with_metaclass(ABCMeta, BaseRegistry, MutableMapping)):
+# https://github.com/eflglobal/class-registry/issues/9
+@add_metaclass(ABCMeta)
+class MutableRegistry(BaseRegistry, MutableMapping):
     """
     Extends :py:class:`BaseRegistry` with methods that can be used to
     modify the registered classes.
