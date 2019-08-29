@@ -89,5 +89,5 @@ Installation
 ------------
 Install the latest stable version via pip::
 
-   pip install class-registry
+   pip install phx-class-registry
 

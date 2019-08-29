@@ -17,7 +17,7 @@ setup(
     description='Factory+Registry pattern for Python classes.',
     url='https://class-registry.readthedocs.io/',
 
-    version='3.0.3',
+    version='3.0.4',
 
     packages=['class_registry'],
 
@@ -27,7 +27,7 @@ setup(
 
     extras_require={
         'docs-builder': ['sphinx', 'sphinx_rtd_theme'],
-        'test-runner':  ['detox'],
+        'test-runner':  ['tox >= 3.7'],
     },
 
     test_suite='test',
@@ -45,6 +45,7 @@ setup(
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: Implementation :: PyPy',
         'Topic :: Software Development :: Libraries :: Python Modules',
     ],
 

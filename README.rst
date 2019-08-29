@@ -3,7 +3,6 @@
 .. image:: https://readthedocs.org/projects/class-registry/badge/?version=latest
    :target: http://class-registry.readthedocs.io/
 
-=============
 ClassRegistry
 =============
 At the intersection of the Registry and Factory patterns lies the
@@ -84,7 +83,7 @@ Installation
 ------------
 Install the latest stable version via pip::
 
-   pip install class-registry
+   pip install phx-class-registry
 
 
 Running Unit Tests
@@ -103,7 +102,7 @@ Install the package with the ``test-runner`` extra to set up the necessary
 dependencies, and then you can run the tests with the ``detox`` command::
 
   pip install -e .[test-runner]
-  detox
+  tox -p all
 
 Documentation
 -------------
