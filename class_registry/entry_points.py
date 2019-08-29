@@ -1,11 +1,6 @@
-# coding=utf-8
-from __future__ import absolute_import, division, print_function, \
-    unicode_literals
-
-from typing import Dict, Optional, Text
+import typing
 
 from pkg_resources import iter_entry_points
-from six import iteritems
 
 from class_registry import BaseRegistry
 
@@ -18,8 +13,12 @@ class EntryPointClassRegistry(BaseRegistry):
     """
     A class registry that loads classes using setuptools entry points.
     """
-    def __init__(self, group, attr_name=None):
-        # type: (Text, Optional[Text]) -> None
+
+    def __init__(
+            self,
+            group: str,
+            attr_name: typing.Optional[str] = None,
+    ) -> None:
         """
         :param group:
             The name of the entry point group that will be used to load
@@ -35,10 +34,10 @@ class EntryPointClassRegistry(BaseRegistry):
         """
         super(EntryPointClassRegistry, self).__init__()
 
-        self.attr_name  = attr_name
-        self.group      = group
+        self.attr_name = attr_name
+        self.group = group
 
-        self._cache = None # type: Optional[Dict[Text, type]]
+        self._cache = None  # type: typing.Optional[typing.Dict[str, type]]
         """
         Caches registered classes locally, so that we don't have to
         keep iterating over entry points.
@@ -54,12 +53,12 @@ class EntryPointClassRegistry(BaseRegistry):
 
     def __repr__(self):
         return '{type}(group={group!r})'.format(
-            group   = self.group,
-            type    = type(self).__name__,
+            group=self.group,
+            type=type(self).__name__,
         )
 
     def get(self, key, *args, **kwargs):
-        instance =\
+        instance = \
             super(EntryPointClassRegistry, self).get(key, *args, **kwargs)
 
         if self.attr_name:
@@ -79,7 +78,7 @@ class EntryPointClassRegistry(BaseRegistry):
         return cls
 
     def items(self):
-        return iteritems(self._get_cache())
+        return self._get_cache().items()
 
     def refresh(self):
         """
@@ -91,8 +90,7 @@ class EntryPointClassRegistry(BaseRegistry):
         """
         self._cache = None
 
-    def _get_cache(self):
-        # type: () -> Dict[Text, type]
+    def _get_cache(self) -> typing.Dict[str, type]:
         """
         Populates the cache (if necessary) and returns it.
         """
@@ -109,5 +107,4 @@ class EntryPointClassRegistry(BaseRegistry):
 
                 self._cache[e.name] = cls
 
-        # noinspection PyTypeChecker
         return self._cache

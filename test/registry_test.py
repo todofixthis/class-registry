@@ -1,7 +1,3 @@
-# coding=utf-8
-from __future__ import absolute_import, division, print_function, \
-    unicode_literals
-
 from functools import cmp_to_key
 from unittest import TestCase
 
@@ -153,7 +149,7 @@ class ClassRegistryTestCase(TestCase):
 
         # Goofus uses positional arguments, which are magical and
         # make his code more difficult to read.
-        goofus  = registry.get('grass', 'goofus')
+        goofus = registry.get('grass', 'goofus')
 
         # Gallant uses keyword arguments, producing self-documenting
         # code and being courteous to his fellow developers.
@@ -215,16 +211,16 @@ class SortedClassRegistryTestCase(TestCase):
         When iterating over a SortedClassRegistry, classes are returned
         in sorted order rather than inclusion order.
         """
-        registry =\
+        registry = \
             SortedClassRegistry(
-                attr_name   = 'element',
-                sort_key    = 'weight',
+                attr_name='element',
+                sort_key='weight',
             )
 
         @registry.register
         class Geodude(Pokemon):
             element = 'rock'
-            weight  = 100
+            weight = 100
 
         @registry.register
         class Machop(Pokemon):
@@ -247,17 +243,17 @@ class SortedClassRegistryTestCase(TestCase):
         """
         Reversing the order of a sort key.
         """
-        registry =\
+        registry = \
             SortedClassRegistry(
-                attr_name   = 'element',
-                sort_key    = 'weight',
-                reverse     = True,
+                attr_name='element',
+                sort_key='weight',
+                reverse=True,
             )
 
         @registry.register
         class Geodude(Pokemon):
             element = 'rock'
-            weight  = 100
+            weight = 100
 
         @registry.register
         class Machop(Pokemon):
@@ -281,17 +277,18 @@ class SortedClassRegistryTestCase(TestCase):
         If you want to use a ``cmp`` function to define the ordering,
         you must use the :py:func:`cmp_to_key` function.
         """
+
         def compare_pokemon(a, b):
             # ``a`` and ``b`` are tuples of ``(key, class)``.
             return (
                     (a[1].popularity < b[1].popularity)
-                -   (a[1].popularity > b[1].popularity)
+                    - (a[1].popularity > b[1].popularity)
             )
 
-        registry =\
+        registry = \
             SortedClassRegistry(
-                attr_name   = 'element',
-                sort_key    = cmp_to_key(compare_pokemon),
+                attr_name='element',
+                sort_key=cmp_to_key(compare_pokemon),
             )
 
         @registry.register

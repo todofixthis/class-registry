@@ -1,13 +1,11 @@
-.. image:: https://travis-ci.org/eflglobal/class-registry.svg?branch=master
-   :target: https://travis-ci.org/eflglobal/class-registry
+.. image:: https://travis-ci.org/todofixthis/class-registry.svg?branch=master
+   :target: https://travis-ci.org/todofixthis/class-registry
 .. image:: https://readthedocs.org/projects/class-registry/badge/?version=latest
    :target: http://class-registry.readthedocs.io/
-
 
 =============
 ClassRegistry
 =============
-
 At the intersection of the Registry and Factory patterns lies the
 ``ClassRegistry``:
 
@@ -21,7 +19,6 @@ At the intersection of the Registry and Factory patterns lies the
 
 Getting Started
 ---------------
-
 Create a registry using the ``class_registry.ClassRegistry`` class, then
 decorate any classes that you wish to register with its ``register`` method:
 
@@ -57,7 +54,6 @@ To create a class instance from a registry, use the subscript operator:
 
 Advanced Usage
 ~~~~~~~~~~~~~~
-
 There's a whole lot more you can do with ClassRegistry, including:
 
 - Provide args and kwargs to new class instances.
@@ -72,13 +68,20 @@ For more advanced usage, check out the documentation on `ReadTheDocs`_!
 
 Requirements
 ------------
+ClassRegistry is compatible with the following Python versions:
 
-ClassRegistry is compatible with Python versions 3.7, 3.6, 3.5 and 2.7.
+- 3.8
+- 3.7
+- 3.6
+- 3.5
 
+pypy3 is also supported.
+
+.. note::
+  ClassRegistry is **not** compatible with Python 2.
 
 Installation
 ------------
-
 Install the latest stable version via pip::
 
    pip install class-registry
@@ -97,20 +100,10 @@ To run the unit tests, it is recommended that you use the `detox`_ library.
 detox speeds up the tests by running them in parallel.
 
 Install the package with the ``test-runner`` extra to set up the necessary
-dependencies, and then you can run the tests with the ``tox`` command::
+dependencies, and then you can run the tests with the ``detox`` command::
 
   pip install -e .[test-runner]
-  tox
-
-.. tip::
-  To run tests for multiple Python versions in parallel::
-
-    # Python 3.7 only
-    tox -p all
-
-    # Python 3.6 or earlier
-    pip install detox
-    detox
+  detox
 
 Documentation
 -------------

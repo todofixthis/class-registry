@@ -1,11 +1,7 @@
-# coding=utf-8
-from __future__ import absolute_import, division, print_function, \
-    unicode_literals
-
 from unittest import TestCase
 
-from class_registry.registry import ClassRegistry
 from class_registry.cache import ClassRegistryInstanceCache
+from class_registry.registry import ClassRegistry
 from test import Bulbasaur, Charmander, Charmeleon, Squirtle, Wartortle
 
 

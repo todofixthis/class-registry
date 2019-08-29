@@ -1,15 +1,8 @@
-# coding=utf-8
-from __future__ import absolute_import, division, print_function, \
-    unicode_literals
-
+import typing
 from abc import ABCMeta, abstractmethod as abstract_method
 from collections import OrderedDict
 from functools import cmp_to_key
 from inspect import isclass as is_class
-from typing import Any, Callable, Generator, Hashable, Iterator, Mapping, \
-    MutableMapping, Optional, Text, Tuple, Union
-
-from six import PY2, add_metaclass, iteritems
 
 __all__ = [
     'BaseRegistry',
@@ -30,12 +23,11 @@ class RegistryKeyError(KeyError):
     pass
 
 
-# https://github.com/eflglobal/class-registry/issues/9
-@add_metaclass(ABCMeta)
-class BaseRegistry(Mapping):
+class BaseRegistry(typing.Mapping, metaclass=ABCMeta):
     """
     Base functionality for registries.
     """
+
     def __contains__(self, key):
         """
         Returns whether the specified key is registered.
@@ -60,7 +52,6 @@ class BaseRegistry(Mapping):
         return self.get(key)
 
     def __iter__(self):
-        # type: () -> Generator[Hashable]
         """
         Returns a generator for iterating over registry keys, in the
         order that they were registered.
@@ -69,7 +60,6 @@ class BaseRegistry(Mapping):
 
     @abstract_method
     def __len__(self):
-        # type: () -> int
         """
         Returns the number of registered classes.
         """
@@ -116,8 +106,7 @@ class BaseRegistry(Mapping):
         return self.create_instance(self.get_class(key), *args, **kwargs)
 
     @staticmethod
-    def gen_lookup_key(key):
-        # type: (Any) -> Hashable
+    def gen_lookup_key(key: typing.Any) -> typing.Hashable:
         """
         Used by :py:meth:`get` to generate a lookup key.
 
@@ -127,8 +116,7 @@ class BaseRegistry(Mapping):
         return key
 
     @staticmethod
-    def create_instance(class_, *args, **kwargs):
-        # type: (type, *Any, **Any) -> Any
+    def create_instance(class_: type, *args, **kwargs):
         """
         Prepares the return value for :py:meth:`get`.
 
@@ -147,8 +135,7 @@ class BaseRegistry(Mapping):
         return class_(*args, **kwargs)
 
     @abstract_method
-    def items(self):
-        # type: () -> Generator[Tuple[Hashable, type]]
+    def items(self) -> typing.Iterable[typing.Tuple[typing.Hashable, type]]:
         """
         Iterates over registered classes and their corresponding keys,
         in the order that they were registered.
@@ -160,8 +147,7 @@ class BaseRegistry(Mapping):
             'Not implemented in {cls}.'.format(cls=type(self).__name__),
         )
 
-    def keys(self):
-        # type: () -> Generator[Hashable]
+    def keys(self) -> typing.Iterable[typing.Hashable]:
         """
         Returns a generator for iterating over registry keys, in the
         order that they were registered.
@@ -172,8 +158,7 @@ class BaseRegistry(Mapping):
         for item in self.items():
             yield item[0]
 
-    def values(self):
-        # type: () -> Generator[type]
+    def values(self) -> typing.Iterable[type]:
         """
         Returns a generator for iterating over registered classes, in
         the order that they were registered.
@@ -184,40 +169,18 @@ class BaseRegistry(Mapping):
         for item in self.items():
             yield item[1]
 
-    # Add some compatibility aliases to make class registries behave
-    # more like dicts in Python 2.
-    if PY2:
-        def iteritems(self):
-            """
-            Included for compatibility with :py:data:`six.iteritems`.
-            Do not invoke directly!
-            """
-            return self.items()
 
-        def iterkeys(self):
-            """
-            Included for compatibility with :py:data:`six.iterkeys`.
-            Do not invoke directly!
-            """
-            return self.keys()
-
-        def itervalues(self):
-            """
-            Included for compatibility with :py:data:`six.itervalues`.
-            Do not invoke directly!
-            """
-            return self.values()
-
-
-# https://github.com/eflglobal/class-registry/issues/9
-@add_metaclass(ABCMeta)
-class MutableRegistry(BaseRegistry, MutableMapping):
+class MutableRegistry(
+    BaseRegistry,
+    typing.MutableMapping,
+    metaclass=ABCMeta,
+):
     """
     Extends :py:class:`BaseRegistry` with methods that can be used to
     modify the registered classes.
     """
-    def __init__(self, attr_name=None):
-        # type: (Optional[Text]) -> None
+
+    def __init__(self, attr_name: typing.Optional[str] = None) -> None:
         """
         :param attr_name:
             If provided, :py:meth:`register` will automatically detect
@@ -227,8 +190,7 @@ class MutableRegistry(BaseRegistry, MutableMapping):
 
         self.attr_name = attr_name
 
-    def __delitem__(self, key):
-        # type: (Hashable) -> None
+    def __delitem__(self, key: typing.Hashable) -> None:
         """
         Provides alternate syntax for un-registering a class.
         """
@@ -236,12 +198,11 @@ class MutableRegistry(BaseRegistry, MutableMapping):
 
     def __repr__(self):
         return '{type}({attr_name!r})'.format(
-            attr_name   = self.attr_name,
-            type        = type(self).__name__,
+            attr_name=self.attr_name,
+            type=type(self).__name__,
         )
 
-    def __setitem__(self, key, class_):
-        # type: (Text, type) -> None
+    def __setitem__(self, key: str, class_: type) -> None:
         """
         Provides alternate syntax for registering a class.
         """
@@ -281,10 +242,10 @@ class MutableRegistry(BaseRegistry, MutableMapping):
         def _decorator(cls):
             self._register(key, cls)
             return cls
+
         return _decorator
 
-    def unregister(self, key):
-        # type: (Any) -> type
+    def unregister(self, key: typing.Any) -> type:
         """
         Unregisters the class with the specified key.
 
@@ -300,8 +261,7 @@ class MutableRegistry(BaseRegistry, MutableMapping):
         return self._unregister(self.gen_lookup_key(key))
 
     @abstract_method
-    def _register(self, key, class_):
-        # type: (Hashable, type) -> None
+    def _register(self, key: typing.Hashable, class_: type) -> None:
         """
         Registers a class with the registry.
         """
@@ -310,8 +270,7 @@ class MutableRegistry(BaseRegistry, MutableMapping):
         )
 
     @abstract_method
-    def _unregister(self, key):
-        # type: (Hashable) -> type
+    def _unregister(self, key: typing.Hashable) -> type:
         """
         Unregisters the class at the specified key.
         """
@@ -320,14 +279,17 @@ class MutableRegistry(BaseRegistry, MutableMapping):
         )
 
 
-
 class ClassRegistry(MutableRegistry):
     """
     Maintains a registry of classes and provides a generic factory for
     instantiating them.
     """
-    def __init__(self, attr_name=None, unique=False):
-        # type: (Optional[Text], bool) -> None
+
+    def __init__(
+            self,
+            attr_name: typing.Optional[str] = None,
+            unique: bool = False,
+    ) -> None:
         """
         :param attr_name:
             If provided, :py:meth:`register` will automatically detect
@@ -347,7 +309,6 @@ class ClassRegistry(MutableRegistry):
         self._registry = OrderedDict()
 
     def __len__(self):
-        # type: () -> int
         """
         Returns the number of registered classes.
         """
@@ -355,9 +316,9 @@ class ClassRegistry(MutableRegistry):
 
     def __repr__(self):
         return '{type}(attr_name={attr_name!r}, unique={unique!r})'.format(
-            attr_name   = self.attr_name,
-            type        = type(self).__name__,
-            unique      = self.unique,
+            attr_name=self.attr_name,
+            type=type(self).__name__,
+            unique=self.unique,
         )
 
     def get_class(self, key):
@@ -371,16 +332,14 @@ class ClassRegistry(MutableRegistry):
         except KeyError:
             return self.__missing__(lookup_key)
 
-    def items(self):
-        # type: () -> Iterator[Tuple[Hashable, type]]
+    def items(self) -> typing.Iterable[typing.Tuple[typing.Hashable, str]]:
         """
         Iterates over all registered classes, in the order they were
         added.
         """
-        return iteritems(self._registry)
+        return self._registry.items()
 
-    def _register(self, key, class_):
-        # type: (Hashable, type) -> None
+    def _register(self, key: typing.Hashable, class_: type) -> None:
         """
         Registers a class with the registry.
         """
@@ -388,32 +347,30 @@ class ClassRegistry(MutableRegistry):
             raise ValueError(
                 'Attempting to register class {cls} '
                 'with empty registry key {key!r}.'.format(
-                    cls = class_.__name__,
-                    key = key,
+                    cls=class_.__name__,
+                    key=key,
                 ),
             )
 
         if self.unique and (key in self._registry):
             raise RegistryKeyError(
                 '{cls} with key {key!r} is already registered.'.format(
-                    cls = class_.__name__,
-                    key = key,
+                    cls=class_.__name__,
+                    key=key,
                 ),
             )
 
         self._registry[key] = class_
 
-    def _unregister(self, key):
-        # type: (Hashable) -> type
+    def _unregister(self, key: typing.Hashable) -> type:
         """
         Unregisters the class at the specified key.
         """
         return (
             self._registry.pop(key)
-                if key in self._registry
-                else self.__missing__(key)
+            if key in self._registry
+            else self.__missing__(key)
         )
-
 
 
 class SortedClassRegistry(ClassRegistry):
@@ -421,13 +378,23 @@ class SortedClassRegistry(ClassRegistry):
     A ClassRegistry that uses a function to determine sort order when
     iterating.
     """
+
     def __init__(
             self,
-            sort_key,                   # type: Union[Text, Callable[[Tuple[Hashable, type], Tuple[Hashable, type]], int]]
-            attr_name       = None,     # type: Optional[Text]
-            unique          = False,    # type: bool
-            reverse         = False,    # type: bool
-    ):
+            sort_key: typing.Union[
+                str,
+                typing.Callable[
+                    [
+                        typing.Tuple[typing.Hashable, type],
+                        typing.Tuple[typing.Hashable, type]
+                    ],
+                    int,
+                ],
+            ],
+            attr_name: typing.Optional[str] = None,
+            unique: bool = False,
+            reverse: bool = False,
+    ) -> None:
         """
         :param sort_key:
             Attribute name or callable, used to determine the sort value.
@@ -452,18 +419,17 @@ class SortedClassRegistry(ClassRegistry):
 
         self._sort_key = (
             sort_key
-                if callable(sort_key)
-                else self.create_sorter(sort_key)
+            if callable(sort_key)
+            else self.create_sorter(sort_key)
         )
 
         self.reverse = reverse
 
-    def items(self):
-        # type: () -> Iterator[Tuple[Hashable, type]]
+    def items(self) -> typing.Iterable[typing.Tuple[typing.Hashable, type]]:
         return sorted(
-            iteritems(self._registry),
-                key     = self._sort_key,
-                reverse = self.reverse,
+            self._registry.items(),
+            key=self._sort_key,
+            reverse=self.reverse,
         )
 
     @staticmethod
@@ -472,8 +438,8 @@ class SortedClassRegistry(ClassRegistry):
         Given a sort key, creates a function that can be used to sort
         items when iterating over the registry.
         """
+
         def sorter(a, b):
-            # type: (Tuple[Hashable, type], Tuple[Hashable, type]) -> int
             a_attr = getattr(a[1], sort_key)
             b_attr = getattr(b[1], sort_key)
 

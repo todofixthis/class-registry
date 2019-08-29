@@ -1,11 +1,5 @@
-# coding=utf-8
-from __future__ import absolute_import, division, print_function, \
-    unicode_literals
-
+import typing
 from collections import defaultdict
-from typing import Any, Dict, Generator, Hashable
-
-from six import iterkeys
 
 from class_registry import ClassRegistry
 
@@ -27,8 +21,8 @@ class ClassRegistryInstanceCache(object):
     any classes that are registered afterward are accessible to
     both the ClassRegistry and the ClassRegistryInstanceCache.
     """
-    def __init__(self, class_registry, *args, **kwargs):
-        # type: (ClassRegistry, *Any, **Any) -> None
+
+    def __init__(self, class_registry: ClassRegistry, *args, **kwargs) -> None:
         """
         :param class_registry:
             The wrapped ClassRegistry.
@@ -43,13 +37,15 @@ class ClassRegistryInstanceCache(object):
         """
         super(ClassRegistryInstanceCache, self).__init__()
 
-        self._registry  = class_registry
-        self._cache     = {}
+        self._registry = class_registry
+        self._cache = {}
 
-        self._key_map = defaultdict(list) # type: Dict[Hashable, list]
+        self._key_map = defaultdict(
+            list,
+        )  # type: typing.Dict[typing.Hashable, list]
 
-        self._template_args     = args
-        self._template_kwargs   = kwargs
+        self._template_args = args
+        self._template_kwargs = kwargs
 
     def __getitem__(self, key):
         """
@@ -65,7 +61,7 @@ class ClassRegistryInstanceCache(object):
             # :py:meth:`__iter__`
             self._key_map[class_key].append(instance_key)
 
-            self._cache[instance_key] =\
+            self._cache[instance_key] = \
                 self._registry.get(
                     class_key,
                     *self._template_args,
@@ -74,15 +70,14 @@ class ClassRegistryInstanceCache(object):
 
         return self._cache[instance_key]
 
-    def __iter__(self):
-        # type: () -> Generator[Any]
+    def __iter__(self) -> typing.Generator[typing.Any, None, None]:
         """
         Returns a generator for iterating over cached instances, using
         the wrapped registry to determine sort order.
 
         If a key has not been accessed yet, it will not be included.
         """
-        for lookup_key in iterkeys(self._registry):
+        for lookup_key in self._registry.keys():
             for cache_key in self._key_map[lookup_key]:
                 yield self._cache[cache_key]
 
@@ -94,11 +89,10 @@ class ClassRegistryInstanceCache(object):
         Note that this method does not account for any classes that may
         be added to the wrapped ClassRegistry in the future.
         """
-        for key in iterkeys(self._registry):
+        for key in self._registry.keys():
             self.__getitem__(key)
 
-    def get_instance_key(self, key):
-        # type: (Any) -> Hashable
+    def get_instance_key(self, key: typing.Any) -> typing.Hashable:
         """
         Generates a key that can be used to store/lookup values in the
         instance cache.
@@ -108,8 +102,7 @@ class ClassRegistryInstanceCache(object):
         """
         return self.get_class_key(key)
 
-    def get_class_key(self, key):
-        # type: (Any) -> Hashable
+    def get_class_key(self, key: typing.Any) -> typing.Hashable:
         """
         Generates a key that can be used to store/lookup values in the
         wrapped :py:class:`ClassRegistry` instance.

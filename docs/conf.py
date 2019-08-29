@@ -1,6 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-#
 # class-registry documentation build configuration file, created by
 # sphinx-quickstart on Wed Jun 28 17:10:35 2017.
 #

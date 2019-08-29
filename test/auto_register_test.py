@@ -1,11 +1,5 @@
-# coding=utf-8
-from __future__ import absolute_import, division, print_function, \
-    unicode_literals
-
 from abc import ABCMeta, abstractmethod as abstract_method
 from unittest import TestCase
-
-from six import with_metaclass
 
 from class_registry import AutoRegister, ClassRegistry
 
@@ -19,15 +13,15 @@ class AutoRegisterTestCase(TestCase):
 
         # Note that we declare :py:func:`AutoRegister` as the metaclass
         # for our base class.
-        class BasePokemon(with_metaclass(AutoRegister(registry))):
+        class BasePokemon(metaclass=AutoRegister(registry)):
             """
             Abstract base class; will not get registered.
             """
+
             @abstract_method
             def get_abilities(self):
                 raise NotImplementedError()
 
-        # noinspection PyClassHasNoInit
         class Sandslash(BasePokemon):
             """
             Non-abstract subclass; will get registered automatically.
@@ -37,16 +31,15 @@ class AutoRegisterTestCase(TestCase):
             def get_abilities(self):
                 return ['sand veil']
 
-        # noinspection PyClassHasNoInit
-        class BaseEvolvingPokemon(with_metaclass(ABCMeta, BasePokemon)):
+        class BaseEvolvingPokemon(BasePokemon, metaclass=ABCMeta):
             """
             Abstract subclass; will not get registered.
             """
+
             @abstract_method
             def evolve(self):
                 raise NotImplementedError()
 
-        # noinspection PyClassHasNoInit
         class Ekans(BaseEvolvingPokemon):
             """
             Non-abstract subclass; will get registered automatically.
@@ -58,7 +51,6 @@ class AutoRegisterTestCase(TestCase):
 
             def evolve(self):
                 return 'Congratulations! Your EKANS evolved into ARBOK!'
-
 
         self.assertListEqual(
             list(registry.items()),
@@ -77,7 +69,7 @@ class AutoRegisterTestCase(TestCase):
         """
         registry = ClassRegistry(attr_name='element')
 
-        class FightingPokemon(with_metaclass(AutoRegister(registry))):
+        class FightingPokemon(metaclass=AutoRegister(registry)):
             element = 'fighting'
 
         self.assertListEqual(

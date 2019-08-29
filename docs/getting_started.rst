@@ -1,7 +1,5 @@
-===============
 Getting Started
 ===============
-
 As you saw in the :doc:`introduction </index>`, you can create a new registry
 using the :py:class:`class_registry.ClassRegistry` class.
 
@@ -40,10 +38,9 @@ raise a :py:class:`class_registry.RegistryKeyError`:
    except RegistryKeyError:
      pass
 
--------------
+
 Registry Keys
 -------------
-
 By default, you have to provide the registry key whenever you register a new
 class.  But, there's an easier way to do it!
 
@@ -65,7 +62,6 @@ extract the registry key using that attribute:
 Note in the above example that the registry automatically extracted the registry
 key for the ``Squirtle`` class using its ``element`` attribute.
 
-----------
 Collisions
 ----------
 What happens if two classes have the same registry key?
@@ -120,7 +116,6 @@ occurs:
 Attempting to register ``Ivysaur`` with the same registry key as ``Bulbasaur``
 raised a :py:class:`RegistryKeyError`, so it didn't override ``Bulbasaur``.
 
------------
 Init Params
 -----------
 Every time you access a registry key in a :py:class:`ClassRegistry`, it creates

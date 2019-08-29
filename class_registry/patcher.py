@@ -1,11 +1,3 @@
-# coding=utf-8
-from __future__ import absolute_import, division, print_function, \
-    unicode_literals
-
-from typing import Any
-
-from six import iteritems
-
 from class_registry.registry import MutableRegistry, RegistryKeyError
 
 __all__ = [
@@ -20,14 +12,14 @@ class RegistryPatcher(object):
 
     Note: only mutable registries can be patched!
     """
+
     class DoesNotExist(object):
         """
         Used to identify a value that did not exist before we started.
         """
         pass
 
-    def __init__(self, registry, *args, **kwargs):
-        # type: (MutableRegistry, *Any, **Any) -> None
+    def __init__(self, registry: MutableRegistry, *args, **kwargs) -> None:
         """
         :param registry:
             A :py:class:`MutableRegistry` instance to patch.
@@ -54,13 +46,12 @@ class RegistryPatcher(object):
 
         self.target = registry
 
-        self._new_values  = kwargs
+        self._new_values = kwargs
         self._prev_values = {}
 
     def __enter__(self):
         self.apply()
 
-    # noinspection PyUnusedLocal
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.restore()
 
@@ -71,11 +62,11 @@ class RegistryPatcher(object):
         # Back up previous values.
         self._prev_values = {
             key: self._get_value(key, self.DoesNotExist)
-                for key in self._new_values
+            for key in self._new_values
         }
 
         # Patch values.
-        for key, value in iteritems(self._new_values):
+        for key, value in self._new_values.items():
             # Remove the existing value first (prevents issues if the
             # registry has ``unique=True``).
             self._del_value(key)
@@ -88,7 +79,7 @@ class RegistryPatcher(object):
         Restores previous settings.
         """
         # Restore previous settings.
-        for key, value in iteritems(self._prev_values):
+        for key, value in self._prev_values.items():
             # Remove the existing value first (prevents issues if the
             # registry has ``unique=True``).
             self._del_value(key)
