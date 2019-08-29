@@ -15,12 +15,11 @@ script:
   - python setup.py test
 
 deploy:
-  matrix:
-    - true:
-        python: '3.7'
-        tags: true
-      provider: pypi
-      distributions: bdist_wheel sdist
-      user: phx
-      password:
-        secure: h7C7gj7bTzqJzilbrePGKJlkQkH4FqXkdd/h5P6Uny94jojbzhjp/Qdz9Mz355t4q07v/XtLiw6DoERvlTueRx1qdfyMAR3xwxFVQ5Xx2+58pJhnsSMIJqalia+2UOE/T88vwxpnebAUP39CzLP0N5E4rZN5t7+9mcj0Yi11VY1hfUQZwYfsoFQaZlQgq0FV3F+ZKQ3W2XFE3mZ0ZFs3n3Wrjr0EgJMUhZ/MjtX76V7di1y6VaY0MeoUffD9n4Be0C6CdkiLEUdlqaNA9eEPkpcqqGixroPtstnDtbvEfDf+TR1pjzdZIjVQebc++jkxGkcsJH8/doEAig3lqE/jgj3MMy+2YNtUQxvO6Hlo7AhDCAGQzKCHntJiJWjsFP5Bwt50gchbVFIASlojH/vU67SZSXj/ZgcllNduwb+DgvNex0TdBCUw7x5E3lltbnjjKdNCWj0Omv8c6svp4RHLHkRmJRh9Y0Q+wXMYIoHwo2+N2pxOpy3bGk5QECxAzgj2JEGMWBO2WYr0kFFUTL9THsIrt4l3E3GcHX7+dBRN9Lsfuot+q+4HjvuBseCxq7DUHfwTkroPIkakkmaxIScX/pvuL7S8u6zkh2PkKieSCHBZOKAc8DFi+WddBFgmWI1/y44UoE6yUcZvxnW6fQUwWtU8nwmYm/65DCIDSct6y1M=
+  on:
+    python: '3.7'
+    tags: true
+  provider: pypi
+  user: phx
+  password:
+    secure: h7C7gj7bTzqJzilbrePGKJlkQkH4FqXkdd/h5P6Uny94jojbzhjp/Qdz9Mz355t4q07v/XtLiw6DoERvlTueRx1qdfyMAR3xwxFVQ5Xx2+58pJhnsSMIJqalia+2UOE/T88vwxpnebAUP39CzLP0N5E4rZN5t7+9mcj0Yi11VY1hfUQZwYfsoFQaZlQgq0FV3F+ZKQ3W2XFE3mZ0ZFs3n3Wrjr0EgJMUhZ/MjtX76V7di1y6VaY0MeoUffD9n4Be0C6CdkiLEUdlqaNA9eEPkpcqqGixroPtstnDtbvEfDf+TR1pjzdZIjVQebc++jkxGkcsJH8/doEAig3lqE/jgj3MMy+2YNtUQxvO6Hlo7AhDCAGQzKCHntJiJWjsFP5Bwt50gchbVFIASlojH/vU67SZSXj/ZgcllNduwb+DgvNex0TdBCUw7x5E3lltbnjjKdNCWj0Omv8c6svp4RHLHkRmJRh9Y0Q+wXMYIoHwo2+N2pxOpy3bGk5QECxAzgj2JEGMWBO2WYr0kFFUTL9THsIrt4l3E3GcHX7+dBRN9Lsfuot+q+4HjvuBseCxq7DUHfwTkroPIkakkmaxIScX/pvuL7S8u6zkh2PkKieSCHBZOKAc8DFi+WddBFgmWI1/y44UoE6yUcZvxnW6fQUwWtU8nwmYm/65DCIDSct6y1M=
+  distributions: bdist_wheel sdist
