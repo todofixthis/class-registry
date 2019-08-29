@@ -1,7 +1,3 @@
-# coding=utf-8
-from __future__ import absolute_import, division, print_function, \
-    unicode_literals
-
 from abc import ABCMeta
 from inspect import isabstract as is_abstract
 
@@ -12,8 +8,7 @@ __all__ = [
 ]
 
 
-def AutoRegister(registry, base_type=ABCMeta):
-    # type: (MutableRegistry, type) -> type
+def AutoRegister(registry: MutableRegistry, base_type: type = ABCMeta) -> type:
     """
     Creates a metaclass that automatically registers all non-abstract
     subclasses in the specified registry.
