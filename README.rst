@@ -1,5 +1,5 @@
-.. image:: https://travis-ci.org/eflglobal/class-registry.svg?branch=master
-   :target: https://travis-ci.org/eflglobal/class-registry
+.. image:: https://travis-ci.org/todofixthis/class-registry.svg?branch=master
+   :target: https://travis-ci.org/todofixthis/class-registry
 .. image:: https://readthedocs.org/projects/class-registry/badge/?version=latest
    :target: http://class-registry.readthedocs.io/
 
@@ -125,6 +125,6 @@ documentation locally:
       make html
 
 
-.. _ReadTheDocs: https://todofixthis-class-registry.readthedocs.io/
+.. _ReadTheDocs: https://class-registry.readthedocs.io/
 .. _detox: https://pypi.python.org/pypi/detox
 .. _tox: https://tox.readthedocs.io/
