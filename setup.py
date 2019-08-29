@@ -13,11 +13,11 @@ with open(join(cwd, 'README.rst'), 'r', 'utf-8') as f:  # type: StreamReader
 ##
 # Off we go!
 setup(
-    name='todofixthis-class-registry',
+    name='phx-class-registry',
     description='Factory+Registry pattern for Python classes.',
     url='https://class-registry.readthedocs.io/',
 
-    version='3.0.1',
+    version='3.0.2',
 
     packages=['class_registry'],
 
