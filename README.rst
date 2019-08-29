@@ -75,6 +75,8 @@ ClassRegistry is compatible with the following Python versions:
 - 3.6
 - 3.5
 
+pypy3 is also supported.
+
 .. note::
   ClassRegistry is **not** compatible with Python 2.
 
