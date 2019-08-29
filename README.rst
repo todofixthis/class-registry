@@ -95,11 +95,8 @@ To run unit tests after installing from source::
 This project is also compatible with `tox`_, which will run the unit tests in
 different virtual environments (one for each supported version of Python).
 
-To run the unit tests, it is recommended that you use the `detox`_ library.
-detox speeds up the tests by running them in parallel.
-
 Install the package with the ``test-runner`` extra to set up the necessary
-dependencies, and then you can run the tests with the ``detox`` command::
+dependencies, and then you can run the tests with the ``tox`` command::
 
   pip install -e .[test-runner]
   tox -p all
@@ -125,5 +122,4 @@ documentation locally:
 
 
 .. _ReadTheDocs: https://class-registry.readthedocs.io/
-.. _detox: https://pypi.python.org/pypi/detox
 .. _tox: https://tox.readthedocs.io/
