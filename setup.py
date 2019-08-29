@@ -13,9 +13,9 @@ with open(join(cwd, 'README.rst'), 'r', 'utf-8') as f:  # type: StreamReader
 ##
 # Off we go!
 setup(
-    name='class-registry',
+    name='todofixthis-class-registry',
     description='Factory+Registry pattern for Python classes.',
-    url='https://class-registry.readthedocs.io/',
+    url='https://todofixthis-class-registry.readthedocs.io/',
 
     version='3.0.0',
 
@@ -44,6 +44,7 @@ setup(
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
         'Topic :: Software Development :: Libraries :: Python Modules',
     ],
 
