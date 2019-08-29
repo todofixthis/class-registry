@@ -1,4 +1,3 @@
-========================
 Entry Points Integration
 ========================
 A serially-underused feature of setuptools is its `entry points`_.  This feature
@@ -50,7 +49,6 @@ Simply declare an :py:class:`EntryPointClassRegistry` instance, and it will
 automatically find any classes registered to that entry point group across every
 single installed project in your virtualenv!
 
----------------
 Reverse Lookups
 ---------------
 From time to time, you may need to perform a "reverse lookup":  Given a class or

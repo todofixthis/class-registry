@@ -1,9 +1,7 @@
-===============
 Advanced Topics
 ===============
 This section covers more advanced or esoteric uses of ClassRegistry features.
 
----------------------------------
 Registering Classes Automatically
 ---------------------------------
 Tired of having to add the ``register`` decorator to every class that you want
@@ -19,12 +17,11 @@ Here's an example:
 
    from abc import abstractmethod
    from class_registry import AutoRegister, ClassRegistry
-   from six import with_metaclass
 
    pokedex = ClassRegistry('element')
 
    # Note ``AutoRegister(pokedex)`` used as the metaclass here.
-   class Pokemon(with_metaclass(AutoRegister(pokedex))):
+   class Pokemon(metaclass=AutoRegister(pokedex)):
       @abstractmethod
       def get_abilities(self):
         raise NotImplementedError()
@@ -61,7 +58,7 @@ because it is abstract.
       from abc import ABCMeta
 
       # Declare an "abstract" class.
-      class ElectricPokemon(with_metaclass(ABCMeta, Pokemon)):
+      class ElectricPokemon(Pokemon, metaclass=ABCMeta):
         element = 'electric'
 
         def get_abilities(self):
@@ -85,7 +82,7 @@ because it is abstract.
       from inspect import isabstract
       assert not isabstract(ElectricPokemon)
 
---------
+
 Patching
 --------
 From time to time, you might need to register classes temporarily.  For example,

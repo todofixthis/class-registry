@@ -1,4 +1,3 @@
-========================
 Factories vs. Registries
 ========================
 Despite its name, :py:class:`ClassRegistry` also has aspects in common with the

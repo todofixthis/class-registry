@@ -1,4 +1,3 @@
-=========================
 Iterating Over Registries
 =========================
 Sometimes, you want to iterate over all of the classes registered in a
@@ -50,7 +49,6 @@ Here's an example:
    all non-abstract subclasses of a particular base class.  See
    :doc:`advanced_topics` for more information.
 
------------------------
 Changing the Sort Order
 -----------------------
 As you probably noticed, these functions iterate over classes in the order that

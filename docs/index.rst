@@ -1,6 +1,5 @@
 ClassRegistry
 =============
-
 .. toctree::
    :maxdepth: 1
    :caption: Contents:
@@ -12,10 +11,8 @@ ClassRegistry
    advanced_topics
 
 
-=============
 ClassRegistry
 =============
-
 At the intersection of the Registry and Factory patterns lies the
 ``ClassRegistry``:
 
@@ -26,10 +23,8 @@ At the intersection of the Registry and Factory patterns lies the
   infinitely extensible by 3rd-party libraries!
 - And more!
 
----------------
 Getting Started
 ---------------
-
 Create a registry using the ``class_registry.ClassRegistry`` class, then
 decorate any classes that you wish to register with its ``register`` method:
 
@@ -64,7 +59,6 @@ To create a class instance from a registry, use the subscript operator:
 
 Advanced Usage
 --------------
-
 There's a whole lot more you can do with ClassRegistry, including:
 
 - Provide args and kwargs to new class instances.
@@ -77,16 +71,20 @@ There's a whole lot more you can do with ClassRegistry, including:
 To learn more about what you can do with ClassRegistry,
 :doc:`keep reading! </getting_started>`
 
-------------
 Requirements
 ------------
+ClassRegistry is compatible with the following Python versions:
 
-ClassRegistry is compatible with Python versions 3.6, 3.5 and 2.7.
+- 3.8
+- 3.7
+- 3.6
+- 3.5
 
-------------
+.. note::
+  ClassRegistry is **not** compatible with Python 2.
+
 Installation
 ------------
-
 Install the latest stable version via pip::
 
    pip install class-registry
