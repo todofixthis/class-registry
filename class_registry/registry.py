@@ -299,8 +299,8 @@ class ClassRegistry(MutableRegistry):
             Determines what happens when two classes are registered with
             the same key:
 
-            - ``True``: The second class will replace the first one.
-            - ``False``: A ``ValueError`` will be raised.
+            - ``True``: A :py:class:`KeyError` will be raised.
+            - ``False``: The second class will replace the first one.
         """
         super(ClassRegistry, self).__init__(attr_name)
 
