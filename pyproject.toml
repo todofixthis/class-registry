@@ -2,7 +2,7 @@
 
 [project]
 name = "phx-class-registry"
-version = "4.0.3"
+version = "4.0.4"
 description = "Factory+Registry pattern for Python classes"
 readme = "README.rst"
 requires-python = ">= 3"
@@ -34,4 +34,5 @@ classifiers = [
 
 [project.urls]
 Documentation = "https://class-registry.readthedocs.io/"
+Changelog = "https://github.com/todofixthis/class-registry/releases"
 Repository = "https://github.com/todofixthis/class-registry"
