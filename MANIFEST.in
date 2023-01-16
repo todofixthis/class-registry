@@ -1,2 +1,2 @@
-include LICENSE
+include LICENCE.txt
 recursive-include test *.py
