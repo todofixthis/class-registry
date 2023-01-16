@@ -125,8 +125,6 @@ Steps to build releases are based on `Packaging Python Projects Tutorial`_
    Make sure to build releases off of the ``main`` branch, and check that all
    changes from ``develop`` have been merged before creating the release!
 
-.. _build-the-project:
-
 1. Build the Project
 ~~~~~~~~~~~~~~~~~~~~
 #. Install extra dependencies (you only have to do this once)::
@@ -172,8 +170,7 @@ Steps to build releases are based on `Packaging Python Projects Tutorial`_
    - Any backwards-incompatible changes and/or migration instructions.
    - SHA256 hashes of the build artefacts.
 #. GPG-sign the description for the release (ASCII-armoured).
-#. Attach the build artefacts created during
-   :ref:`1. Build the Project <build-the-project>`.
+#. Attach the build artefacts to the release.
 #. Click ``Publish release``.
 
 .. _Create a PyPI API token: https://pypi.org/manage/account/token/
