@@ -38,8 +38,7 @@ class RegistryPatcherTestCase(TestCase):
 
     def test_patch_manual_keys(self):
         """
-        Patching a registry in a context, specifying registry keys
-        manually.
+        Patching a registry in a context, specifying registry keys manually.
         """
         self.registry.register('sparky')(Charmander)
         self.registry.register('chad')(Squirtle)

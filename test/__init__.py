@@ -1,7 +1,7 @@
 class Pokemon(object):
     """
-    A basic class with some attributes that we can use to test out
-    class registries.
+    A basic class with some attributes that we can use to test out class
+    registries.
     """
     element = None
 

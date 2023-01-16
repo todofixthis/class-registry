@@ -9,12 +9,12 @@ from test import Bulbasaur, Charmander, Mew, PokemonFactory, Squirtle
 
 def setUpModule():
     #
-    # Install a fake distribution that we can use to inject entry
-    # points at runtime.
+    # Install a fake distribution that we can use to inject entry points at
+    # runtime.
     #
-    # The side effects from this are pretty severe, but they (very
-    # probably) only impact this test, and they are undone as soon as
-    # the process terminates.
+    # The side effects from this are pretty severe, but they (very probably)
+    # only impact this test, and they are undone as soon as the process
+    # terminates.
     #
     working_set.add_entry(dirname(__file__))
 
@@ -40,8 +40,8 @@ class EntryPointClassRegistryTestCase(TestCase):
         self.assertIsInstance(water, Squirtle)
         self.assertEqual(water.name, 'archibald')
 
-        # The 'psychic' entry point actually references a function, but
-        # it works exactly the same as a class.
+        # The 'psychic' entry point actually references a function, but it
+        # works exactly the same as a class.
         psychic = registry.get('psychic', 'snuggles')
         self.assertIsInstance(psychic, Mew)
         self.assertEqual(psychic.name, 'snuggles')
@@ -61,8 +61,8 @@ class EntryPointClassRegistryTestCase(TestCase):
             self.assertEqual(registry['fire'].poke_type, 'fire')
             self.assertEqual(registry.get('water', 'phil').poke_type, 'water')
 
-            # Registered functions and methods can't be branded this
-            # way, though...
+            # Registered functions and methods can't be branded this way,
+            # though...
             self.assertFalse(
                 hasattr(PokemonFactory.create_psychic_pokemon, 'poke_type'),
             )
@@ -96,10 +96,11 @@ class EntryPointClassRegistryTestCase(TestCase):
 
     def test_error_wrong_group(self):
         """
-        The registry can't find entry points associated with the wrong
+        The registry can't find entry points associated with the wrong group.
         """
+        # Pokémon get registered (unsurprisingly) under the ``pokemon`` group,
+        # not ``random``.
         registry = EntryPointClassRegistry('random')
 
         with self.assertRaises(RegistryKeyError):
-            # The dummy project registers
             registry.get('fire')

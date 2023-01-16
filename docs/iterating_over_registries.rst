@@ -99,7 +99,8 @@ the items are sorted:
      """
      Sorts items by weight, using registry key as a tiebreaker.
 
-     ``a`` and ``b`` are tuples of (registry key, class)``.
+     :param a: Tuple of (key, class)
+     :param b: Tuple of (key, class)
      """
      # Sort descending by weight first.
      weight_cmp = (

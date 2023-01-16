@@ -82,14 +82,15 @@ What happens if two classes have the same registry key?
    assert isinstance(janet, Ivysaur)
 
 As you can see, if two (or more) classes have the same registry key, whichever
-one is registered last will override any the other(s).
+one is registered last will override any of the other(s).
 
 .. note::
 
     It is not always easy to predict the order in which classes will be
-    registered, especially when they are spread across different modules!
+    registered, especially when they are spread across different modules, so you
+    probably don't want to rely on this behaviour!
 
-If you don't want this behavior, you can pass ``unique=True`` to the
+If you want to prevent collisions, you can pass ``unique=True`` to the
 :py:class:`ClassRegistry` initializer to raise an exception whenever a collision
 occurs:
 
@@ -113,7 +114,8 @@ occurs:
    janet = pokedex['grass']
    assert isinstance(janet, Bulbasaur)
 
-Attempting to register ``Ivysaur`` with the same registry key as ``Bulbasaur``
+Because we passed ``unique=True`` to the :py:class:`ClassRegistry` initialiser,
+attempting to register ``Ivysaur`` with the same registry key as ``Bulbasaur``
 raised a :py:class:`RegistryKeyError`, so it didn't override ``Bulbasaur``.
 
 Init Params
@@ -129,7 +131,7 @@ a new instance:
    assert marlene is not charlene
 
 Since you're creating a new instance every time, you also have the option of
-providing args and kwargs to the class initializer using the registry's
+providing args and kwargs to the class initialiser using the registry's
 :py:meth:`get` method:
 
 .. code-block:: python
@@ -154,7 +156,7 @@ providing args and kwargs to the class initializer using the registry's
    assert tammy.level == 42
 
 Any arguments that you provide to :py:meth:`get` will be passed directly to the
-corresponding class' initializer.
+corresponding class' initialiser.
 
 .. hint::
 

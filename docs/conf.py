@@ -62,7 +62,7 @@ author = 'Phoenix Zerin'
 #
 # This is also used if you do content translation via gettext catalogs.
 # Usually you set "language" from the command line for these cases.
-language = None
+language = 'en-NZ'
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
@@ -74,7 +74,6 @@ pygments_style = 'sphinx'
 
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = False
-
 
 # -- Options for HTML output ----------------------------------------------
 
@@ -94,12 +93,10 @@ todo_include_todos = False
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
 
-
 # -- Options for HTMLHelp output ------------------------------------------
 
 # Output file base name for HTML help builder.
 htmlhelp_basename = 'class-registrydoc'
-
 
 # -- Options for LaTeX output ---------------------------------------------
 
@@ -126,9 +123,8 @@ latex_elements = {
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
     (master_doc, 'class-registry.tex', 'class-registry Documentation',
-     'Phoenix Zerin', 'manual'),
+    'Phoenix Zerin', 'manual'),
 ]
-
 
 # -- Options for manual page output ---------------------------------------
 
@@ -136,9 +132,8 @@ latex_documents = [
 # (source start file, name, description, authors, manual section).
 man_pages = [
     (master_doc, 'classregistry', 'class-registry Documentation',
-     [author], 1)
+    [author], 1)
 ]
-
 
 # -- Options for Texinfo output -------------------------------------------
 
@@ -147,9 +142,6 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
     (master_doc, 'class-registry', 'class-registry Documentation',
-     author, 'class-registry', 'One line description of project.',
-     'Miscellaneous'),
+    author, 'class-registry', 'One line description of project.',
+    'Miscellaneous'),
 ]
-
-
-

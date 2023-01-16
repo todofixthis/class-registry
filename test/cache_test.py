@@ -15,8 +15,8 @@ class ClassRegistryInstanceCacheTestCase(TestCase):
     def test_get(self):
         """
         When an instance is returned from
-        :py:meth:`ClassRegistryInstanceCache.get`, future invocations
-        return the same instance.
+        :py:meth:`ClassRegistryInstanceCache.get`, future invocations return
+        the same instance.
         """
         # Register a few classes with the ClassRegistry.
         self.registry.register(Bulbasaur)
@@ -41,8 +41,8 @@ class ClassRegistryInstanceCacheTestCase(TestCase):
 
     def test_template_args(self):
         """
-        Extra params passed to the cache constructor are passed to the
-        template function when creating new instances.
+        Extra params passed to the cache constructor are passed to the template
+        function when creating new instances.
         """
         self.registry.register(Charmeleon)
         self.registry.register(Wartortle)

@@ -67,17 +67,15 @@ For more advanced usage, check out the documentation on `ReadTheDocs`_!
 
 Requirements
 ------------
-ClassRegistry is compatible with the following Python versions:
+ClassRegistry is known to be compatible with the following Python versions:
 
-- 3.8
-- 3.7
-- 3.6
-- 3.5
-
-pypy3 is also supported.
+- 3.11
+- 3.10
+- 3.9
 
 .. note::
-  ClassRegistry is **not** compatible with Python 2.
+   ClassRegistry's code is pretty simple, so it's likely to be compatible with
+   versions not listed here; there's just no test coverage to prove it 😇
 
 Installation
 ------------
@@ -86,20 +84,18 @@ Install the latest stable version via pip::
    pip install phx-class-registry
 
 
+.. important::
+   Make sure to install `phx-class-registry`, **not** `class-registry`.  I
+   created the latter at a previous job years ago, and after I left they never
+   touched that project again — so in the end I had to fork it 🤷
+
 Running Unit Tests
 ------------------
-To run unit tests after installing from source::
-
-  python setup.py test
-
-This project is also compatible with `tox`_, which will run the unit tests in
-different virtual environments (one for each supported version of Python).
-
 Install the package with the ``test-runner`` extra to set up the necessary
 dependencies, and then you can run the tests with the ``tox`` command::
 
-  pip install -e .[test-runner]
-  tox -p all
+   pip install -e .[test-runner]
+   tox -p all
 
 Documentation
 -------------
@@ -110,16 +106,79 @@ documentation locally:
 
 #. Install extra dependencies (you only have to do this once)::
 
-      pip install '.[docs-builder]'
+    pip install -e '.[docs-builder]'
 
 #. Switch to the ``docs`` directory::
 
-      cd docs
+    cd docs
 
 #. Build the documentation::
 
-      make html
+    make html
+
+Releases
+--------
+Steps to build releases are based on `Packaging Python Projects Tutorial`_
+
+.. important::
+
+   Make sure to build releases off of the ``main`` branch, and check that all
+   changes from ``develop`` have been merged before creating the release!
+
+1. Build the Project
+~~~~~~~~~~~~~~~~~~~~
+#. Install extra dependencies (you only have to do this once)::
+
+    pip install -e '.[build-system]'
+
+#. Delete artefacts from previous builds, if applicable::
+
+    rm dist/*
+
+#. Run the build::
+
+    python -m build
+
+#. The build artefacts will be located in the ``dist`` directory at the top
+   level of the project.
+
+2. Upload to PyPI
+~~~~~~~~~~~~~~~~~
+#. `Create a PyPI API token`_ (you only have to do this once).
+#. Increment the version number in ``pyproject.toml``.
+#. Check that the build artefacts are valid, and fix any errors that it finds::
+
+    python -m twine check dist/*
+
+#. Upload build artefacts to PyPI::
+
+    python -m twine upload dist/*
 
 
+3. Create GitHub Release
+~~~~~~~~~~~~~~~~~~~~~~~~
+#. Create a tag and push to GitHub::
+
+    git tag <version>
+    git push
+
+   ``<version>`` must match the updated version number in ``pyproject.toml``.
+
+#. Go to the `Releases page for the repo`_.
+#. Click ``Draft a new release``.
+#. Select the tag that you created in step 1.
+#. Specify the title of the release (e.g., ``ClassRegistry v1.2.3``).
+#. Write a description for the release.  Make sure to include:
+   - Credit for code contributed by community members.
+   - Significant functionality that was added/changed/removed.
+   - Any backwards-incompatible changes and/or migration instructions.
+   - SHA256 hashes of the build artefacts.
+#. GPG-sign the description for the release (ASCII-armoured).
+#. Attach the build artefacts to the release.
+#. Click ``Publish release``.
+
+.. _Create a PyPI API token: https://pypi.org/manage/account/token/
+.. _Packaging Python Projects Tutorial: https://packaging.python.org/en/latest/tutorials/packaging-projects/
 .. _ReadTheDocs: https://class-registry.readthedocs.io/
+.. _Releases page for the repo: https://github.com/todofixthis/class-registry/releases
 .. _tox: https://tox.readthedocs.io/
