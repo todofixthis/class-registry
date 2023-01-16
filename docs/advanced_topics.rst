@@ -152,3 +152,45 @@ is already registered.
 
    In particular, this means that :py:class:`EntryPointClassRegistry` can
    **not** be patched using :py:class:`RegistryPatcher`.
+
+
+Overriding Lookup Keys
+----------------------
+In some cases, you may want to customise the way a ``ClassRegistry`` looks up
+which class to use.  For example, you may need to change the registry key for a
+particular class, but you want to maintain backwards-compatibility for existing
+code that references the old key.
+
+To customise this, create a subclass of ``ClassRegistry`` and override its
+``gen_lookup_key`` method:
+
+.. code-block:: python
+
+   class FacadeRegistry(ClassRegistry):
+     @staticmethod
+     def gen_lookup_key(key: str) -> str:
+         """
+         In a previous version of the codebase, some pokémon had the 'bird'
+         type, but this was later dropped in favour of 'flying'.
+         """
+         if key == 'bird':
+             return 'flying'
+
+         return key
+
+   pokedex = FacadeRegistry('element')
+
+   @pokedex.register
+   class MissingNo(Pokemon):
+       element = 'flying'
+
+   @pokedex.register
+   class Meowth(object):
+     element = 'normal'
+
+   # MissingNo can be accessed by either key.
+   assert isinstance(pokedex['bird'], MissingNo)
+   assert isinstance(pokedex['flying'], MissingNo)
+
+   # Other pokémon work as you'd expect.
+   assert isinstance(pokedex['normal'], Meowth)

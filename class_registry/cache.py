@@ -1,7 +1,7 @@
 import typing
 from collections import defaultdict
 
-from class_registry import ClassRegistry
+from . import ClassRegistry
 
 __all__ = [
     'ClassRegistryInstanceCache',

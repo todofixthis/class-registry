@@ -27,7 +27,6 @@ class ClassRegistryTestCase(TestCase):
         # classes.  We'll see how to assign registry keys automatically in the
         # next test.
         with self.assertRaises(ValueError):
-            # noinspection PyUnusedLocal
             @registry.register
             class Venusaur(Pokemon):
                 pass
@@ -71,25 +70,22 @@ class ClassRegistryTestCase(TestCase):
         registry = ClassRegistry('element')
 
         with self.assertRaises(ValueError):
-            # noinspection PyUnusedLocal
+            # noinspection PyTypeChecker
             @registry.register(None)
             class Ponyta(Pokemon):
                 element = 'fire'
 
         with self.assertRaises(ValueError):
-            # noinspection PyUnusedLocal
             @registry.register('')
             class Rapidash(Pokemon):
                 element = 'fire'
 
         with self.assertRaises(ValueError):
-            # noinspection PyUnusedLocal
             @registry.register
             class Mew(Pokemon):
                 element = None
 
         with self.assertRaises(ValueError):
-            # noinspection PyUnusedLocal
             @registry.register
             class Mewtwo(Pokemon):
                 element = ''
@@ -199,6 +195,118 @@ class ClassRegistryTestCase(TestCase):
         self.assertTrue('bug' in registry)
 
 
+class GenLookupKeyTestCase(TestCase):
+    """
+    Checks that a ClassRegistry subclass behaves correctly when it overrides
+    the `gen_lookup_key` method.
+    """
+
+    class TestRegistry(ClassRegistry):
+        @staticmethod
+        def gen_lookup_key(key: str) -> str:
+            """
+            Simple override of `gen_lookup_key`, to ensure the registry
+            behaves as expected when the lookup key is different.
+            """
+            return ''.join(reversed(key))
+
+    def setUp(self) -> None:
+        self.registry = self.TestRegistry()
+
+        self.registry.register('fire')(Charmander)
+        self.registry.register('water')(Squirtle)
+
+    def test_contains(self):
+        self.assertTrue('fire' in self.registry)
+        self.assertFalse('erif' in self.registry)
+
+    def test_dir(self):
+        self.assertListEqual(dir(self.registry), ['fire', 'water'])
+
+    def test_getitem(self):
+        self.assertIsInstance(self.registry['fire'], Charmander)
+
+    def test_iter(self):
+        generator = iter(self.registry)
+
+        self.assertEqual(next(generator), 'fire')
+        self.assertEqual(next(generator), 'water')
+
+        with self.assertRaises(StopIteration):
+            next(generator)
+
+    def test_len(self):
+        self.assertEqual(len(self.registry), 2)
+
+    def test_get_class(self):
+        self.assertIs(self.registry.get_class('fire'), Charmander)
+
+    def test_get(self):
+        self.assertIsInstance(self.registry.get('fire'), Charmander)
+
+    def test_items(self):
+        generator = self.registry.items()
+
+        self.assertEqual(next(generator), ('fire', Charmander))
+        self.assertEqual(next(generator), ('water', Squirtle))
+
+        with self.assertRaises(StopIteration):
+            next(generator)
+
+    def test_keys(self):
+        generator = self.registry.keys()
+
+        self.assertEqual(next(generator), 'fire')
+        self.assertEqual(next(generator), 'water')
+
+        with self.assertRaises(StopIteration):
+            next(generator)
+
+    def test_delitem(self):
+        del self.registry['fire']
+        self.assertListEqual(list(self.registry.keys()), ['water'])
+
+    def test_setitem(self):
+        self.registry['grass'] = Bulbasaur
+        self.assertListEqual(list(self.registry.keys()),
+            ['fire', 'water', 'grass'])
+
+    def test_unregister(self):
+        self.registry.unregister('fire')
+        self.assertListEqual(list(self.registry.keys()), ['water'])
+
+    def test_use_case_aliases(self):
+        """
+        A common use case for overriding `gen_lookup_key` is to specify some
+        aliases (e.g., for backwards-compatibility when refactoring an existing
+        registry).
+        """
+
+        class TestRegistry(ClassRegistry):
+            @staticmethod
+            def gen_lookup_key(key: str) -> str:
+                """
+                Simulate a scenario where we renamed the key for a class in the
+                registry, but we want to preserve backwards-compatibility with
+                existing code that hasn't been updated yet.
+                """
+                if key == 'bird':
+                    return 'flying'
+
+                return key
+
+        registry = TestRegistry()
+
+        @registry.register('flying')
+        class MissingNo(Pokemon):
+            pass
+
+        self.assertIsInstance(registry['bird'], MissingNo)
+        self.assertIsInstance(registry['flying'], MissingNo)
+
+        self.assertListEqual(list(registry.keys()), ['flying'])
+
+
 class SortedClassRegistryTestCase(TestCase):
     def test_sort_key(self):
         """
@@ -271,7 +379,12 @@ class SortedClassRegistryTestCase(TestCase):
         """
 
         def compare_pokemon(a, b):
-            # ``a`` and ``b`` are tuples of ``(key, class)``.
+            """
+            Sort in descending order by popularity.
+
+            :param a: Tuple of (key, class, lookup_key)
+            :param b: Tuple of (key, class, lookup_key)
+            """
             return (
                     (a[1].popularity < b[1].popularity)
                     - (a[1].popularity > b[1].popularity)
@@ -302,4 +415,37 @@ class SortedClassRegistryTestCase(TestCase):
         self.assertListEqual(
             list(registry.values()),
             [Cubone, Onix, Exeggcute],
+        )
+
+    def test_gen_lookup_key_overridden(self):
+        """
+        When a ``SortedClassRegistry`` overrides the ``gen_lookup_key`` method,
+        it can sort by lookup keys if desired.
+        """
+
+        def compare_by_lookup_key(a, b):
+            """
+            :param a: Tuple of (key, class, lookup_key)
+            :param b: Tuple of (key, class, lookup_key)
+            """
+            return (a[2] > b[2]) - (a[2] < b[2])
+
+        class TestRegistry(SortedClassRegistry):
+            @staticmethod
+            def gen_lookup_key(key: str) -> str:
+                """
+                Simple override of `gen_lookup_key`, to ensure the sorting
+                behaves as expected when the lookup key is different.
+                """
+                return ''.join(reversed(key))
+
+        registry = TestRegistry(sort_key=cmp_to_key(compare_by_lookup_key))
+
+        registry.register('fire')(Charmander)
+        registry.register('grass')(Bulbasaur)
+        registry.register('water')(Squirtle)
+
+        self.assertListEqual(
+            list(registry.items()),
+            [('fire', Charmander), ('water', Squirtle), ('grass', Bulbasaur)]
         )

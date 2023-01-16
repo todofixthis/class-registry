@@ -1,6 +1,6 @@
 import typing
 
-from .registry import MutableRegistry, RegistryKeyError
+from .registry import BaseMutableRegistry, RegistryKeyError
 
 __all__ = [
     'RegistryPatcher',
@@ -21,7 +21,7 @@ class RegistryPatcher(object):
         """
         pass
 
-    def __init__(self, registry: MutableRegistry, *args, **kwargs) -> None:
+    def __init__(self, registry: BaseMutableRegistry, *args, **kwargs) -> None:
         """
         :param registry:
             A :py:class:`MutableRegistry` instance to patch.
