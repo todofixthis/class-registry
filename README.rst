@@ -131,6 +131,10 @@ Steps to build releases are based on `Packaging Python Projects Tutorial`_
 
     pip install -e '.[build-system]'
 
+#. Delete artefacts from previous builds, if applicable::
+
+    rm dist/*
+
 #. Run the build::
 
     python -m build
