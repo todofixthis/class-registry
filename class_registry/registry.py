@@ -191,7 +191,7 @@ class BaseMutableRegistry(BaseRegistry, typing.MutableMapping,
         """
         Provides alternate syntax for un-registering a class.
         """
-        self._unregister(type(self).gen_lookup_key(key))
+        self._unregister(self.gen_lookup_key(key))
         del self._lookup_keys[key]
 
     def __repr__(self) -> str:
@@ -205,7 +205,7 @@ class BaseMutableRegistry(BaseRegistry, typing.MutableMapping,
         """
         Provides alternate syntax for registering a class.
         """
-        lookup_key = type(self).gen_lookup_key(key)
+        lookup_key = self.gen_lookup_key(key)
 
         self._register(lookup_key, class_)
         self._lookup_keys[key] = lookup_key
@@ -238,7 +238,7 @@ class BaseMutableRegistry(BaseRegistry, typing.MutableMapping,
         if is_class(key):
             if self.attr_name:
                 attr_key = getattr(key, self.attr_name)
-                lookup_key = type(self).gen_lookup_key(attr_key)
+                lookup_key = self.gen_lookup_key(attr_key)
 
                 # Note that ``getattr`` will raise an AttributeError if the
                 # class doesn't have the required attribute.
@@ -257,7 +257,7 @@ class BaseMutableRegistry(BaseRegistry, typing.MutableMapping,
 
         # ``@register('some_attr')`` usage:
         def _decorator(cls: type) -> type:
-            lookup_key = type(self).gen_lookup_key(key)
+            lookup_key = self.gen_lookup_key(key)
 
             self._register(lookup_key, cls)
             self._lookup_keys[key] = lookup_key
@@ -279,7 +279,7 @@ class BaseMutableRegistry(BaseRegistry, typing.MutableMapping,
         :raise:
             - :py:class:`KeyError` if the key is not registered.
         """
-        result = self._unregister(type(self).gen_lookup_key(key))
+        result = self._unregister(self.gen_lookup_key(key))
         del self._lookup_keys[key]
 
         return result
@@ -355,7 +355,7 @@ class ClassRegistry(BaseMutableRegistry):
         """
         Returns the class associated with the specified key.
         """
-        lookup_key = type(self).gen_lookup_key(key)
+        lookup_key = self.gen_lookup_key(key)
 
         try:
             return self._registry[lookup_key]
@@ -465,7 +465,7 @@ class SortedClassRegistry(ClassRegistry):
         typing.Tuple[typing.Hashable, type], None, None]:
         for (key, class_, _) in sorted(
                 # Provide human-readable key and lookup key to the sorter...
-                ((key, class_, type(self).gen_lookup_key(key)) for
+                ((key, class_, self.gen_lookup_key(key)) for
                         (key, class_) in super().items()),
                 key=self._sort_key,
                 reverse=self.reverse,
