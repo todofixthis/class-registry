@@ -106,15 +106,15 @@ documentation locally:
 
 #. Install extra dependencies (you only have to do this once)::
 
-   pip install -e '.[docs-builder]'
+    pip install -e '.[docs-builder]'
 
 #. Switch to the ``docs`` directory::
 
-   cd docs
+    cd docs
 
 #. Build the documentation::
 
-   make html
+    make html
 
 Releases
 --------
@@ -133,14 +133,17 @@ Build the Project
 #. The build artefacts will be located in the ``dist`` directory at the top
    level of the project.
 
-
 Upload to PyPI
 ~~~~~~~~~~~~~~
 #. `Create a PyPI API token`_ (you only have to do this once).
 #. Increment the version number in ``pyproject.toml``.
+#. Check that the build artefacts are valid, and fix any errors that it finds::
+
+    python -m twine check dist/*
+
 #. Upload build artefacts to PyPI::
 
-   python -m twine upload dist/*
+    python -m twine upload dist/*
 
 .. _Create a PyPI API token: https://pypi.org/manage/account/token/
 .. _Packaging Python Projects Tutorial: https://packaging.python.org/en/latest/tutorials/packaging-projects/
