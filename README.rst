@@ -120,8 +120,15 @@ Releases
 --------
 Steps to build releases are based on `Packaging Python Projects Tutorial`_
 
-Build the Project
-~~~~~~~~~~~~~~~~~
+.. important::
+
+   Make sure to build releases off of the ``main`` branch, and check that all
+   changes from ``develop`` have been merged before creating the release!
+
+.. _build-the-project:
+
+1. Build the Project
+~~~~~~~~~~~~~~~~~~~~
 #. Install extra dependencies (you only have to do this once)::
 
     pip install -e '.[build-system]'
@@ -133,8 +140,8 @@ Build the Project
 #. The build artefacts will be located in the ``dist`` directory at the top
    level of the project.
 
-Upload to PyPI
-~~~~~~~~~~~~~~
+2. Upload to PyPI
+~~~~~~~~~~~~~~~~~
 #. `Create a PyPI API token`_ (you only have to do this once).
 #. Increment the version number in ``pyproject.toml``.
 #. Check that the build artefacts are valid, and fix any errors that it finds::
@@ -145,7 +152,32 @@ Upload to PyPI
 
     python -m twine upload dist/*
 
+
+3. Create GitHub Release
+~~~~~~~~~~~~~~~~~~~~~~~~
+#. Create a tag and push to GitHub::
+
+    git tag <version>
+    git push
+
+   ``<version>`` must match the updated version number in ``pyproject.toml``.
+
+#. Go to the `Releases page for the repo`_.
+#. Click ``Draft a new release``.
+#. Select the tag that you created in step 1.
+#. Specify the title of the release (e.g., ``ClassRegistry v1.2.3``).
+#. Write a description for the release.  Make sure to include:
+   - Credit for code contributed by community members.
+   - Significant functionality that was added/changed/removed.
+   - Any backwards-incompatible changes and/or migration instructions.
+   - SHA256 hashes of the build artefacts.
+#. GPG-sign the description for the release (ASCII-armoured).
+#. Attach the build artefacts created during
+   :ref:`1. Build the Project <build-the-project>`.
+#. Click ``Publish release``.
+
 .. _Create a PyPI API token: https://pypi.org/manage/account/token/
 .. _Packaging Python Projects Tutorial: https://packaging.python.org/en/latest/tutorials/packaging-projects/
 .. _ReadTheDocs: https://class-registry.readthedocs.io/
+.. _Releases page for the repo: https://github.com/todofixthis/class-registry/releases
 .. _tox: https://tox.readthedocs.io/
