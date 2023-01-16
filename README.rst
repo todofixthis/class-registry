@@ -138,7 +138,7 @@ Upload to PyPI
 ~~~~~~~~~~~~~~
 #. `Create a PyPI API token`_ (you only have to do this once).
 #. Increment the version number in ``pyproject.toml``.
-#. Upload build artefacts to PyPI:
+#. Upload build artefacts to PyPI::
 
    python -m twine upload dist/*
 
