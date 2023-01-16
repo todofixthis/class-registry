@@ -126,8 +126,8 @@ such a purpose:
    except RegistryKeyError:
      pass
 
-If desired, you can also change the registry key, or even replace a class that
-is already registered.
+If desired, you can also change existing registry keys, or even replace a class
+that is already registered.
 
 .. code-block:: python
 
@@ -148,7 +148,7 @@ is already registered.
 .. important::
 
    Only mutable registries can be patched (any class that extends
-   :py:class:`MutableRegistry`).
+   :py:class:`BaseMutableRegistry`).
 
    In particular, this means that :py:class:`EntryPointClassRegistry` can
    **not** be patched using :py:class:`RegistryPatcher`.

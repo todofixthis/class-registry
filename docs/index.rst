@@ -88,3 +88,8 @@ Installation
 Install the latest stable version via pip::
 
    pip install phx-class-registry
+
+.. important::
+   Make sure to install `phx-class-registry`, **not** `class-registry`.  I
+   created the latter at a previous job years ago, and after I left they never
+   touched that project again — so in the end I had to fork it 🤷
