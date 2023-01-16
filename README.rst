@@ -67,17 +67,15 @@ For more advanced usage, check out the documentation on `ReadTheDocs`_!
 
 Requirements
 ------------
-ClassRegistry is compatible with the following Python versions:
+ClassRegistry is known to be compatible with the following Python versions:
 
-- 3.8
-- 3.7
-- 3.6
-- 3.5
-
-pypy3 is also supported.
+- 3.11
+- 3.10
+- 3.9
 
 .. note::
-  ClassRegistry is **not** compatible with Python 2.
+   ClassRegistry's code is pretty simple, so it's likely to be compatible with
+   versions not listed here; there's just no test coverage to prove it 😇
 
 Installation
 ------------
@@ -86,15 +84,13 @@ Install the latest stable version via pip::
    pip install phx-class-registry
 
 
+.. important::
+   Make sure to install `phx-class-registry`, **not** `class-registry`.  I
+   created the latter in a previous job, but after I left they never touched
+   that project again — so in the end I had to fork it 🤷
+
 Running Unit Tests
 ------------------
-To run unit tests after installing from source::
-
-  python setup.py test
-
-This project is also compatible with `tox`_, which will run the unit tests in
-different virtual environments (one for each supported version of Python).
-
 Install the package with the ``test-runner`` extra to set up the necessary
 dependencies, and then you can run the tests with the ``tox`` command::
 

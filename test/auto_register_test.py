@@ -64,8 +64,7 @@ class AutoRegisterTestCase(TestCase):
 
     def test_abstract_strict_definition(self):
         """
-        If a class has no unimplemented abstract methods, it gets
-        registered.
+        If a class has no unimplemented abstract methods, it gets registered.
         """
         registry = ClassRegistry(attr_name='element')
 

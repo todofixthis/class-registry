@@ -73,21 +73,18 @@ To learn more about what you can do with ClassRegistry,
 
 Requirements
 ------------
-ClassRegistry is compatible with the following Python versions:
+ClassRegistry is known to be compatible with the following Python versions:
 
-- 3.8
-- 3.7
-- 3.6
-- 3.5
-
-pypy3 is also supported.
+- 3.11
+- 3.10
+- 3.9
 
 .. note::
-  ClassRegistry is **not** compatible with Python 2.
+   ClassRegistry's code is pretty simple, so it's likely to be compatible with
+   versions not listed here; there's just no test coverage to prove it 😇
 
 Installation
 ------------
 Install the latest stable version via pip::
 
    pip install phx-class-registry
-

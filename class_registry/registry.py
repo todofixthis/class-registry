@@ -17,8 +17,8 @@ class RegistryKeyError(KeyError):
     """
     Used to differentiate a registry lookup from a standard KeyError.
 
-    This is especially useful when a registry class expects to extract
-    values from dicts to generate keys.
+    This is especially useful when a registry class expects to extract values
+    from dicts to generate keys.
     """
     pass
 
@@ -28,30 +28,31 @@ class BaseRegistry(typing.Mapping, metaclass=ABCMeta):
     Base functionality for registries.
     """
 
-    def __contains__(self, key):
+    def __contains__(self, key: typing.Hashable) -> bool:
         """
         Returns whether the specified key is registered.
         """
         try:
-            # Use :py:meth:`get_class` instead of :py:meth:`__getitem__`
-            # in case the registered class' initializer requires
-            # arguments.
+            # Use :py:meth:`get_class` instead of :py:meth:`__getitem__`, to
+            # avoid creating a new instance unnecessarily (i.e., prevent
+            # errors if the corresponding class' constructor requires
+            # arguments).
             self.get_class(key)
         except RegistryKeyError:
             return False
         else:
             return True
 
-    def __dir__(self):
+    def __dir__(self) -> typing.List[typing.Hashable]:
         return list(self.keys())
 
-    def __getitem__(self, key):
+    def __getitem__(self, key: typing.Hashable) -> object:
         """
         Shortcut for calling :py:meth:`get` with empty args/kwargs.
         """
         return self.get(key)
 
-    def __iter__(self):
+    def __iter__(self) -> typing.KeysView[typing.Hashable]:
         """
         Returns a generator for iterating over registry keys, in the
         order that they were registered.
@@ -59,7 +60,7 @@ class BaseRegistry(typing.Mapping, metaclass=ABCMeta):
         return self.keys()
 
     @abstract_method
-    def __len__(self):
+    def __len__(self) -> int:
         """
         Returns the number of registered classes.
         """
@@ -67,15 +68,17 @@ class BaseRegistry(typing.Mapping, metaclass=ABCMeta):
             'Not implemented in {cls}.'.format(cls=type(self).__name__),
         )
 
-    def __missing__(self, key):
+    def __missing__(self, key) -> typing.Optional[object]:
         """
-        Returns the result (or raises an exception) when the requested
-        key can't be found in the registry.
+        Defines what to do when trying to access an unregistered key.
+
+        Default behaviour is to throw a typed exception, but you could override
+        this in a subclass, e.g., to return a default value.
         """
         raise RegistryKeyError(key)
 
     @abstract_method
-    def get_class(self, key):
+    def get_class(self, key: typing.Hashable) -> type:
         """
         Returns the class associated with the specified key.
         """
@@ -83,7 +86,7 @@ class BaseRegistry(typing.Mapping, metaclass=ABCMeta):
             'Not implemented in {cls}.'.format(cls=type(self).__name__),
         )
 
-    def get(self, key, *args, **kwargs):
+    def get(self, key: typing.Hashable, *args, **kwargs) -> object:
         """
         Creates a new instance of the class matching the specified key.
 
@@ -92,13 +95,13 @@ class BaseRegistry(typing.Mapping, metaclass=ABCMeta):
 
         :param args:
             Positional arguments passed to class initializer.
-            Ignored if the class registry was initialized with a null
-            template function.
+            Ignored if the class registry was initialized with a null template
+            function.
 
         :param kwargs:
             Keyword arguments passed to class initializer.
-            Ignored if the class registry was initialized with a null
-            template function.
+            Ignored if the class registry was initialized with a null template
+            function.
 
         References:
           - :py:meth:`__init__`
@@ -106,22 +109,23 @@ class BaseRegistry(typing.Mapping, metaclass=ABCMeta):
         return self.create_instance(self.get_class(key), *args, **kwargs)
 
     @staticmethod
-    def gen_lookup_key(key: typing.Any) -> typing.Hashable:
+    def gen_lookup_key(key: typing.Hashable) -> typing.Hashable:
         """
         Used by :py:meth:`get` to generate a lookup key.
 
-        You may override this method in a subclass, for example if you
-        need to support legacy aliases, etc.
+        You may override this method in a subclass, for example if you need to
+        support legacy aliases, etc.
         """
         return key
 
     @staticmethod
-    def create_instance(class_: type, *args, **kwargs):
+    def create_instance(class_: type, *args,
+            **kwargs) -> object:
         """
         Prepares the return value for :py:meth:`get`.
 
-        You may override this method in a subclass, if you want to
-        customize the way new instances are created.
+        You may override this method in a subclass, if you want to customize
+        the way new instances are created.
 
         :param class_:
             The requested class.
@@ -135,56 +139,43 @@ class BaseRegistry(typing.Mapping, metaclass=ABCMeta):
         return class_(*args, **kwargs)
 
     @abstract_method
-    def items(self) -> typing.Iterable[typing.Tuple[typing.Hashable, type]]:
+    def items(self) -> typing.ItemsView[typing.Hashable, type]:
         """
-        Iterates over registered classes and their corresponding keys,
-        in the order that they were registered.
-
-        Note: For compatibility with Python 3, this method should
-        return a generator.
+        Iterates over registered classes and their corresponding keys, in the
+        order that they were registered.
         """
         raise NotImplementedError(
             'Not implemented in {cls}.'.format(cls=type(self).__name__),
         )
 
-    def keys(self) -> typing.Iterable[typing.Hashable]:
+    def keys(self) -> typing.KeysView[typing.Hashable]:
         """
-        Returns a generator for iterating over registry keys, in the
-        order that they were registered.
-
-        Note: For compatibility with Python 3, this method should
-        return a generator.
+        Returns a generator for iterating over registry keys, in the order that
+        they were registered.
         """
         for item in self.items():
             yield item[0]
 
-    def values(self) -> typing.Iterable[type]:
+    def values(self) -> typing.ValuesView[type]:
         """
-        Returns a generator for iterating over registered classes, in
-        the order that they were registered.
-
-        Note: For compatibility with Python 3, this method should
-        return a generator.
+        Returns a generator for iterating over registered classes, in the order
+        that they were registered.
         """
         for item in self.items():
             yield item[1]
 
 
-class MutableRegistry(
-    BaseRegistry,
-    typing.MutableMapping,
-    metaclass=ABCMeta,
-):
+class MutableRegistry(BaseRegistry, typing.MutableMapping, metaclass=ABCMeta):
     """
-    Extends :py:class:`BaseRegistry` with methods that can be used to
-    modify the registered classes.
+    Extends :py:class:`BaseRegistry` with methods that can be used to modify
+    the registered classes.
     """
 
     def __init__(self, attr_name: typing.Optional[str] = None) -> None:
         """
         :param attr_name:
-            If provided, :py:meth:`register` will automatically detect
-            the key to use when registering new classes.
+            If provided, :py:meth:`register` will automatically detect the key
+            to use when registering new classes.
         """
         super(MutableRegistry, self).__init__()
 
@@ -194,21 +185,24 @@ class MutableRegistry(
         """
         Provides alternate syntax for un-registering a class.
         """
-        self._unregister(key)
+        self._unregister(self.gen_lookup_key(key))
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return '{type}({attr_name!r})'.format(
             attr_name=self.attr_name,
             type=type(self).__name__,
         )
 
-    def __setitem__(self, key: str, class_: type) -> None:
+    def __setitem__(self, key: typing.Hashable,
+            class_: type) -> None:
         """
         Provides alternate syntax for registering a class.
         """
-        self._register(key, class_)
+        self._register(self.gen_lookup_key(key), class_)
 
-    def register(self, key):
+    def register(self,
+            key: typing.Union[typing.Hashable, type]) -> \
+            typing.Callable[[type], type]:
         """
         Decorator that registers a class with the registry.
 
@@ -230,22 +224,27 @@ class MutableRegistry(
             The registry key to use for the registered class.
             Optional if the registry's :py:attr:`attr_name` is set.
         """
+        # ``@register`` usage:
         if is_class(key):
             if self.attr_name:
-                # Note that ``getattr`` will raise an AttributeError if
-                # the class doesn't have the required attribute.
-                self._register(getattr(key, self.attr_name), key)
+                # Note that ``getattr`` will raise an AttributeError if the
+                # class doesn't have the required attribute.
+                self._register(
+                    self.gen_lookup_key(getattr(key, self.attr_name)),
+                    key
+                )
                 return key
             else:
                 raise ValueError('Registry key is required.')
 
-        def _decorator(cls):
-            self._register(key, cls)
+        # ``@register('some_attr')`` usage:
+        def _decorator(cls: type) -> type:
+            self._register(self.gen_lookup_key(key), cls)
             return cls
 
         return _decorator
 
-    def unregister(self, key: typing.Any) -> type:
+    def unregister(self, key: typing.Hashable) -> type:
         """
         Unregisters the class with the specified key.
 
@@ -261,9 +260,12 @@ class MutableRegistry(
         return self._unregister(self.gen_lookup_key(key))
 
     @abstract_method
-    def _register(self, key: typing.Hashable, class_: type) -> None:
+    def _register(self, key: typing.Hashable,
+            class_: type) -> None:
         """
         Registers a class with the registry.
+
+        :param key: Has already been processed by :py:meth:`gen_lookup_key`.
         """
         raise NotImplementedError(
             'Not implemented in {cls}.'.format(cls=type(self).__name__),
@@ -273,6 +275,8 @@ class MutableRegistry(
     def _unregister(self, key: typing.Hashable) -> type:
         """
         Unregisters the class at the specified key.
+
+        :param key: Has already been processed by :py:meth:`gen_lookup_key`.
         """
         raise NotImplementedError(
             'Not implemented in {cls}.'.format(cls=type(self).__name__),
@@ -292,12 +296,12 @@ class ClassRegistry(MutableRegistry):
     ) -> None:
         """
         :param attr_name:
-            If provided, :py:meth:`register` will automatically detect
-            the key to use when registering new classes.
+            If provided, :py:meth:`register` will automatically detect the key
+            to use when registering new classes.
 
         :param unique:
-            Determines what happens when two classes are registered with
-            the same key:
+            Determines what happens when two classes are registered with the
+            same key:
 
             - ``True``: The second class will replace the first one.
             - ``False``: A ``ValueError`` will be raised.
@@ -306,22 +310,23 @@ class ClassRegistry(MutableRegistry):
 
         self.unique = unique
 
-        self._registry = OrderedDict()
+        self._registry: typing.OrderedDict[
+            typing.Hashable, type] = OrderedDict()
 
-    def __len__(self):
+    def __len__(self) -> int:
         """
         Returns the number of registered classes.
         """
         return len(self._registry)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return '{type}(attr_name={attr_name!r}, unique={unique!r})'.format(
             attr_name=self.attr_name,
             type=type(self).__name__,
             unique=self.unique,
         )
 
-    def get_class(self, key):
+    def get_class(self, key: typing.Hashable) -> typing.Optional[type]:
         """
         Returns the class associated with the specified key.
         """
@@ -332,16 +337,18 @@ class ClassRegistry(MutableRegistry):
         except KeyError:
             return self.__missing__(lookup_key)
 
-    def items(self) -> typing.Iterable[typing.Tuple[typing.Hashable, str]]:
+    def items(self) -> typing.ItemsView[typing.Hashable, type]:
         """
-        Iterates over all registered classes, in the order they were
-        added.
+        Iterates over all registered classes, in the order they were added.
         """
         return self._registry.items()
 
-    def _register(self, key: typing.Hashable, class_: type) -> None:
+    def _register(self, key: typing.Hashable,
+            class_: type) -> None:
         """
         Registers a class with the registry.
+
+        :param key: Has already been processed by :py:meth:`gen_lookup_key`.
         """
         if key in ['', None]:
             raise ValueError(
@@ -365,6 +372,8 @@ class ClassRegistry(MutableRegistry):
     def _unregister(self, key: typing.Hashable) -> type:
         """
         Unregisters the class at the specified key.
+
+        :param key: Has already been processed by :py:meth:`gen_lookup_key`.
         """
         return (
             self._registry.pop(key)
@@ -401,13 +410,18 @@ class SortedClassRegistry(ClassRegistry):
 
             If callable, must accept two tuples of (key, class).
 
+            .. note::
+                Keys are passed through :py:meth:`gen_lookup_key` before being
+                passed to the sort function.  By default, it's a passthrough,
+                but keep it in mind if you override the method in a subclass.
+
         :param attr_name:
-            If provided, :py:meth:`register` will automatically detect
-            the key to use when registering new classes.
+            If provided, :py:meth:`register` will automatically detect the key
+            to use when registering new classes.
 
         :param unique:
-            Determines what happens when two classes are registered with
-            the same key:
+            Determines what happens when two classes are registered with the
+            same key:
 
             - ``True``: The second class will replace the first one.
             - ``False``: A ``ValueError`` will be raised.
@@ -425,18 +439,25 @@ class SortedClassRegistry(ClassRegistry):
 
         self.reverse = reverse
 
-    def items(self) -> typing.Iterable[typing.Tuple[typing.Hashable, type]]:
-        return sorted(
-            self._registry.items(),
-            key=self._sort_key,
-            reverse=self.reverse,
-        )
+    def items(self) -> typing.ItemsView[typing.Hashable, type]:
+        for t in sorted(
+                self._registry.items(),
+                key=self._sort_key,
+                reverse=self.reverse,
+        ):
+            yield t
 
     @staticmethod
-    def create_sorter(sort_key):
+    def create_sorter(sort_key: str) -> typing.Callable[
+        [
+            typing.Tuple[typing.Hashable, type],
+            typing.Tuple[typing.Hashable, type]
+        ],
+        int,
+    ]:
         """
-        Given a sort key, creates a function that can be used to sort
-        items when iterating over the registry.
+        Given a sort key, creates a function that can be used to sort items
+        when iterating over the registry.
         """
 
         def sorter(a, b):

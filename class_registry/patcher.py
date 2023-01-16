@@ -1,4 +1,6 @@
-from class_registry.registry import MutableRegistry, RegistryKeyError
+import typing
+
+from .registry import MutableRegistry, RegistryKeyError
 
 __all__ = [
     'RegistryPatcher',
@@ -7,8 +9,8 @@ __all__ = [
 
 class RegistryPatcher(object):
     """
-    Creates a context in which classes are temporarily registered with
-    a class registry, then removed when the context exits.
+    Creates a context in which classes are temporarily registered with a class
+    registry, then removed when the context exits.
 
     Note: only mutable registries can be patched!
     """
@@ -33,11 +35,10 @@ class RegistryPatcher(object):
             Note: ``registry.attr_name`` must be set!
 
         :param kwargs:
-            Same as ``args``, except you explicitly specify the
-            registry keys.
+            Same as ``args``, except you explicitly specify the registry keys.
 
-            In the event of a conflict, values in ``args`` override
-            values in ``kwargs``.
+            In the event of a conflict, values in ``args`` override values in
+            ``kwargs``.
         """
         super(RegistryPatcher, self).__init__()
 
@@ -49,13 +50,13 @@ class RegistryPatcher(object):
         self._new_values = kwargs
         self._prev_values = {}
 
-    def __enter__(self):
+    def __enter__(self) -> None:
         self.apply()
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
         self.restore()
 
-    def apply(self):
+    def apply(self) -> None:
         """
         Applies the new values.
         """
@@ -67,36 +68,37 @@ class RegistryPatcher(object):
 
         # Patch values.
         for key, value in self._new_values.items():
-            # Remove the existing value first (prevents issues if the
-            # registry has ``unique=True``).
+            # Remove the existing value first (prevents issues if the registry
+            # has ``unique=True``).
             self._del_value(key)
 
             if value is not self.DoesNotExist:
                 self._set_value(key, value)
 
-    def restore(self):
+    def restore(self) -> None:
         """
         Restores previous settings.
         """
         # Restore previous settings.
         for key, value in self._prev_values.items():
-            # Remove the existing value first (prevents issues if the
-            # registry has ``unique=True``).
+            # Remove the existing value first (prevents issues if the registry
+            # has ``unique=True``).
             self._del_value(key)
 
             if value is not self.DoesNotExist:
                 self._set_value(key, value)
 
-    def _get_value(self, key, default=None):
+    def _get_value(self, key: typing.Hashable, default=None) -> \
+            typing.Optional[type]:
         try:
             return self.target.get_class(key)
         except RegistryKeyError:
             return default
 
-    def _set_value(self, key, value):
+    def _set_value(self, key: typing.Hashable, value: type) -> None:
         self.target.register(key)(value)
 
-    def _del_value(self, key):
+    def _del_value(self, key: typing.Hashable) -> None:
         try:
             self.target.unregister(key)
         except RegistryKeyError:

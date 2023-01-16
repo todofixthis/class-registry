@@ -17,7 +17,7 @@ setup(
     description='Factory+Registry pattern for Python classes.',
     url='https://class-registry.readthedocs.io/',
 
-    version='3.0.5',
+    version='4.0.0',
 
     packages=['class_registry'],
 
@@ -27,12 +27,8 @@ setup(
 
     extras_require={
         'docs-builder': ['sphinx', 'sphinx_rtd_theme'],
-        'test-runner':  ['tox >= 3.7'],
+        'test-runner':  ['nose2', 'tox'],
     },
-
-    test_suite='test',
-    test_loader='nose.loader:TestLoader',
-    tests_require=['nose'],
 
     license='MIT',
 
@@ -41,15 +37,12 @@ setup(
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.5',
-        'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: 3.7',
-        'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.11',
         'Programming Language :: Python :: Implementation :: PyPy',
         'Topic :: Software Development :: Libraries :: Python Modules',
     ],
 
-    keywords='registry pattern',
+    keywords='factory registry design pattern',
 
     author='Phoenix Zerin',
     author_email='phx@phx.ph',
