@@ -1,0 +1,37 @@
+# :see: https://peps.python.org/pep-0621/
+
+[project]
+name = "phx-class-registry"
+version = "4.0.0"
+description = "Factory+Registry pattern for Python classes"
+readme = "README.rst"
+requires-python = ">= 3"
+license = { file = "LICENCE.txt" }
+authors = [
+    { email = "Phoenix Zerin <phx@phx.nz>" }
+]
+keywords = [
+    "design pattern",
+    "factory pattern",
+    "registry pattern",
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: Implementation :: PyPy",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+
+[project.optional-dependencies]
+"build-system" = ["build", "twine"]
+"docs-builder" = ["sphinx", "sphinx_rtd_theme"]
+"test-runner" = ["tox"]
+
+[project.urls]
+documentation = "https://class-registry.readthedocs.io/"
+repository = "https://github.com/todofixthis/class-registry"

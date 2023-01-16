@@ -111,7 +111,7 @@ class ClassRegistryTestCase(TestCase):
 
         .. note::
            This is not used that often outside unit tests (e.g., to remove
-           artifacts when a test has to add a class to a global registry).
+           artefacts when a test has to add a class to a global registry).
         """
         registry = ClassRegistry(attr_name='element')
         registry.register(Charmander)

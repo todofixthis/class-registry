@@ -94,8 +94,8 @@ Running Unit Tests
 Install the package with the ``test-runner`` extra to set up the necessary
 dependencies, and then you can run the tests with the ``tox`` command::
 
-  pip install -e .[test-runner]
-  tox -p all
+   pip install -e .[test-runner]
+   tox -p all
 
 Documentation
 -------------
@@ -106,16 +106,42 @@ documentation locally:
 
 #. Install extra dependencies (you only have to do this once)::
 
-      pip install '.[docs-builder]'
+   pip install -e '.[docs-builder]'
 
 #. Switch to the ``docs`` directory::
 
-      cd docs
+   cd docs
 
 #. Build the documentation::
 
-      make html
+   make html
+
+Releases
+--------
+Steps to build releases are based on `Packaging Python Projects Tutorial`_
+
+Build the Project
+~~~~~~~~~~~~~~~~~
+#. Install extra dependencies (you only have to do this once)::
+
+    pip install -e '.[build-system]'
+
+#. Run the build::
+
+    python -m build
+
+#. The build artefacts will be located in the ``dist`` directory at the top
+   level of the project.
 
 
+Upload to PyPI
+~~~~~~~~~~~~~~
+#. `Create a PyPI API token`_ (you only have to do this once).
+#. Upload build artefacts to PyPI:
+
+   python -m twine upload dist/*
+
+.. _Create a PyPI API token: https://pypi.org/manage/account/token/
+.. _Packaging Python Projects Tutorial: https://packaging.python.org/en/latest/tutorials/packaging-projects/
 .. _ReadTheDocs: https://class-registry.readthedocs.io/
 .. _tox: https://tox.readthedocs.io/
