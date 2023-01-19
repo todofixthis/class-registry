@@ -35,4 +35,5 @@ classifiers = [
 [project.urls]
 Documentation = "https://class-registry.readthedocs.io/"
 Changelog = "https://github.com/todofixthis/class-registry/releases"
+Issues = "https://github.com/todofixthis/class-registry/issues"
 Repository = "https://github.com/todofixthis/class-registry"

@@ -1,5 +1,3 @@
-.. image:: https://travis-ci.org/todofixthis/class-registry.svg?branch=master
-   :target: https://travis-ci.org/todofixthis/class-registry
 .. image:: https://readthedocs.org/projects/class-registry/badge/?version=latest
    :target: http://class-registry.readthedocs.io/
 
@@ -74,8 +72,10 @@ ClassRegistry is known to be compatible with the following Python versions:
 - 3.9
 
 .. note::
-   ClassRegistry's code is pretty simple, so it's likely to be compatible with
-   versions not listed here; there's just no test coverage to prove it 😇
+   I'm only one person, so to keep from getting overwhelmed, I'm only committing
+   to supporting the 3 most recent versions of Python.  ClassRegistry's code is
+   pretty simple, so it's likely to be compatible with versions not listed here;
+   there just won't be any test coverage to prove it 😇
 
 Installation
 ------------
@@ -87,7 +87,8 @@ Install the latest stable version via pip::
 .. important::
    Make sure to install `phx-class-registry`, **not** `class-registry`.  I
    created the latter at a previous job years ago, and after I left they never
-   touched that project again — so in the end I had to fork it 🤷
+   touched that project again and stopped responding to my emails — so in the
+   end I had to fork it 🤷
 
 Running Unit Tests
 ------------------
