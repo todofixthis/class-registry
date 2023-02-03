@@ -1,2 +1,3 @@
 include LICENCE.txt
-recursive-include test *.py
+graft test
+prune **/__pycache__

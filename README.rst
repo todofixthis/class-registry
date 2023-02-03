@@ -96,7 +96,11 @@ Install the package with the ``test-runner`` extra to set up the necessary
 dependencies, and then you can run the tests with the ``tox`` command::
 
    pip install -e .[test-runner]
-   tox -p all
+   tox -p
+
+To run tests in the current virtualenv::
+
+   python -m unittest
 
 Documentation
 -------------
