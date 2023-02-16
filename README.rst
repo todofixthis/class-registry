@@ -1,3 +1,5 @@
+.. image:: https://github.com/todofixthis/class-registry/actions/workflows/build.yml/badge.svg
+   :target: https://github.com/todofixthis/class-registry/actions/workflows/build.yml
 .. image:: https://readthedocs.org/projects/class-registry/badge/?version=latest
    :target: http://class-registry.readthedocs.io/
 
