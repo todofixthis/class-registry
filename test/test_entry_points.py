@@ -1,22 +1,18 @@
-from os.path import dirname
+from importlib.metadata import entry_points
 from unittest import TestCase
-
-from pkg_resources import iter_entry_points, working_set
 
 from class_registry import EntryPointClassRegistry, RegistryKeyError
 from test import Bulbasaur, Charmander, Mew, PokemonFactory, Squirtle
+from test.helper import DummyDistributionFinder
 
 
 def setUpModule():
-    #
-    # Install a fake distribution that we can use to inject entry points at
-    # runtime.
-    #
-    # The side effects from this are pretty severe, but they (very probably)
-    # only impact this test, and they are undone as soon as the process
-    # terminates.
-    #
-    working_set.add_entry(dirname(__file__))
+    # Inject a distribution that defines some entry points.
+    DummyDistributionFinder.install()
+
+
+def tearDownModule():
+    DummyDistributionFinder.uninstall()
 
 
 class EntryPointClassRegistryTestCase(TestCase):
@@ -85,7 +81,7 @@ class EntryPointClassRegistryTestCase(TestCase):
         """
         # Just in case some other package defines pokémon entry
         # points (:
-        expected = len(list(iter_entry_points('pokemon')))
+        expected = len(list(entry_points(group='pokemon')))
 
         # Quick sanity check, to make sure our test pokémon are
         # registered correctly.
