@@ -1,6 +1,6 @@
-import typing
+from importlib.metadata import entry_points
 
-from pkg_resources import iter_entry_points
+import typing
 
 from . import BaseRegistry
 
@@ -97,7 +97,7 @@ class EntryPointClassRegistry(BaseRegistry):
         """
         if self._cache is None:
             self._cache = {}
-            for e in iter_entry_points(self.group):
+            for e in entry_points(group=self.group):
                 cls = e.load()
 
                 # Try to apply branding, but only for compatible types (i.e.,

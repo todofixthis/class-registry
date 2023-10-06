@@ -1,3 +1,5 @@
+.. image:: https://github.com/todofixthis/class-registry/actions/workflows/build.yml/badge.svg
+   :target: https://github.com/todofixthis/class-registry/actions/workflows/build.yml
 .. image:: https://readthedocs.org/projects/class-registry/badge/?version=latest
    :target: http://class-registry.readthedocs.io/
 
@@ -67,9 +69,9 @@ Requirements
 ------------
 ClassRegistry is known to be compatible with the following Python versions:
 
+- 3.12
 - 3.11
 - 3.10
-- 3.9
 
 .. note::
    I'm only one person, so to keep from getting overwhelmed, I'm only committing
