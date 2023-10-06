@@ -75,13 +75,15 @@ Requirements
 ------------
 ClassRegistry is known to be compatible with the following Python versions:
 
+- 3.12
 - 3.11
 - 3.10
-- 3.9
 
 .. note::
-   ClassRegistry's code is pretty simple, so it's likely to be compatible with
-   versions not listed here; there's just no test coverage to prove it 😇
+   I'm only one person, so to keep from getting overwhelmed, I'm only committing
+   to supporting the 3 most recent versions of Python.  ClassRegistry's code is
+   pretty simple, so it's likely to be compatible with versions not listed here;
+   there just won't be any test coverage to prove it 😇
 
 Installation
 ------------
