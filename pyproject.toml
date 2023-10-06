@@ -2,7 +2,7 @@
 
 [project]
 name = "phx-class-registry"
-version = "4.0.6"
+version = "4.1.0"
 description = "Factory+Registry pattern for Python classes"
 readme = "README.rst"
 requires-python = ">= 3.10"
