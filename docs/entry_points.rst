@@ -7,28 +7,46 @@ registries!
 
 Let's see what that might look like in practice.
 
-First, we'll create a package with its own ``setup.py`` file:
+First, we'll create a package with its own ``pyproject.toml`` file:
 
-.. code-block:: python
+.. code-block:: toml
 
-   # generation_2/setup.py
+   # generation_2/pyproject.toml
+   [project]
+   name="pokemon-generation-2"
+   description="Extends the pokédex with generation 2 pokémon!"
 
-   from setuptools import setup
-
-   setup(
-     name = 'pokemon-generation-2',
-     description = 'Extends the pokédex with generation 2 pokémon!',
-
-     entry_points = {
-       'pokemon': [
-         'grass=gen2.pokemon:Chikorita',
-         'fire=gen2.pokemon:Cyndaquil',
-         'water=gen2.pokemon:Totodile',
-       ],
-     },
-   )
+   [project.entry-points.pokemon]
+   grass="gen2.pokemon:Chikorita"
+   fire="gen2.pokemon:Cyndaquil"
+   water="gen2.pokemon:Totodile"
 
 Note that we declared some ``pokemon`` entry points.
+
+.. tip::
+
+   If your project uses ``setup.py``, it will look like this instead:
+
+   .. code-block:: python
+
+      # generation_2/setup.py
+      from setuptools import setup
+
+      setup(
+        name = 'pokemon-generation-2',
+        description = 'Extends the pokédex with generation 2 pokémon!',
+
+        entry_points = {
+          'pokemon': [
+            'grass=gen2.pokemon:Chikorita',
+            'fire=gen2.pokemon:Cyndaquil',
+            'water=gen2.pokemon:Totodile',
+          ],
+        },
+      )
+
+   Note that ``setup.py`` is being phased out in favour of ``pyproject.toml``.
+   `Learn more about pyproject.toml.`_
 
 Let's see what happens once the ``pokemon-generation-2`` package is installed::
 
@@ -92,3 +110,4 @@ on every class and instance that it returned.
    overwrite it.
 
 .. _entry points: http://setuptools.readthedocs.io/en/latest/setuptools.html#dynamic-discovery-of-services-and-plugins
+.. _Learn more about pyproject.toml.: https://stackoverflow.com/q/62983756/5568265
