@@ -26,7 +26,9 @@ jobs:
           cache: poetry
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
-        run: poetry install --include=test
+        run: |
+          pip install poetry
+          poetry install --include=test
       - name: Run tests
         run: poetry run pytest
 
@@ -43,7 +45,9 @@ jobs:
           cache: poetry
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
-        run: poetry install --include=dev
+        run: |
+          pip install poetry
+          poetry install --include=dev
       - name: Check docs build
         run: |
           cd docs
