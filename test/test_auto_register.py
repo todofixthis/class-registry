@@ -1,7 +1,8 @@
 from abc import ABCMeta, abstractmethod as abstract_method
 from unittest import TestCase
 
-from class_registry import AutoRegister, ClassRegistry
+from class_registry import ClassRegistry
+from class_registry.auto_register import AutoRegister
 
 
 class AutoRegisterTestCase(TestCase):
@@ -9,7 +10,7 @@ class AutoRegisterTestCase(TestCase):
         """
         Using :py:func:`AutoRegister` to, well, auto-register classes.
         """
-        registry = ClassRegistry(attr_name='element')
+        registry = ClassRegistry(attr_name="element")
 
         # Note that we declare :py:func:`AutoRegister` as the metaclass
         # for our base class.
@@ -26,10 +27,11 @@ class AutoRegisterTestCase(TestCase):
             """
             Non-abstract subclass; will get registered automatically.
             """
-            element = 'ground'
+
+            element = "ground"
 
             def get_abilities(self):
-                return ['sand veil']
+                return ["sand veil"]
 
         class BaseEvolvingPokemon(BasePokemon, metaclass=ABCMeta):
             """
@@ -44,21 +46,21 @@ class AutoRegisterTestCase(TestCase):
             """
             Non-abstract subclass; will get registered automatically.
             """
-            element = 'poison'
+
+            element = "poison"
 
             def get_abilities(self):
-                return ['intimidate', 'shed skin']
+                return ["intimidate", "shed skin"]
 
             def evolve(self):
-                return 'Congratulations! Your EKANS evolved into ARBOK!'
+                return "Congratulations! Your EKANS evolved into ARBOK!"
 
         self.assertListEqual(
             list(registry.items()),
-
             [
                 # Note that only non-abstract classes got registered.
-                ('ground', Sandslash),
-                ('poison', Ekans),
+                ("ground", Sandslash),
+                ("poison", Ekans),
             ],
         )
 
@@ -66,19 +68,18 @@ class AutoRegisterTestCase(TestCase):
         """
         If a class has no unimplemented abstract methods, it gets registered.
         """
-        registry = ClassRegistry(attr_name='element')
+        registry = ClassRegistry(attr_name="element")
 
         class FightingPokemon(metaclass=AutoRegister(registry)):
-            element = 'fighting'
+            element = "fighting"
 
         self.assertListEqual(
             list(registry.items()),
-
             [
                 # :py:class:`FightingPokemon` does not define any
                 # abstract methods, so it is not considered to be
                 # abstract!
-                ('fighting', FightingPokemon),
+                ("fighting", FightingPokemon),
             ],
         )
 

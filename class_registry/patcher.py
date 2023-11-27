@@ -1,9 +1,10 @@
 import typing
 
-from .registry import BaseMutableRegistry, RegistryKeyError
+from . import RegistryKeyError
+from .base import BaseMutableRegistry
 
 __all__ = [
-    'RegistryPatcher',
+    "RegistryPatcher",
 ]
 
 
@@ -19,6 +20,7 @@ class RegistryPatcher(object):
         """
         Used to identify a value that did not exist before we started.
         """
+
         pass
 
     def __init__(self, registry: BaseMutableRegistry, *args, **kwargs) -> None:
@@ -62,8 +64,7 @@ class RegistryPatcher(object):
         """
         # Back up previous values.
         self._prev_values = {
-            key: self._get_value(key, self.DoesNotExist)
-            for key in self._new_values
+            key: self._get_value(key, self.DoesNotExist) for key in self._new_values
         }
 
         # Patch values.
@@ -88,8 +89,7 @@ class RegistryPatcher(object):
             if value is not self.DoesNotExist:
                 self._set_value(key, value)
 
-    def _get_value(self, key: typing.Hashable, default=None) -> \
-            typing.Optional[type]:
+    def _get_value(self, key: typing.Hashable, default=None) -> typing.Optional[type]:
         try:
             return self.target.get_class(key)
         except RegistryKeyError:

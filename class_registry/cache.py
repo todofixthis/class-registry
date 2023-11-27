@@ -4,7 +4,7 @@ from collections import defaultdict
 from . import ClassRegistry
 
 __all__ = [
-    'ClassRegistryInstanceCache',
+    "ClassRegistryInstanceCache",
 ]
 
 
@@ -58,9 +58,7 @@ class ClassRegistryInstanceCache(object):
             self._key_map[class_key].append(instance_key)
 
             self._cache[instance_key] = self._registry.get(
-                class_key,
-                *self._template_args,
-                **self._template_kwargs
+                class_key, *self._template_args, **self._template_kwargs
             )
 
         return self._cache[instance_key]

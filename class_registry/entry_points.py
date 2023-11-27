@@ -1,11 +1,10 @@
+import typing
 from importlib.metadata import entry_points
 
-import typing
-
-from . import BaseRegistry
+from .base import BaseRegistry
 
 __all__ = [
-    'EntryPointClassRegistry',
+    "EntryPointClassRegistry",
 ]
 
 
@@ -15,9 +14,9 @@ class EntryPointClassRegistry(BaseRegistry):
     """
 
     def __init__(
-            self,
-            group: str,
-            attr_name: typing.Optional[str] = None,
+        self,
+        group: str,
+        attr_name: typing.Optional[str] = None,
     ) -> None:
         """
         :param group:
@@ -52,14 +51,13 @@ class EntryPointClassRegistry(BaseRegistry):
         return len(self._get_cache())
 
     def __repr__(self) -> str:
-        return '{type}(group={group!r})'.format(
+        return "{type}(group={group!r})".format(
             group=self.group,
             type=type(self).__name__,
         )
 
-    def get(self, key: typing.Hashable, *args, **kwargs) -> object:
-        instance = super(EntryPointClassRegistry, self).get(key, *args,
-            **kwargs)
+    def get(self, key: typing.Hashable, *args, **kwargs) -> typing.Any:
+        instance = super(EntryPointClassRegistry, self).get(key, *args, **kwargs)
 
         if self.attr_name:
             # Apply branding to the instance explicitly.

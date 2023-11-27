@@ -1,15 +1,14 @@
 from abc import ABCMeta
 from inspect import isabstract as is_abstract
 
-from .registry import BaseMutableRegistry
+from .base import BaseMutableRegistry
 
 __all__ = [
-    'AutoRegister',
+    "AutoRegister",
 ]
 
 
-def AutoRegister(registry: BaseMutableRegistry,
-        base_type: type = ABCMeta) -> type:
+def AutoRegister(registry: BaseMutableRegistry, base_type: type = ABCMeta) -> type:
     """
     Creates a metaclass that automatically registers all non-abstract
     subclasses in the specified registry.
@@ -48,7 +47,7 @@ def AutoRegister(registry: BaseMutableRegistry,
     """
     if not registry.attr_name:
         raise ValueError(
-            'Missing `attr_name` in {registry}.'.format(registry=registry),
+            "Missing `attr_name` in {registry}.".format(registry=registry),
         )
 
     class _metaclass(base_type):
