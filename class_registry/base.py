@@ -56,9 +56,7 @@ class BaseRegistry(typing.Mapping, ABC):
         """
         Returns the number of registered classes.
         """
-        raise NotImplementedError(
-            "Not implemented in {cls}.".format(cls=type(self).__name__),
-        )
+        raise NotImplementedError()
 
     def __missing__(self, key) -> typing.Optional[typing.Any]:
         """
@@ -74,9 +72,7 @@ class BaseRegistry(typing.Mapping, ABC):
         """
         Returns the class associated with the specified key.
         """
-        raise NotImplementedError(
-            "Not implemented in {cls}.".format(cls=type(self).__name__),
-        )
+        raise NotImplementedError()
 
     def get(self, key: typing.Hashable, *args, **kwargs) -> typing.Any:
         """
@@ -135,9 +131,7 @@ class BaseRegistry(typing.Mapping, ABC):
         Iterates over registered classes and their corresponding keys, in the order that
         they were registered.
         """
-        raise NotImplementedError(
-            "Not implemented in {cls}.".format(cls=type(self).__name__),
-        )
+        raise NotImplementedError()
 
     def keys(self) -> typing.Generator[typing.Hashable, None, None]:
         """
@@ -185,10 +179,7 @@ class BaseMutableRegistry(BaseRegistry, typing.MutableMapping, ABC):
         del self._lookup_keys[key]
 
     def __repr__(self) -> str:
-        return "{type}({attr_name!r})".format(
-            attr_name=self.attr_name,
-            type=type(self).__name__,
-        )
+        return f"{type(self).__name__}({self.attr_name!r})"
 
     def __setitem__(self, key: typing.Hashable, class_: type) -> None:
         """
@@ -276,9 +267,7 @@ class BaseMutableRegistry(BaseRegistry, typing.MutableMapping, ABC):
 
         :param key: Has already been processed by :py:meth:`gen_lookup_key`.
         """
-        raise NotImplementedError(
-            "Not implemented in {cls}.".format(cls=type(self).__name__),
-        )
+        raise NotImplementedError()
 
     @abstract_method
     def _unregister(self, key: typing.Hashable) -> type:
@@ -287,9 +276,7 @@ class BaseMutableRegistry(BaseRegistry, typing.MutableMapping, ABC):
 
         :param key: Has already been processed by :py:meth:`gen_lookup_key`.
         """
-        raise NotImplementedError(
-            "Not implemented in {cls}.".format(cls=type(self).__name__),
-        )
+        raise NotImplementedError()
 
 
 def AutoRegister(registry: BaseMutableRegistry) -> type:
@@ -323,9 +310,7 @@ def AutoRegister(registry: BaseMutableRegistry) -> type:
         Note: the registry's ``attr_name`` attribute must be set!
     """
     if not registry.attr_name:
-        raise ValueError(
-            "Missing `attr_name` in {registry}.".format(registry=registry),
-        )
+        raise ValueError(f"Missing `attr_name` in {registry}.")
 
     class _Base:
         def __init_subclass__(cls, **kwargs):

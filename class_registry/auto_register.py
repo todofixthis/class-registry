@@ -55,9 +55,7 @@ def AutoRegister(registry: BaseMutableRegistry, base_type: type = ABCMeta) -> ty
     )
 
     if not registry.attr_name:
-        raise ValueError(
-            "Missing `attr_name` in {registry}.".format(registry=registry),
-        )
+        raise ValueError(f"Missing `attr_name` in {registry}.")
 
     class _metaclass(base_type):
         def __init__(self, what, bases=None, attrs=None):
