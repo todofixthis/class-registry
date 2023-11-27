@@ -1,83 +1,85 @@
-from unittest import TestCase
+import pytest
 
+from class_registry import ClassRegistry
 from class_registry.cache import ClassRegistryInstanceCache
-from class_registry.registry import ClassRegistry
 from test import Bulbasaur, Charmander, Charmeleon, Squirtle, Wartortle
 
 
-class ClassRegistryInstanceCacheTestCase(TestCase):
-    def setUp(self):
-        super(ClassRegistryInstanceCacheTestCase, self).setUp()
+@pytest.fixture(name="registry")
+def fixture_registry() -> ClassRegistry:
+    return ClassRegistry(attr_name="element")
 
-        self.registry = ClassRegistry(attr_name='element')
-        self.cache = ClassRegistryInstanceCache(self.registry)
 
-    def test_get(self):
-        """
-        When an instance is returned from
-        :py:meth:`ClassRegistryInstanceCache.get`, future invocations return
-        the same instance.
-        """
-        # Register a few classes with the ClassRegistry.
-        self.registry.register(Bulbasaur)
-        self.registry.register(Charmander)
-        self.registry.register(Squirtle)
+@pytest.fixture(name="cache")
+def fixture_cache(registry: ClassRegistry) -> ClassRegistryInstanceCache:
+    return ClassRegistryInstanceCache(registry)
 
-        poke_1 = self.cache['grass']
-        self.assertIsInstance(poke_1, Bulbasaur)
 
-        # Same key = exact same instance.
-        poke_2 = self.cache['grass']
-        self.assertIs(poke_2, poke_1)
+def test_get(cache: ClassRegistryInstanceCache, registry: ClassRegistry):
+    """
+    When an instance is returned from
+    :py:meth:`ClassRegistryInstanceCache.get`, future invocations return
+    the same instance.
+    """
+    # Register a few classes with the ClassRegistry.
+    registry.register(Bulbasaur)
+    registry.register(Charmander)
+    registry.register(Squirtle)
 
-        poke_3 = self.cache['water']
-        self.assertIsInstance(poke_3, Squirtle)
+    poke_1 = cache["grass"]
+    assert isinstance(poke_1, Bulbasaur)
 
-        # If we pull a class directly from the wrapped registry, we get
-        # a new instance.
-        poke_4 = self.registry['water']
-        self.assertIsInstance(poke_4, Squirtle)
-        self.assertIsNot(poke_3, poke_4)
+    # Same key = exact same instance.
+    poke_2 = cache["grass"]
+    assert poke_2 is poke_1
 
-    def test_template_args(self):
-        """
-        Extra params passed to the cache constructor are passed to the template
-        function when creating new instances.
-        """
-        self.registry.register(Charmeleon)
-        self.registry.register(Wartortle)
+    poke_3 = cache["water"]
+    assert isinstance(poke_3, Squirtle)
 
-        # Add an extra init param to the cache.
-        cache = ClassRegistryInstanceCache(self.registry, name='Bruce')
+    # If we pull a class directly from the wrapped registry, we get
+    # a new instance.
+    poke_4 = registry["water"]
+    assert isinstance(poke_4, Squirtle)
+    assert poke_3 is not poke_4
 
-        # The cache parameters are automatically applied to the class'
-        # initializer.
-        poke_1 = cache['fire']
-        self.assertIsInstance(poke_1, Charmeleon)
-        self.assertEqual(poke_1.name, 'Bruce')
 
-        poke_2 = cache['water']
-        self.assertIsInstance(poke_2, Wartortle)
-        self.assertEqual(poke_2.name, 'Bruce')
+def test_template_args(cache: ClassRegistryInstanceCache, registry: ClassRegistry):
+    """
+    Extra params passed to the cache constructor are passed to the template
+    function when creating new instances.
+    """
+    registry.register(Charmeleon)
+    registry.register(Wartortle)
 
-    def test_iterator(self):
-        """
-        Creating an iterator using :py:func:`iter`.
-        """
-        self.registry.register(Bulbasaur)
-        self.registry.register(Charmander)
-        self.registry.register(Squirtle)
+    # Add an extra init param to the cache.
+    cache = ClassRegistryInstanceCache(registry, name="Bruce")
 
-        # The cache's iterator only operates over cached instances.
-        self.assertListEqual(list(iter(self.cache)), [])
+    # The cache parameters are automatically applied to the class'
+    # initializer.
+    poke_1 = cache["fire"]
+    assert isinstance(poke_1, Charmeleon)
+    assert poke_1.name == "Bruce"
 
-        poke_1 = self.cache['water']
-        poke_2 = self.cache['grass']
-        poke_3 = self.cache['fire']
+    poke_2 = cache["water"]
+    assert isinstance(poke_2, Wartortle)
+    assert poke_2.name == "Bruce"
 
-        # The order that values are yielded depends on the ordering of
-        # the wrapped registry.
-        self.assertListEqual(
-            list(iter(self.cache)),
-            [poke_2, poke_3, poke_1],
-        )
+
+def test_iterator(cache: ClassRegistryInstanceCache, registry: ClassRegistry):
+    """
+    Creating an iterator using :py:func:`iter`.
+    """
+    registry.register(Bulbasaur)
+    registry.register(Charmander)
+    registry.register(Squirtle)
+
+    # The cache's iterator only operates over cached instances.
+    assert list(iter(cache)) == []
+
+    poke_1 = cache["water"]
+    poke_2 = cache["grass"]
+    poke_3 = cache["fire"]
+
+    # The order that values are yielded depends on the ordering of
+    # the wrapped registry.
+    assert list(iter(cache)) == [poke_2, poke_3, poke_1]

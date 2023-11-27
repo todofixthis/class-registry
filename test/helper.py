@@ -12,7 +12,7 @@ class DummyDistributionFinder(DistributionFinder):
     virtualenv.
     """
 
-    DUMMY_PACKAGE_DIR = 'dummy_package.egg-info'
+    DUMMY_PACKAGE_DIR = "dummy_package.egg-info"
 
     @classmethod
     def install(cls):
@@ -20,7 +20,7 @@ class DummyDistributionFinder(DistributionFinder):
             if isinstance(finder, cls):
                 # If we've already installed an instance of the class, then
                 # something is probably wrong with our tests.
-                raise ValueError(f'{cls.__name__} is already installed')
+                raise ValueError(f"{cls.__name__} is already installed")
 
         sys.meta_path.append(cls())
 
@@ -33,9 +33,11 @@ class DummyDistributionFinder(DistributionFinder):
         else:
             # If we didn't find an installed instance of the class, then
             # something is probably wrong with our tests.
-            raise ValueError(f'{cls.__name__} was not installed')
+            raise ValueError(f"{cls.__name__} was not installed")
 
     def find_distributions(self, context=...) -> list[PathDistribution]:
-        return [PathDistribution(
-            Path(path.join(path.dirname(__file__), self.DUMMY_PACKAGE_DIR))
-        )]
+        return [
+            PathDistribution(
+                Path(path.join(path.dirname(__file__), self.DUMMY_PACKAGE_DIR))
+            )
+        ]

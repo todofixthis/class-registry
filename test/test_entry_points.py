@@ -1,5 +1,6 @@
 from importlib.metadata import entry_points
-from unittest import TestCase
+
+import pytest
 
 from class_registry import RegistryKeyError
 from class_registry.entry_points import EntryPointClassRegistry
@@ -7,97 +8,96 @@ from test import Bulbasaur, Charmander, Mew, PokemonFactory, Squirtle
 from test.helper import DummyDistributionFinder
 
 
-def setUpModule():
+@pytest.fixture(name="distro", autouse=True)
+def fixture_distro():
     # Inject a distribution that defines some entry points.
     DummyDistributionFinder.install()
-
-
-def tearDownModule():
+    yield
     DummyDistributionFinder.uninstall()
 
 
-class EntryPointClassRegistryTestCase(TestCase):
-    def test_happy_path(self):
-        """
-        Loading classes automatically via entry points.
+def test_happy_path():
+    """
+    Loading classes automatically via entry points.
 
-        See ``dummy_package.egg-info/entry_points.txt`` for more info.
-        """
-        registry = EntryPointClassRegistry("pokemon")
+    See ``dummy_package.egg-info/entry_points.txt`` for more info.
+    """
+    registry = EntryPointClassRegistry("pokemon")
 
-        fire = registry["fire"]
-        self.assertIsInstance(fire, Charmander)
-        self.assertIsNone(fire.name)
+    fire = registry["fire"]
+    assert isinstance(fire, Charmander)
+    assert fire.name is None
 
-        grass = registry.get("grass")
-        self.assertIsInstance(grass, Bulbasaur)
-        self.assertIsNone(grass.name)
+    grass = registry.get("grass")
+    assert isinstance(grass, Bulbasaur)
+    assert grass.name is None
 
-        water = registry.get("water", name="archibald")
-        self.assertIsInstance(water, Squirtle)
-        self.assertEqual(water.name, "archibald")
+    water = registry.get("water", name="archibald")
+    assert isinstance(water, Squirtle)
+    assert water.name == "archibald"
 
-        # The 'psychic' entry point actually references a function, but it
-        # works exactly the same as a class.
-        psychic = registry.get("psychic", "snuggles")
-        self.assertIsInstance(psychic, Mew)
-        self.assertEqual(psychic.name, "snuggles")
+    # The 'psychic' entry point actually references a function, but it
+    # works exactly the same as a class.
+    psychic = registry.get("psychic", "snuggles")
+    assert isinstance(psychic, Mew)
+    assert psychic.name == "snuggles"
 
-    def test_branding(self):
-        """
-        Configuring the registry to "brand" each class/instance with its
-        corresponding key.
-        """
-        registry = EntryPointClassRegistry("pokemon", attr_name="poke_type")
-        try:
-            # Branding is applied immediately to each registered class.
-            self.assertEqual(getattr(Charmander, "poke_type"), "fire")
-            self.assertEqual(getattr(Squirtle, "poke_type"), "water")
 
-            # Instances, too!
-            self.assertEqual(registry["fire"].poke_type, "fire")
-            self.assertEqual(registry.get("water", "phil").poke_type, "water")
+def test_branding():
+    """
+    Configuring the registry to "brand" each class/instance with its
+    corresponding key.
+    """
+    registry = EntryPointClassRegistry("pokemon", attr_name="poke_type")
+    try:
+        # Branding is applied immediately to each registered class.
+        assert getattr(Charmander, "poke_type") == "fire"
+        assert getattr(Squirtle, "poke_type") == "water"
 
-            # Registered functions and methods can't be branded this way,
-            # though...
-            self.assertFalse(
-                hasattr(PokemonFactory.create_psychic_pokemon, "poke_type"),
-            )
+        # Instances, too!
+        assert registry["fire"].poke_type == "fire"
+        assert registry.get("water", "phil").poke_type == "water"
 
-            # ... but we can brand the resulting instances.
-            self.assertEqual(registry["psychic"].poke_type, "psychic")
-            self.assertEqual(registry.get("psychic").poke_type, "psychic")
-        finally:
-            # Clean up after ourselves.
-            for cls in registry.values():
-                if isinstance(cls, type):
-                    try:
-                        delattr(cls, "poke_type")
-                    except AttributeError:
-                        pass
+        # Registered functions and methods can't be branded this way,
+        # though...
+        assert not hasattr(PokemonFactory.create_psychic_pokemon, "poke_type")
 
-    def test_len(self):
-        """
-        Getting the length of an entry point class registry.
-        """
-        # Just in case some other package defines pokémon entry
-        # points (:
-        expected = len(list(entry_points(group="pokemon")))
+        # ... but we can brand the resulting instances.
+        assert registry["psychic"].poke_type == "psychic"
+        assert registry.get("psychic").poke_type == "psychic"
+    finally:
+        # Clean up after ourselves.
+        for cls in registry.values():
+            if isinstance(cls, type):
+                try:
+                    delattr(cls, "poke_type")
+                except AttributeError:
+                    pass
 
-        # Quick sanity check, to make sure our test pokémon are
-        # registered correctly.
-        self.assertGreaterEqual(expected, 4)
 
-        registry = EntryPointClassRegistry("pokemon")
-        self.assertEqual(len(registry), expected)
+def test_len():
+    """
+    Getting the length of an entry point class registry.
+    """
+    # Just in case some other package defines pokémon entry
+    # points (:
+    expected = len(list(entry_points(group="pokemon")))
 
-    def test_error_wrong_group(self):
-        """
-        The registry can't find entry points associated with the wrong group.
-        """
-        # Pokémon get registered (unsurprisingly) under the ``pokemon`` group,
-        # not ``random``.
-        registry = EntryPointClassRegistry("random")
+    # Quick sanity check, to make sure our test pokémon are
+    # registered correctly.
+    assert expected >= 4
 
-        with self.assertRaises(RegistryKeyError):
-            registry.get("fire")
+    registry = EntryPointClassRegistry("pokemon")
+    assert len(registry) == expected
+
+
+def test_error_wrong_group():
+    """
+    The registry can't find entry points associated with the wrong group.
+    """
+    # Pokémon get registered (unsurprisingly) under the ``pokemon`` group,
+    # not ``random``.
+    registry = EntryPointClassRegistry("random")
+
+    with pytest.raises(RegistryKeyError):
+        registry.get("fire")

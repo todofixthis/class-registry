@@ -1,61 +1,61 @@
-from unittest import TestCase
+import pytest
 
+from class_registry import ClassRegistry, RegistryKeyError
 from class_registry.patcher import RegistryPatcher
-from class_registry.registry import ClassRegistry, RegistryKeyError
 from test import Bulbasaur, Charmander, Charmeleon, Ivysaur, Squirtle
 
 
-class RegistryPatcherTestCase(TestCase):
-    def setUp(self):
-        super(RegistryPatcherTestCase, self).setUp()
+@pytest.fixture(name="registry")
+def fixture_registry() -> ClassRegistry:
+    return ClassRegistry(attr_name="element", unique=True)
 
-        self.registry = ClassRegistry(attr_name='element', unique=True)
 
-    def test_patch_detect_keys(self):
-        """
-        Patching a registry in a context, with registry keys detected
-        automatically.
-        """
-        self.registry.register(Charmander)
-        self.registry.register(Squirtle)
+def test_patch_detect_keys(registry: ClassRegistry):
+    """
+    Patching a registry in a context, with registry keys detected
+    automatically.
+    """
+    registry.register(Charmander)
+    registry.register(Squirtle)
 
-        with RegistryPatcher(self.registry, Charmeleon, Bulbasaur):
-            self.assertIsInstance(self.registry['fire'], Charmeleon)
-            self.assertIsInstance(self.registry['water'], Squirtle)
+    with RegistryPatcher(registry, Charmeleon, Bulbasaur):
+        assert isinstance(registry["fire"], Charmeleon)
+        assert isinstance(registry["water"], Squirtle)
 
-            # Nesting contexts?  You betcha!
-            with RegistryPatcher(self.registry, Ivysaur):
-                self.assertIsInstance(self.registry['grass'], Ivysaur)
+        # Nesting contexts?  You betcha!
+        with RegistryPatcher(registry, Ivysaur):
+            assert isinstance(registry["grass"], Ivysaur)
 
-            self.assertIsInstance(self.registry['grass'], Bulbasaur)
+        assert isinstance(registry["grass"], Bulbasaur)
 
-        # Save file corrupted.  Restoring previous save...
-        self.assertIsInstance(self.registry['fire'], Charmander)
-        self.assertIsInstance(self.registry['water'], Squirtle)
+    # Save file corrupted.  Restoring previous save...
+    assert isinstance(registry["fire"], Charmander)
+    assert isinstance(registry["water"], Squirtle)
 
-        with self.assertRaises(RegistryKeyError):
-            self.registry.get('grass')
+    with pytest.raises(RegistryKeyError):
+        registry.get("grass")
 
-    def test_patch_manual_keys(self):
-        """
-        Patching a registry in a context, specifying registry keys manually.
-        """
-        self.registry.register('sparky')(Charmander)
-        self.registry.register('chad')(Squirtle)
 
-        with RegistryPatcher(self.registry, sparky=Charmeleon, rex=Bulbasaur):
-            self.assertIsInstance(self.registry['sparky'], Charmeleon)
-            self.assertIsInstance(self.registry['chad'], Squirtle)
+def test_patch_manual_keys(registry: ClassRegistry):
+    """
+    Patching a registry in a context, specifying registry keys manually.
+    """
+    registry.register("sparky")(Charmander)
+    registry.register("chad")(Squirtle)
 
-            # Don't worry Chad; your day will come!
-            with RegistryPatcher(self.registry, rex=Ivysaur):
-                self.assertIsInstance(self.registry['rex'], Ivysaur)
+    with RegistryPatcher(registry, sparky=Charmeleon, rex=Bulbasaur):
+        assert isinstance(registry["sparky"], Charmeleon)
+        assert isinstance(registry["chad"], Squirtle)
 
-            self.assertIsInstance(self.registry['rex'], Bulbasaur)
+        # Don't worry Chad; your day will come!
+        with RegistryPatcher(registry, rex=Ivysaur):
+            assert isinstance(registry["rex"], Ivysaur)
 
-        # Save file corrupted.  Restoring previous save...
-        self.assertIsInstance(self.registry['sparky'], Charmander)
-        self.assertIsInstance(self.registry['chad'], Squirtle)
+        assert isinstance(registry["rex"], Bulbasaur)
 
-        with self.assertRaises(RegistryKeyError):
-            self.registry.get('jodie')
+    # Save file corrupted.  Restoring previous save...
+    assert isinstance(registry["sparky"], Charmander)
+    assert isinstance(registry["chad"], Squirtle)
+
+    with pytest.raises(RegistryKeyError):
+        registry.get("jodie")
