@@ -1,5 +1,6 @@
 from abc import ABCMeta
 from inspect import isabstract as is_abstract
+from warnings import warn
 
 from .base import BaseMutableRegistry
 
@@ -45,6 +46,14 @@ def AutoRegister(registry: BaseMutableRegistry, base_type: type = ABCMeta) -> ty
 
         99.99% of the time, this should be :py:class:`ABCMeta`.
     """
+    warn(
+        "class_registry.auto_register.AutoRegister is deprecated and will be removed in"
+        "a future version of ClassRegistry.  Use class_registry.base.AutoRegister"
+        "instead (returns a base class instead of a metaclass).  See"
+        "https://github.com/todofixthis/class-registry/issues/14 for more information.",
+        DeprecationWarning,
+    )
+
     if not registry.attr_name:
         raise ValueError(
             "Missing `attr_name` in {registry}.".format(registry=registry),
