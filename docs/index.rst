@@ -5,7 +5,7 @@ ClassRegistry
    :caption: Contents:
 
    getting_started
-   factories_vs_registries
+   service_registries
    iterating_over_registries
    entry_points
    advanced_topics
@@ -13,20 +13,18 @@ ClassRegistry
 
 ClassRegistry
 =============
-At the intersection of the Registry and Factory patterns lies the
-``ClassRegistry``:
+At the intersection of the Registry and Factory patterns lies the ``ClassRegistry``:
 
-- Define global factories that generate new class instances based on
-  configurable keys.
+- Define global factories that generate new class instances based on configurable keys.
 - Seamlessly create powerful service registries.
-- Integrate with setuptools's ``entry_points`` system to make your registries
-  infinitely extensible by 3rd-party libraries!
+- Integrate with setuptools's ``entry_points`` system to make your registries infinitely
+  extensible by 3rd-party libraries!
 - And more!
 
 Getting Started
 ---------------
-Create a registry using the ``class_registry.ClassRegistry`` class, then
-decorate any classes that you wish to register with its ``register`` method:
+Create a registry using the ``class_registry.ClassRegistry`` class, then decorate any
+classes that you wish to register with its ``register`` method:
 
 .. code-block:: python
 
@@ -36,15 +34,15 @@ decorate any classes that you wish to register with its ``register`` method:
 
    @pokedex.register('fire')
    class Charizard(Pokemon):
-     ...
+       ...
 
    @pokedex.register('grass')
    class Bulbasaur(Pokemon):
-     ...
+       ...
 
    @pokedex.register('water')
    class Squirtle(Pokemon):
-     ...
+       ...
 
 To create a class instance from a registry, use the subscript operator:
 
@@ -63,8 +61,8 @@ There's a whole lot more you can do with ClassRegistry, including:
 
 - Provide args and kwargs to new class instances.
 - Automatically register non-abstract classes.
-- Integrate with setuptools's ``entry_points`` system so that 3rd-party
-  libraries can add their own classes to your registries.
+- Integrate with setuptools's ``entry_points`` system so that 3rd-party libraries can
+  add their own classes to your registries.
 - Wrap your registry in an instance cache to create a service registry.
 - And more!
 
@@ -80,10 +78,11 @@ ClassRegistry is known to be compatible with the following Python versions:
 - 3.10
 
 .. note::
-   I'm only one person, so to keep from getting overwhelmed, I'm only committing
-   to supporting the 3 most recent versions of Python.  ClassRegistry's code is
-   pretty simple, so it's likely to be compatible with versions not listed here;
-   there just won't be any test coverage to prove it 😇
+
+   I'm only one person, so to keep from getting overwhelmed, I'm only committing to
+   supporting the 3 most recent versions of Python.  ClassRegistry's code is pretty
+   simple, so it's likely to be compatible with versions not listed here; there just
+   won't be any test coverage to prove it 😇
 
 Installation
 ------------
@@ -92,6 +91,7 @@ Install the latest stable version via pip::
    pip install phx-class-registry
 
 .. important::
-   Make sure to install `phx-class-registry`, **not** `class-registry`.  I
-   created the latter at a previous job years ago, and after I left they never
-   touched that project again — so in the end I had to fork it 🤷
+
+   Make sure to install `phx-class-registry`, **not** `class-registry`.  I created the
+   latter at a previous job years ago, and after I left they never touched that project
+   again and stopped responding to my emails — so in the end I had to fork it 🤷

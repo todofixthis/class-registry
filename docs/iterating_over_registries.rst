@@ -1,18 +1,11 @@
 Iterating Over Registries
 =========================
 Sometimes, you want to iterate over all of the classes registered in a
-:py:class:`ClassRegistry`.  There are three methods included to help you do
-this:
+:py:class:`ClassRegistry`.  There are three methods included to help you do this:
 
-- :py:meth:`items` iterates over the registry keys and corresponding classes as
-  tuples.
+- :py:meth:`items` iterates over the registry keys and corresponding classes as tuples.
 - :py:meth:`keys` iterates over the registry keys.
 - :py:meth:`values` iterates over the registered classes.
-
-.. note::
-
-   Regardless of which version of Python you are using, all three of these
-   methods return generators.
 
 Here's an example:
 
@@ -24,18 +17,18 @@ Here's an example:
 
    @pokedex.register
    class Geodude(object):
-     element = 'rock'
+       element = 'rock'
 
    @pokedex.register
    class Machop(object):
-     element = 'fighting'
+       element = 'fighting'
 
    @pokedex.register
    class Bellsprout(object):
-     element = 'grass'
+       element = 'grass'
 
    assert list(pokedex.items()) == \
-     [('rock', Geodude), ('fighting', Machop), ('grass', Bellsprout)]
+       [('rock', Geodude), ('fighting', Machop), ('grass', Bellsprout)]
 
    assert list(pokedex.keys()) == ['rock', 'fighting', 'grass']
 
@@ -45,116 +38,113 @@ Here's an example:
 
    Tired of having to add the :py:meth:`register` decorator to every class?
 
-   You can use the :py:func:`AutoRegister` metaclass to automatically register
-   all non-abstract subclasses of a particular base class.  See
-   :doc:`advanced_topics` for more information.
+   You can use the :py:func:`AutoRegister` metaclass to automatically register all
+   non-abstract subclasses of a particular base class.  See :doc:`advanced_topics` for
+   more information.
 
 Changing the Sort Order
 -----------------------
-As you probably noticed, these functions iterate over classes in the order that
-they are registered.
+As you probably noticed, these functions iterate over classes in the order that they are
+registered.
 
-If you'd like to customize this ordering, use :py:class:`SortedClassRegistry`:
+If you'd like to customise this ordering, use :py:class:`SortedClassRegistry`:
 
 .. code-block:: python
 
-   from class_registry import SortedClassRegistry
+   from class_registry.registry import SortedClassRegistry
 
-   pokedex =\
-     SortedClassRegistry(attr_name='element', sort_key='weight')
+   pokedex = SortedClassRegistry(attr_name='element', sort_key='weight')
 
    @pokedex.register
    class Geodude(object):
-     element = 'rock'
-     weight = 1000
+       element = 'rock'
+       weight = 1000
 
    @pokedex.register
    class Machop(object):
-     element = 'fighting'
-     weight = 75
+       element = 'fighting'
+       weight = 75
 
    @pokedex.register
    class Bellsprout(object):
-     element = 'grass'
-     weight = 15
+       element = 'grass'
+       weight = 15
 
    assert list(pokedex.items()) == \
-     [('grass', Bellsprout), ('fighting', Machop), ('rock', Geodude)]
+       [('grass', Bellsprout), ('fighting', Machop), ('rock', Geodude)]
 
    assert list(pokedex.keys()) == ['grass', 'fighting', 'rock']
 
    assert list(pokedex.values()) == [Bellsprout, Machop, Geodude]
 
-In the above example, the code iterates over registered classes in ascending
-order by their ``weight`` attributes.
+In the above example, the code iterates over registered classes in ascending order by
+their ``weight`` attributes.
 
-You can provide a sorting function instead, if you need more control over how
-the items are sorted:
+You can provide a sorting function instead if you need more control over how the items
+are sorted:
 
 .. code-block:: python
 
    from functools import cmp_to_key
 
    def sorter(a, b):
-     """
-     Sorts items by weight, using registry key as a tiebreaker.
+       """
+       Sorts items by weight, using registry key as a tiebreaker.
 
-     :param a: Tuple of (key, class)
-     :param b: Tuple of (key, class)
-     """
-     # Sort descending by weight first.
-     weight_cmp = (
-         (a[1].weight < b[1].weight)
-       - (a[1].weight > b[1].weight)
-     )
+       :param a: Tuple of (key, class)
+       :param b: Tuple of (key, class)
+       """
+       # Sort descending by weight first.
+       weight_cmp = (
+             (a[1].weight < b[1].weight)
+           - (a[1].weight > b[1].weight)
+       )
 
-     if weight_cmp != 0:
-       return weight_cmp
+       if weight_cmp != 0:
+           return weight_cmp
 
-     # Use registry key as a fallback.
-     return ((a[0] > b[0]) - (a[0] < b[0]))
+       # Use registry key as a fallback.
+       return ((a[0] > b[0]) - (a[0] < b[0]))
 
    pokedex =\
-     SortedClassRegistry(
-       attr_name = 'element',
+       SortedClassRegistry(
+           attr_name = 'element',
 
-       # Note that we pass ``sorter`` through ``cmp_to_key`` first!
-       sort_key = cmp_to_key(sorter),
-     )
+           # Note that we pass ``sorter`` through ``cmp_to_key`` first!
+           sort_key = cmp_to_key(sorter),
+       )
 
    @pokedex.register
    class Horsea(object):
-     element = 'water'
-     weight = 5
+       element = 'water'
+       weight = 5
 
    @pokedex.register
    class Koffing(object):
-     element = 'poison'
-     weight = 20
+       element = 'poison'
+       weight = 20
 
    @pokedex.register
    class Voltorb(object):
-     element = 'electric'
-     weight = 5
+       element = 'electric'
+       weight = 5
 
    assert list(pokedex.items()) == \
-     [('poison', Koffing), ('electric', Voltorb), ('water', Horsea)]
+       [('poison', Koffing), ('electric', Voltorb), ('water', Horsea)]
 
    assert list(pokedex.keys()) == ['poison', 'electric', 'water']
 
    assert list(pokedex.values()) == [Koffing, Voltorb, Horsea]
 
-This time, the :py:class:`SortedClassRegistry` used our custom sorter function,
-so that the classes were sorted descending by weight, with the registry key used
-as a tiebreaker.
+This time, the :py:class:`SortedClassRegistry` used our custom sorter function, so that
+the classes were sorted descending by weight, with the registry key used as a
+tiebreaker.
 
 .. important::
 
-   Note that we had to pass the sorter function through
-   :py:func:`functools.cmp_to_key` before providing it to the
-   :py:class:`SortedClassRegistry` initializer.
+   Note that we had to pass the sorter function through :py:func:`functools.cmp_to_key`
+   before providing it to the :py:class:`SortedClassRegistry` initialiser.
 
    This is necessary because of how sorting works in Python.  See
-   `Sorting HOW TO`_ for more information.
-
-.. _sorting how to: https://docs.python.org/3/howto/sorting.html#key-functions
+   `Sorting HOW TO <https://docs.python.org/3/howto/sorting.html#key-functions>`_ for
+   more information.
