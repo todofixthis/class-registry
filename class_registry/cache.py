@@ -1,11 +1,9 @@
+__all__ = ["ClassRegistryInstanceCache"]
+
 import typing
 from collections import defaultdict
 
 from . import ClassRegistry
-
-__all__ = [
-    "ClassRegistryInstanceCache",
-]
 
 
 class ClassRegistryInstanceCache(object):

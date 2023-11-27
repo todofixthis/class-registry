@@ -1,11 +1,9 @@
+__all__ = ["RegistryPatcher"]
+
 import typing
 
 from . import RegistryKeyError
 from .base import BaseMutableRegistry
-
-__all__ = [
-    "RegistryPatcher",
-]
 
 
 class RegistryPatcher(object):

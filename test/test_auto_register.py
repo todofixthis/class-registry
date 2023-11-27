@@ -1,9 +1,16 @@
-from abc import ABCMeta, abstractmethod as abstract_method
+"""
+Unit tests for :py:class:`class_registry.base.AutoRegister`, which replaces
+:py:class:`class_registry.auto_register.AutoRegister` (the latter returns a metaclass,
+whilst the former returns a base class).
+
+:see: https://github.com/todofixthis/class-registry/issues/14
+"""
+from abc import ABC, abstractmethod as abstract_method
 
 import pytest
 
 from class_registry import ClassRegistry
-from class_registry.auto_register import AutoRegister
+from class_registry.base import AutoRegister
 
 
 def test_auto_register():
@@ -12,19 +19,15 @@ def test_auto_register():
     """
     registry = ClassRegistry(attr_name="element")
 
-    # :py:func:`AutoRegister` is deprecated.
-    # :see: https://github.com/todofixthis/class-registry/issues/14
-    with pytest.deprecated_call():
-        # Note that we declare :py:func:`AutoRegister` as the metaclass
-        # for our base class.
-        class BasePokemon(metaclass=AutoRegister(registry)):
-            """
-            Abstract base class; will not get registered.
-            """
+    # Note that we declare :py:func:`AutoRegister` as a base class.
+    class BasePokemon(AutoRegister(registry), ABC):
+        """
+        Abstract base class; will not get registered.
+        """
 
-            @abstract_method
-            def get_abilities(self):
-                raise NotImplementedError()
+        @abstract_method
+        def get_abilities(self):
+            raise NotImplementedError()
 
     class Sandslash(BasePokemon):
         """
@@ -36,7 +39,7 @@ def test_auto_register():
         def get_abilities(self):
             return ["sand veil"]
 
-    class BaseEvolvingPokemon(BasePokemon, metaclass=ABCMeta):
+    class BaseEvolvingPokemon(BasePokemon, ABC):
         """
         Abstract subclass; will not get registered.
         """
@@ -71,12 +74,8 @@ def test_abstract_strict_definition():
     """
     registry = ClassRegistry(attr_name="element")
 
-    # :py:func:`AutoRegister` is deprecated.
-    # :see: https://github.com/todofixthis/class-registry/issues/14
-    with pytest.deprecated_call():
-
-        class FightingPokemon(metaclass=AutoRegister(registry)):
-            element = "fighting"
+    class FightingPokemon(AutoRegister(registry)):
+        element = "fighting"
 
     assert list(registry.items()) == [
         # :py:class:`FightingPokemon` does not define any
@@ -93,7 +92,4 @@ def test_error_attr_name_missing():
     registry = ClassRegistry()
 
     with pytest.raises(ValueError):
-        # :py:func:`AutoRegister` is deprecated.
-        # :see: https://github.com/todofixthis/class-registry/issues/14
-        with pytest.deprecated_call():
-            AutoRegister(registry)
+        AutoRegister(registry)

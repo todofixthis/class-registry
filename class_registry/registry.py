@@ -1,11 +1,8 @@
+__all__ = ["ClassRegistry", "SortedClassRegistry"]
+
 import typing
 from collections import OrderedDict
 from functools import cmp_to_key
-
-__all__ = [
-    "ClassRegistry",
-    "SortedClassRegistry",
-]
 
 from .base import BaseMutableRegistry, RegistryKeyError
 
@@ -168,12 +165,7 @@ class SortedClassRegistry(ClassRegistry):
             yield key, class_
 
     @staticmethod
-    def create_sorter(
-        sort_key: str,
-    ) -> typing.Callable[
-        [typing.Tuple[typing.Hashable, type], typing.Tuple[typing.Hashable, type]],
-        int,
-    ]:
+    def create_sorter(sort_key: str) -> typing.Any:
         """
         Given a sort key, creates a function that can be used to sort items
         when iterating over the registry.

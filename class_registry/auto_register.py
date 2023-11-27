@@ -1,22 +1,22 @@
+__all__ = ["AutoRegister"]
+
 from abc import ABCMeta
 from inspect import isabstract as is_abstract
 from warnings import warn
 
 from .base import BaseMutableRegistry
 
-__all__ = [
-    "AutoRegister",
-]
-
 
 def AutoRegister(registry: BaseMutableRegistry, base_type: type = ABCMeta) -> type:
     """
-    Creates a metaclass that automatically registers all non-abstract
-    subclasses in the specified registry.
+    DEPRECATED: Use ``class_registry.base.AutoRegister`` instead (returns a base class
+    instead of a metaclass).
 
-    IMPORTANT:  Python defines abstract as "having at least one unimplemented
-    abstract method"; specifying :py:class:`ABCMeta` as the metaclass is not
-    enough!
+    Creates a metaclass that automatically registers all non-abstract subclasses in the
+    specified registry.
+
+    IMPORTANT:  Python defines abstract as "having at least one unimplemented abstract
+    method"; adding :py:class:`ABC` as a base class is not enough!
 
     Example::
 

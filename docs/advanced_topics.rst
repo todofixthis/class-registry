@@ -4,25 +4,27 @@ This section covers more advanced or esoteric uses of ClassRegistry features.
 
 Registering Classes Automatically
 ---------------------------------
-Tired of having to add the ``register`` decorator to every class that you want
-to add to a class registry?  Surely there's a better way!
+Tired of having to add the ``register`` decorator to every class that you want to add to
+a class registry?  Surely there's a better way!
 
-ClassRegistry also provides an :py:func:`AutoRegister` metaclass that you can
-apply to a base class.  Any non-abstract subclass that extends that base class
-will be registered automatically.
+The answer is :py:func:`class_registry.base.AutoRegister`!
+
+Call ``AutoRegister()`` and pass in a registry, and it returns a base class.  Any
+non-abstract class that extends from that base class automatically gets added to the
+registry.
 
 Here's an example:
 
 .. code-block:: python
 
-   from abc import abstractmethod
+   from abc import ABC, abstractmethod
    from class_registry import ClassRegistry
-   from class_registry.auto_register import AutoRegister
+   from class_registry.base import AutoRegister
 
    pokedex = ClassRegistry('element')
 
-   # Note ``AutoRegister(pokedex)`` used as the metaclass here.
-   class Pokemon(metaclass=AutoRegister(pokedex)):
+   # Note ``AutoRegister(pokedex)`` used as a base class here, as well as ``ABC``.
+   class Pokemon(AutoRegister(pokedex), ABC):
         @abstractmethod
         def get_abilities(self):
             raise NotImplementedError()
@@ -79,6 +81,31 @@ because it is abstract.
 
       from inspect import isabstract
       assert not isabstract(ElectricPokemon)
+
+.. note::
+
+   In previous versions of ClassRegistry, ``AutoRegister`` returned a metaclass instead
+   of a base class.  The metaclass version of the function still exists at
+   :py:func:`class_registry.auto_register.AutoRegister`, but
+   `it is deprecated and will be removed in a future version of ClassRegistry <https://github.com/todofixthis/class-registry/issues/14>`.
+
+   If your code is still using the old ``AutoRegister`` function, you can change it like
+   this:
+
+   .. code-block:: python
+
+      # Deprecated:
+      from class_registry.auto_register import AutoRegister
+
+      class MyBaseClass(metaclass=AutoRegister(my_registry)):
+          ...
+
+      # Update to this:
+      from abc import ABC
+      from class_registry.base import AutoRegister
+
+      class MyBaseClass(AutoRegister(my_registry), ABC):
+          ...
 
 Patching
 --------

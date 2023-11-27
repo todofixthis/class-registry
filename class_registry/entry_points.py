@@ -1,11 +1,9 @@
+__all__ = ["EntryPointClassRegistry"]
+
 import typing
 from importlib.metadata import entry_points
 
 from .base import BaseRegistry
-
-__all__ = [
-    "EntryPointClassRegistry",
-]
 
 
 class EntryPointClassRegistry(BaseRegistry):
