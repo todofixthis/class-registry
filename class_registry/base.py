@@ -284,9 +284,6 @@ def AutoRegister(registry: BaseMutableRegistry) -> type:
     Creates a base class that automatically registers all non-abstract subclasses in the
     specified registry.
 
-    IMPORTANT:  Python defines abstract as "having at least one unimplemented abstract
-    method"; adding :py:class:`ABC` as a base class is not enough!
-
     Example::
 
        commands = ClassRegistry(attr_name='command_name')
@@ -304,10 +301,17 @@ def AutoRegister(registry: BaseMutableRegistry) -> type:
 
        print(list(commands.items())) # [('print', PrintCommand)]
 
+    .. important::
+
+       Python defines abstract as "having at least one unimplemented abstract method";
+       adding :py:class:`abc.ABC` as a base class is not enough.
+
     :param registry:
         The registry that new classes will be added to.
 
-        Note: the registry's ``attr_name`` attribute must be set!
+        .. note::
+
+           The registry's ``attr_name`` attribute must be set.
     """
     if not registry.attr_name:
         raise ValueError(f"Missing `attr_name` in {registry}.")

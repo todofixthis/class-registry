@@ -15,9 +15,6 @@ def AutoRegister(registry: BaseMutableRegistry, base_type: type = ABCMeta) -> ty
     Creates a metaclass that automatically registers all non-abstract subclasses in the
     specified registry.
 
-    IMPORTANT:  Python defines abstract as "having at least one unimplemented abstract
-    method"; adding :py:class:`ABC` as a base class is not enough!
-
     Example::
 
        commands = ClassRegistry(attr_name='command_name')
@@ -36,15 +33,22 @@ def AutoRegister(registry: BaseMutableRegistry, base_type: type = ABCMeta) -> ty
 
        print(list(commands.items())) # [('print', PrintCommand)]
 
+    .. important::
+
+       Python defines abstract as "having at least one unimplemented abstract method";
+       adding :py:class:`abc.ABC` as a base class is not enough.
+
     :param registry:
         The registry that new classes will be added to.
 
-        Note: the registry's ``attr_name`` attribute must be set!
+        .. note::
+
+           The registry's ``attr_name`` attribute must be set.
 
     :param base_type:
         The base type of the metaclass returned by this function.
 
-        99.99% of the time, this should be :py:class:`ABCMeta`.
+        99.99% of the time, this should be :py:class:`abc.ABCMeta`.
     """
     warn(
         "class_registry.auto_register.AutoRegister is deprecated and will be removed in"
