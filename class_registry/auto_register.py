@@ -52,7 +52,7 @@ def AutoRegister(registry: BaseMutableRegistry, base_type: type = ABCMeta) -> ty
 
     class _metaclass(base_type):
         def __init__(self, what, bases=None, attrs=None):
-            super(_metaclass, self).__init__(what, bases, attrs)
+            super().__init__(what, bases, attrs)
 
             if not is_abstract(self):
                 registry.register(self)

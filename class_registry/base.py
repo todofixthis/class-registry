@@ -14,7 +14,10 @@ class RegistryKeyError(KeyError):
     pass
 
 
-class BaseRegistry(typing.Mapping, metaclass=ABCMeta):
+T = typing.TypeVar("T")
+
+
+class BaseRegistry(typing.Mapping[typing.Hashable, T], metaclass=ABCMeta):
     """
     Base functionality for registries.
     """
@@ -37,7 +40,7 @@ class BaseRegistry(typing.Mapping, metaclass=ABCMeta):
     def __dir__(self) -> typing.List[typing.Hashable]:
         return list(self.keys())
 
-    def __getitem__(self, key: typing.Hashable) -> typing.Any:
+    def __getitem__(self, key: typing.Hashable) -> T:
         """
         Shortcut for calling :py:meth:`get` with empty args/kwargs.
         """
@@ -69,7 +72,7 @@ class BaseRegistry(typing.Mapping, metaclass=ABCMeta):
         raise RegistryKeyError(key)
 
     @abstract_method
-    def get_class(self, key: typing.Hashable) -> type:
+    def get_class(self, key: typing.Hashable) -> typing.Type[T]:
         """
         Returns the class associated with the specified key.
         """
@@ -77,7 +80,7 @@ class BaseRegistry(typing.Mapping, metaclass=ABCMeta):
             "Not implemented in {cls}.".format(cls=type(self).__name__),
         )
 
-    def get(self, key: typing.Hashable, *args, **kwargs) -> typing.Any:
+    def get(self, key: typing.Hashable, *args, **kwargs) -> T:
         """
         Creates a new instance of the class matching the specified key.
 
@@ -110,7 +113,7 @@ class BaseRegistry(typing.Mapping, metaclass=ABCMeta):
         return key
 
     @staticmethod
-    def create_instance(class_: type, *args, **kwargs) -> typing.Any:
+    def create_instance(class_: type, *args, **kwargs) -> T:
         """
         Prepares the return value for :py:meth:`get`.
 
@@ -131,7 +134,7 @@ class BaseRegistry(typing.Mapping, metaclass=ABCMeta):
     @abstract_method
     def items(
         self,
-    ) -> typing.Generator[typing.Tuple[typing.Hashable, type], None, None]:
+    ) -> typing.Generator[typing.Tuple[typing.Hashable, typing.Type[T]], None, None]:
         """
         Iterates over registered classes and their corresponding keys, in the
         order that they were registered.
@@ -148,7 +151,7 @@ class BaseRegistry(typing.Mapping, metaclass=ABCMeta):
         for item in self.items():
             yield item[0]
 
-    def values(self) -> typing.Generator[type, None, None]:
+    def values(self) -> typing.Generator[typing.Type[T], None, None]:
         """
         Returns a generator for iterating over registered classes, in the order
         that they were registered.
@@ -157,7 +160,9 @@ class BaseRegistry(typing.Mapping, metaclass=ABCMeta):
             yield item[1]
 
 
-class BaseMutableRegistry(BaseRegistry, typing.MutableMapping, metaclass=ABCMeta):
+class BaseMutableRegistry(
+    BaseRegistry[T], typing.MutableMapping[typing.Hashable, T], metaclass=ABCMeta
+):
     """
     Extends :py:class:`BaseRegistry` with methods that can be used to modify
     the registered classes.
@@ -169,7 +174,7 @@ class BaseMutableRegistry(BaseRegistry, typing.MutableMapping, metaclass=ABCMeta
             If provided, :py:meth:`register` will automatically detect the key
             to use when registering new classes.
         """
-        super(BaseMutableRegistry, self).__init__()
+        super().__init__()
 
         self.attr_name = attr_name
 
@@ -191,7 +196,7 @@ class BaseMutableRegistry(BaseRegistry, typing.MutableMapping, metaclass=ABCMeta
             type=type(self).__name__,
         )
 
-    def __setitem__(self, key: typing.Hashable, class_: type) -> None:
+    def __setitem__(self, key: typing.Hashable, class_: typing.Type[T]) -> None:
         """
         Provides alternate syntax for registering a class.
         """
@@ -201,8 +206,12 @@ class BaseMutableRegistry(BaseRegistry, typing.MutableMapping, metaclass=ABCMeta
         self._lookup_keys[key] = lookup_key
 
     def register(
-        self, key: typing.Union[typing.Hashable, type]
-    ) -> typing.Callable[[type], type]:
+        self,
+        key: typing.Union[typing.Hashable, typing.Type[T]],
+    ) -> typing.Union[
+        typing.Type[T],
+        typing.Callable[[typing.Type[T]], typing.Type[T]],
+    ]:
         """
         Decorator that registers a class with the registry.
 
@@ -246,17 +255,17 @@ class BaseMutableRegistry(BaseRegistry, typing.MutableMapping, metaclass=ABCMeta
                 )
 
         # ``@register('some_attr')`` usage:
-        def _decorator(cls: type) -> type:
-            lookup_key = self.gen_lookup_key(key)
+        def _decorator(cls: typing.Type[T]) -> typing.Type[T]:
+            lookup_key_ = self.gen_lookup_key(key)
 
-            self._register(lookup_key, cls)
-            self._lookup_keys[key] = lookup_key
+            self._register(lookup_key_, cls)
+            self._lookup_keys[key] = lookup_key_
 
             return cls
 
         return _decorator
 
-    def unregister(self, key: typing.Hashable) -> type:
+    def unregister(self, key: typing.Hashable) -> typing.Type[T]:
         """
         Unregisters the class with the specified key.
 
@@ -275,7 +284,7 @@ class BaseMutableRegistry(BaseRegistry, typing.MutableMapping, metaclass=ABCMeta
         return result
 
     @abstract_method
-    def _register(self, key: typing.Hashable, class_: type) -> None:
+    def _register(self, key: typing.Hashable, class_: typing.Type[T]) -> None:
         """
         Registers a class with the registry.
 
@@ -286,7 +295,7 @@ class BaseMutableRegistry(BaseRegistry, typing.MutableMapping, metaclass=ABCMeta
         )
 
     @abstract_method
-    def _unregister(self, key: typing.Hashable) -> type:
+    def _unregister(self, key: typing.Hashable) -> typing.Type[T]:
         """
         Unregisters the class at the specified key.
 

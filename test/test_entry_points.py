@@ -4,7 +4,7 @@ import pytest
 
 from class_registry import RegistryKeyError
 from class_registry.entry_points import EntryPointClassRegistry
-from test import Bulbasaur, Charmander, Mew, PokemonFactory, Squirtle
+from test import Bulbasaur, Charmander, Mew, Pokemon, PokemonFactory, Squirtle
 from test.helper import DummyDistributionFinder
 
 
@@ -22,7 +22,7 @@ def test_happy_path():
 
     See ``dummy_package.egg-info/entry_points.txt`` for more info.
     """
-    registry = EntryPointClassRegistry("pokemon")
+    registry = EntryPointClassRegistry[Pokemon]("pokemon")
 
     fire = registry["fire"]
     assert isinstance(fire, Charmander)
@@ -48,7 +48,7 @@ def test_branding():
     Configuring the registry to "brand" each class/instance with its
     corresponding key.
     """
-    registry = EntryPointClassRegistry("pokemon", attr_name="poke_type")
+    registry = EntryPointClassRegistry[Pokemon]("pokemon", attr_name="poke_type")
     try:
         # Branding is applied immediately to each registered class.
         assert getattr(Charmander, "poke_type") == "fire"
@@ -87,7 +87,7 @@ def test_len():
     # registered correctly.
     assert expected >= 4
 
-    registry = EntryPointClassRegistry("pokemon")
+    registry = EntryPointClassRegistry[Pokemon]("pokemon")
     assert len(registry) == expected
 
 
@@ -95,9 +95,7 @@ def test_error_wrong_group():
     """
     The registry can't find entry points associated with the wrong group.
     """
-    # Pokémon get registered (unsurprisingly) under the ``pokemon`` group,
-    # not ``random``.
-    registry = EntryPointClassRegistry("random")
+    registry = EntryPointClassRegistry[Pokemon]("fhqwhgads")
 
     with pytest.raises(RegistryKeyError):
         registry.get("fire")

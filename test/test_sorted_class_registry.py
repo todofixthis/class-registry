@@ -9,7 +9,7 @@ def test_sort_key():
     When iterating over a SortedClassRegistry, classes are returned in
     sorted order rather than inclusion order.
     """
-    registry = SortedClassRegistry(
+    registry = SortedClassRegistry[Pokemon](
         attr_name="element",
         sort_key="weight",
     )
@@ -38,7 +38,7 @@ def test_sort_key_reverse():
     """
     Reversing the order of a sort key.
     """
-    registry = SortedClassRegistry(
+    registry = SortedClassRegistry[Pokemon](
         attr_name="element",
         sort_key="weight",
         reverse=True,
@@ -78,7 +78,7 @@ def test_cmp_to_key():
         """
         return (a[1].popularity < b[1].popularity) - (a[1].popularity > b[1].popularity)
 
-    registry = SortedClassRegistry(
+    registry = SortedClassRegistry[Pokemon](
         attr_name="element",
         sort_key=cmp_to_key(compare_pokemon),
     )
@@ -116,7 +116,7 @@ def test_gen_lookup_key_overridden():
         """
         return (a[2] > b[2]) - (a[2] < b[2])
 
-    class TestRegistry(SortedClassRegistry):
+    class TestRegistry(SortedClassRegistry[Pokemon]):
         @staticmethod
         def gen_lookup_key(key: str) -> str:
             """

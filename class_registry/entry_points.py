@@ -8,7 +8,10 @@ __all__ = [
 ]
 
 
-class EntryPointClassRegistry(BaseRegistry):
+T = typing.TypeVar("T")
+
+
+class EntryPointClassRegistry(BaseRegistry[T]):
     """
     A class registry that loads classes using setuptools entry points.
     """
@@ -31,12 +34,14 @@ class EntryPointClassRegistry(BaseRegistry):
             Note: if a class already defines this attribute, the registry will
             overwrite it!
         """
-        super(EntryPointClassRegistry, self).__init__()
+        super().__init__()
 
         self.attr_name = attr_name
         self.group = group
 
-        self._cache: typing.Optional[typing.Dict[typing.Hashable, type]] = None
+        self._cache: typing.Optional[
+            typing.Dict[typing.Hashable, typing.Type[T]]
+        ] = None
         """
         Caches registered classes locally, so that we don't have to keep
         iterating over entry points.
@@ -56,8 +61,8 @@ class EntryPointClassRegistry(BaseRegistry):
             type=type(self).__name__,
         )
 
-    def get(self, key: typing.Hashable, *args, **kwargs) -> typing.Any:
-        instance = super(EntryPointClassRegistry, self).get(key, *args, **kwargs)
+    def get(self, key: typing.Hashable, *args, **kwargs) -> T:
+        instance = super().get(key, *args, **kwargs)
 
         if self.attr_name:
             # Apply branding to the instance explicitly.
@@ -67,7 +72,7 @@ class EntryPointClassRegistry(BaseRegistry):
 
         return instance
 
-    def get_class(self, key: typing.Hashable) -> typing.Optional[type]:
+    def get_class(self, key: typing.Hashable) -> typing.Type[T]:
         try:
             cls = self._get_cache()[key]
         except KeyError:
@@ -75,7 +80,7 @@ class EntryPointClassRegistry(BaseRegistry):
 
         return cls
 
-    def items(self) -> typing.ItemsView[typing.Hashable, type]:
+    def items(self) -> typing.ItemsView[typing.Hashable, T]:
         return self._get_cache().items()
 
     def refresh(self):
@@ -89,7 +94,7 @@ class EntryPointClassRegistry(BaseRegistry):
         """
         self._cache = None
 
-    def _get_cache(self) -> typing.Dict[typing.Hashable, type]:
+    def _get_cache(self) -> typing.Dict[typing.Hashable, typing.Type[T]]:
         """
         Populates the cache (if necessary) and returns it.
         """

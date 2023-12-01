@@ -1,3 +1,5 @@
+import typing
+
 import pytest
 
 from class_registry import ClassRegistry, RegistryKeyError
@@ -9,7 +11,7 @@ def test_register_manual_keys():
     Registers a few classes with manually-assigned identifiers and verifies
     that the factory returns them correctly.
     """
-    registry = ClassRegistry()
+    registry = ClassRegistry[Pokemon]()
 
     @registry.register("fire")
     class Charizard(Pokemon):
@@ -23,12 +25,15 @@ def test_register_manual_keys():
     # classes.  We'll see how to assign registry keys automatically in the
     # next test.
     with pytest.raises(ValueError):
-
+        # noinspection PyUnusedLocal
         @registry.register
         class Venusaur(Pokemon):
             pass
 
+    assert registry.get_class("fire") is Charizard
     assert isinstance(registry["fire"], Charizard)
+
+    assert registry.get_class("water") is Blastoise
     assert isinstance(registry["water"], Blastoise)
 
 
@@ -37,7 +42,7 @@ def test_register_detect_keys():
     If an attribute name is passed to ClassRegistry's constructor, it will
     automatically check for this attribute when registering classes.
     """
-    registry = ClassRegistry(attr_name="element")
+    registry = ClassRegistry[Pokemon](attr_name="element")
 
     @registry.register
     class Charizard(Pokemon):
@@ -66,28 +71,28 @@ def test_register_error_empty_key():
     """
     Attempting to register a class with an empty key.
     """
-    registry = ClassRegistry("element")
+    registry = ClassRegistry[Pokemon]("element")
 
     with pytest.raises(ValueError):
-        # noinspection PyTypeChecker
+        # noinspection PyTypeChecker,PyUnusedLocal
         @registry.register(None)
         class Ponyta(Pokemon):
             element = "fire"
 
     with pytest.raises(ValueError):
-
+        # noinspection PyUnusedLocal
         @registry.register("")
         class Rapidash(Pokemon):
             element = "fire"
 
     with pytest.raises(ValueError):
-
+        # noinspection PyUnusedLocal
         @registry.register
         class Mew(Pokemon):
             element = None
 
     with pytest.raises(ValueError):
-
+        # noinspection PyUnusedLocal
         @registry.register
         class Mewtwo(Pokemon):
             element = ""
@@ -98,7 +103,7 @@ def test_unique_keys():
     Specifying ``unique=True`` when creating the registry requires all keys
     to be unique.
     """
-    registry = ClassRegistry(attr_name="element", unique=True)
+    registry = ClassRegistry[Pokemon](attr_name="element", unique=True)
 
     # We can register any class like normal...
     registry.register(Charmander)
@@ -117,7 +122,7 @@ def test_unregister():
        This is not used that often outside unit tests (e.g., to remove
        artefacts when a test has to add a class to a global registry).
     """
-    registry = ClassRegistry(attr_name="element")
+    registry = ClassRegistry[Pokemon](attr_name="element")
     registry.register(Charmander)
     registry.register(Squirtle)
 
@@ -140,7 +145,7 @@ def test_constructor_params():
     """
     Params can be passed to the registered class' constructor.
     """
-    registry = ClassRegistry(attr_name="element")
+    registry = ClassRegistry[Pokemon](attr_name="element")
     registry.register(Bulbasaur)
 
     # Goofus uses positional arguments, which are magical and make his code
@@ -163,7 +168,7 @@ def test_new_instance_every_time():
     """
     Every time a registered class is invoked, a new instance is returned.
     """
-    registry = ClassRegistry(attr_name="element")
+    registry = ClassRegistry[Pokemon](attr_name="element")
     registry.register(Wartortle)
 
     assert registry["water"] is not registry["water"]
@@ -174,7 +179,12 @@ def test_register_function():
     Functions can be registered as well (so long as they walk and quack
     like a class).
     """
-    registry = ClassRegistry()
+    registry = ClassRegistry[
+        typing.Union[
+            Pokemon,
+            typing.Callable[[], Pokemon],
+        ]
+    ]()
 
     @registry.register("fire")
     def pokemon_factory(name=None):
@@ -191,7 +201,7 @@ def test_contains_when_class_init_requires_arguments():
     Special case when checking if a class is registered, and that class'
     initializer requires arguments.
     """
-    registry = ClassRegistry(attr_name="element")
+    registry = ClassRegistry[Pokemon](attr_name="element")
 
     @registry.register
     class Butterfree(Pokemon):

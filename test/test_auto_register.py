@@ -10,7 +10,7 @@ def test_auto_register():
     """
     Using :py:func:`AutoRegister` to, well, auto-register classes.
     """
-    registry = ClassRegistry(attr_name="element")
+    registry = ClassRegistry["BasePokemon"](attr_name="element")
 
     # Note that we declare :py:func:`AutoRegister` as the metaclass
     # for our base class.
@@ -66,7 +66,7 @@ def test_abstract_strict_definition():
     """
     If a class has no unimplemented abstract methods, it gets registered.
     """
-    registry = ClassRegistry(attr_name="element")
+    registry = ClassRegistry["FightingPokemon"](attr_name="element")
 
     class FightingPokemon(metaclass=AutoRegister(registry)):
         element = "fighting"

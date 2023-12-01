@@ -9,8 +9,8 @@ from test import Bulbasaur, Charmander, Pokemon, Squirtle
 
 
 @pytest.fixture(name="customised_registry")
-def fixture_customised_registry() -> ClassRegistry:
-    class CustomisedLookupRegistry(ClassRegistry):
+def fixture_customised_registry() -> ClassRegistry[Pokemon]:
+    class CustomisedLookupRegistry(ClassRegistry[Pokemon]):
         @staticmethod
         def gen_lookup_key(key: str) -> str:
             """
@@ -25,20 +25,20 @@ def fixture_customised_registry() -> ClassRegistry:
     return registry
 
 
-def test_contains(customised_registry: ClassRegistry):
+def test_contains(customised_registry: ClassRegistry[Pokemon]):
     assert "fire" in customised_registry
     assert "erif" not in customised_registry
 
 
-def test_dir(customised_registry: ClassRegistry):
+def test_dir(customised_registry: ClassRegistry[Pokemon]):
     assert dir(customised_registry) == ["fire", "water"]
 
 
-def test_getitem(customised_registry: ClassRegistry):
+def test_getitem(customised_registry: ClassRegistry[Pokemon]):
     assert isinstance(customised_registry["fire"], Charmander)
 
 
-def test_iter(customised_registry: ClassRegistry):
+def test_iter(customised_registry: ClassRegistry[Pokemon]):
     generator = iter(customised_registry)
 
     assert next(generator) == "fire"
@@ -48,19 +48,19 @@ def test_iter(customised_registry: ClassRegistry):
         next(generator)
 
 
-def test_len(customised_registry: ClassRegistry):
+def test_len(customised_registry: ClassRegistry[Pokemon]):
     assert len(customised_registry) == 2
 
 
-def test_get_class(customised_registry: ClassRegistry):
+def test_get_class(customised_registry: ClassRegistry[Pokemon]):
     assert customised_registry.get_class("fire") is Charmander
 
 
-def test_get(customised_registry: ClassRegistry):
+def test_get(customised_registry: ClassRegistry[Pokemon]):
     assert isinstance(customised_registry.get("fire"), Charmander)
 
 
-def test_items(customised_registry: ClassRegistry):
+def test_items(customised_registry: ClassRegistry[Pokemon]):
     generator = customised_registry.items()
 
     assert next(generator), "fire" == Charmander
@@ -70,7 +70,7 @@ def test_items(customised_registry: ClassRegistry):
         next(generator)
 
 
-def test_keys(customised_registry: ClassRegistry):
+def test_keys(customised_registry: ClassRegistry[Pokemon]):
     generator = customised_registry.keys()
 
     assert next(generator) == "fire"
@@ -80,17 +80,17 @@ def test_keys(customised_registry: ClassRegistry):
         next(generator)
 
 
-def test_delitem(customised_registry: ClassRegistry):
+def test_delitem(customised_registry: ClassRegistry[Pokemon]):
     del customised_registry["fire"]
     assert list(customised_registry.keys()) == ["water"]
 
 
-def test_setitem(customised_registry: ClassRegistry):
+def test_setitem(customised_registry: ClassRegistry[Pokemon]):
     customised_registry["grass"] = Bulbasaur
     assert list(customised_registry.keys()), ["fire", "water" == "grass"]
 
 
-def test_unregister(customised_registry: ClassRegistry):
+def test_unregister(customised_registry: ClassRegistry[Pokemon]):
     customised_registry.unregister("fire")
     assert list(customised_registry.keys()) == ["water"]
 
@@ -102,7 +102,7 @@ def test_use_case_aliases():
     registry).
     """
 
-    class TestRegistry(ClassRegistry):
+    class TestRegistry(ClassRegistry[Pokemon]):
         @staticmethod
         def gen_lookup_key(key: str) -> str:
             """

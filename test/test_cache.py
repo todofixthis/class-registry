@@ -2,30 +2,34 @@ import pytest
 
 from class_registry import ClassRegistry
 from class_registry.cache import ClassRegistryInstanceCache
-from test import Bulbasaur, Charmander, Charmeleon, Squirtle, Wartortle
+from test import Bulbasaur, Charmander, Pokemon, Squirtle
 
 
 @pytest.fixture(name="registry")
 def fixture_registry() -> ClassRegistry:
-    return ClassRegistry(attr_name="element")
+    registry = ClassRegistry[Pokemon](attr_name="element")
+    registry.register(Bulbasaur)
+    registry.register(Charmander)
+    registry.register(Squirtle)
+    return registry
 
 
 @pytest.fixture(name="cache")
-def fixture_cache(registry: ClassRegistry) -> ClassRegistryInstanceCache:
-    return ClassRegistryInstanceCache(registry)
+def fixture_cache(
+    registry: ClassRegistry[Pokemon],
+) -> ClassRegistryInstanceCache[Pokemon]:
+    return ClassRegistryInstanceCache[Pokemon](registry)
 
 
-def test_get(cache: ClassRegistryInstanceCache, registry: ClassRegistry):
+def test_get(
+    cache: ClassRegistryInstanceCache[Pokemon],
+    registry: ClassRegistry[Pokemon],
+):
     """
     When an instance is returned from
     :py:meth:`ClassRegistryInstanceCache.get`, future invocations return
     the same instance.
     """
-    # Register a few classes with the ClassRegistry.
-    registry.register(Bulbasaur)
-    registry.register(Charmander)
-    registry.register(Squirtle)
-
     poke_1 = cache["grass"]
     assert isinstance(poke_1, Bulbasaur)
 
@@ -43,36 +47,32 @@ def test_get(cache: ClassRegistryInstanceCache, registry: ClassRegistry):
     assert poke_3 is not poke_4
 
 
-def test_template_args(cache: ClassRegistryInstanceCache, registry: ClassRegistry):
+def test_template_args(registry: ClassRegistry[Pokemon]):
     """
     Extra params passed to the cache constructor are passed to the template
     function when creating new instances.
     """
-    registry.register(Charmeleon)
-    registry.register(Wartortle)
-
     # Add an extra init param to the cache.
     cache = ClassRegistryInstanceCache(registry, name="Bruce")
 
     # The cache parameters are automatically applied to the class'
     # initializer.
     poke_1 = cache["fire"]
-    assert isinstance(poke_1, Charmeleon)
+    assert isinstance(poke_1, Charmander)
     assert poke_1.name == "Bruce"
 
     poke_2 = cache["water"]
-    assert isinstance(poke_2, Wartortle)
+    assert isinstance(poke_2, Squirtle)
     assert poke_2.name == "Bruce"
 
 
-def test_iterator(cache: ClassRegistryInstanceCache, registry: ClassRegistry):
+def test_iterator(
+    cache: ClassRegistryInstanceCache[Pokemon],
+    registry: ClassRegistry[Pokemon],
+):
     """
     Creating an iterator using :py:func:`iter`.
     """
-    registry.register(Bulbasaur)
-    registry.register(Charmander)
-    registry.register(Squirtle)
-
     # The cache's iterator only operates over cached instances.
     assert list(iter(cache)) == []
 
@@ -83,3 +83,20 @@ def test_iterator(cache: ClassRegistryInstanceCache, registry: ClassRegistry):
     # The order that values are yielded depends on the ordering of
     # the wrapped registry.
     assert list(iter(cache)) == [poke_2, poke_3, poke_1]
+
+
+def test_len(
+    cache: ClassRegistryInstanceCache[Pokemon],
+    registry: ClassRegistry[Pokemon],
+):
+    """
+    Checking the length of a cache.
+    """
+    # The length only reflects the number of cached instances.
+    assert len(cache) == 0
+
+    # Calling ``__getitem__`` directly to sneak past the linter (:
+    cache.__getitem__("water")
+    cache.__getitem__("grass")
+
+    assert len(cache) == 2

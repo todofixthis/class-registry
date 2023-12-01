@@ -42,7 +42,7 @@ class RegistryPatcher(object):
             In the event of a conflict, values in ``args`` override values in
             ``kwargs``.
         """
-        super(RegistryPatcher, self).__init__()
+        super().__init__()
 
         for class_ in args:
             kwargs[getattr(class_, registry.attr_name)] = class_
