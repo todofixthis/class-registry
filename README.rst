@@ -102,16 +102,20 @@ To install the distribution for local development, some additional setup is requ
 
       poetry install --with=dev
 
+#. Activate pre-commit hook::
+
+      poetry run autohooks activate --mode=poetry
+
 Running Unit Tests
 ------------------
 Run the tests for all supported versions of Python using
 `tox <https://tox.readthedocs.io/>`_::
 
-   tox -p
+   poetry run tox -p
 
 Or to run tests in the current virtualenv::
 
-   pytest
+   poetry run pytest
 
 Documentation
 -------------
