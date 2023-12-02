@@ -30,10 +30,6 @@ def test_contains(customised_registry: ClassRegistry[Pokemon]):
     assert "erif" not in customised_registry
 
 
-def test_dir(customised_registry: ClassRegistry[Pokemon]):
-    assert dir(customised_registry) == ["fire", "water"]
-
-
 def test_getitem(customised_registry: ClassRegistry[Pokemon]):
     assert isinstance(customised_registry["fire"], Charmander)
 

@@ -37,9 +37,6 @@ class BaseRegistry(typing.Mapping[typing.Hashable, T], metaclass=ABCMeta):
         else:
             return True
 
-    def __dir__(self) -> list[typing.Hashable]:
-        return list(self.keys())
-
     def __getitem__(self, key: typing.Hashable) -> T:
         """
         Shortcut for calling :py:meth:`get` with empty args/kwargs.
