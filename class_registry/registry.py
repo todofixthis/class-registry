@@ -53,10 +53,7 @@ class ClassRegistry(BaseMutableRegistry[T]):
             unique=self.unique,
         )
 
-    def get_class(
-        self,
-        key: typing.Hashable,
-    ) -> typing.Optional[typing.Type[T]]:
+    def get_class(self, key: typing.Hashable) -> typing.Type[T]:
         """
         Returns the class associated with the specified key.
         """
