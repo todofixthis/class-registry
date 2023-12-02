@@ -6,7 +6,7 @@ from test import Bulbasaur, Charmander, Pokemon, Squirtle
 
 
 @pytest.fixture(name="registry")
-def fixture_registry() -> ClassRegistry:
+def fixture_registry() -> ClassRegistry[Pokemon]:
     registry = ClassRegistry[Pokemon](attr_name="element")
     registry.register(Bulbasaur)
     registry.register(Charmander)

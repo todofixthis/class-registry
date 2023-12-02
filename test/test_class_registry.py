@@ -1,5 +1,3 @@
-import typing
-
 import pytest
 
 from class_registry import ClassRegistry, RegistryKeyError
@@ -179,12 +177,7 @@ def test_register_function():
     Functions can be registered as well (so long as they walk and quack
     like a class).
     """
-    registry = ClassRegistry[
-        typing.Union[
-            Pokemon,
-            typing.Callable[[], Pokemon],
-        ]
-    ]()
+    registry = ClassRegistry[Pokemon]()
 
     @registry.register("fire")
     def pokemon_factory(name=None):
