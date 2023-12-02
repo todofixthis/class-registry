@@ -57,7 +57,7 @@ To create a class instance from a registry, use the subscript operator:
 
    .. code-block:: python
 
-      # Annotate the registry with ``[Pokemon]``:
+      # Add type parameter ``[Pokemon]``:
       pokedex = ClassRegistry[Pokemon]()
 
       # Your IDE will automatically infer that ``fighter1`` is a ``Pokemon``.
