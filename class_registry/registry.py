@@ -69,7 +69,7 @@ class ClassRegistry(BaseMutableRegistry[T]):
 
     def items(
         self,
-    ) -> typing.Generator[typing.Tuple[typing.Hashable, typing.Type[T]], None, None,]:
+    ) -> typing.Generator[typing.Tuple[typing.Hashable, typing.Type[T]], None, None]:
         """
         Iterates over all registered classes, in the order they were added.
         """
