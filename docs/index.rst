@@ -53,7 +53,22 @@ To create a class instance from a registry, use the subscript operator:
 
    # CHARIZARD fainted!
    # How come my rival always picks the type that my pokémon is weak against??
-   fighter2 = pokedex['grass']
+   fighter2 = pokedex['water']
+
+.. tip::
+
+   If a :py:class:`ClassRegistry` always returns objects derived from a
+   particular base class, you can provide a
+   `type parameter <https://typing.readthedocs.io/en/latest/source/generics.html#generics>`_
+   to help ype checking, autocomplete, etc.:
+
+   .. code-block:: python
+
+      # Add type parameter ``[Pokemon]``:
+      pokedex = ClassRegistry[Pokemon]()
+
+      # Your IDE will automatically infer that ``fighter1`` is a ``Pokemon``.
+      fighter1 = pokedex['fire']
 
 Advanced Usage
 --------------

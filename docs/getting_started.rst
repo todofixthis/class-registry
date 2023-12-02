@@ -38,6 +38,20 @@ If you try to access a registry key that has no classes registered, it will rais
    except RegistryKeyError:
        pass
 
+Typed Registries
+----------------
+If a :py:class:`ClassRegistry` always returns objects derived from a particular
+base class, you can provide a
+`type parameter <https://typing.readthedocs.io/en/latest/source/generics.html#generics>`_
+to help with type checking, autocomplete, etc.:
+
+.. code-block:: python
+
+   # Add type parameter ``[Pokemon]``:
+   pokedex = ClassRegistry[Pokemon]()
+
+   # Your IDE will automatically infer that ``fighter1`` is a ``Pokemon``.
+   fighter1 = pokedex['fire']
 
 Auto-Detecting Registry Keys
 ----------------------------
