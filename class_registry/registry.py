@@ -154,7 +154,7 @@ class SortedClassRegistry(ClassRegistry[T]):
 
     def items(
         self,
-    ) -> typing.Generator[typing.Tuple[typing.Hashable, typing.Type[T]], None, None,]:
+    ) -> typing.Generator[typing.Tuple[typing.Hashable, typing.Type[T]], None, None]:
         for key, class_, _ in sorted(
             # Provide human-readable key and lookup key to the sorter...
             (
