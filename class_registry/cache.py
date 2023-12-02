@@ -44,9 +44,9 @@ class ClassRegistryInstanceCache(typing.Mapping[typing.Hashable, T]):
         super().__init__()
 
         self._registry: ClassRegistry[T] = class_registry
-        self._cache: typing.Dict[typing.Hashable, T] = {}
+        self._cache: dict[typing.Hashable, T] = {}
 
-        self._key_map: typing.Dict[typing.Hashable, list] = defaultdict(list)
+        self._key_map: dict[typing.Hashable, list] = defaultdict(list)
 
         self._template_args = args
         self._template_kwargs = kwargs

@@ -37,7 +37,7 @@ class BaseRegistry(typing.Mapping[typing.Hashable, T], metaclass=ABCMeta):
         else:
             return True
 
-    def __dir__(self) -> typing.List[typing.Hashable]:
+    def __dir__(self) -> list[typing.Hashable]:
         return list(self.keys())
 
     def __getitem__(self, key: typing.Hashable) -> T:
@@ -181,7 +181,7 @@ class BaseMutableRegistry(
         # Map lookup keys to readable keys.
         # Only needed when :py:meth:`gen_lookup_key` is overridden, but I'm not
         # good enough at reflection black magic to figure out how to do that (:
-        self._lookup_keys: typing.Dict[typing.Hashable, typing.Hashable] = {}
+        self._lookup_keys: dict[typing.Hashable, typing.Hashable] = {}
 
     def __delitem__(self, key: typing.Hashable) -> None:
         """

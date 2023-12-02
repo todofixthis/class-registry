@@ -39,9 +39,7 @@ class EntryPointClassRegistry(BaseRegistry[T]):
         self.attr_name = attr_name
         self.group = group
 
-        self._cache: typing.Optional[
-            typing.Dict[typing.Hashable, typing.Type[T]]
-        ] = None
+        self._cache: typing.Optional[dict[typing.Hashable, typing.Type[T]]] = None
         """
         Caches registered classes locally, so that we don't have to keep
         iterating over entry points.
@@ -94,7 +92,7 @@ class EntryPointClassRegistry(BaseRegistry[T]):
         """
         self._cache = None
 
-    def _get_cache(self) -> typing.Dict[typing.Hashable, typing.Type[T]]:
+    def _get_cache(self) -> dict[typing.Hashable, typing.Type[T]]:
         """
         Populates the cache (if necessary) and returns it.
         """
