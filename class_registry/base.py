@@ -206,13 +206,18 @@ class BaseMutableRegistry(
         self._register(lookup_key, class_)
         self._lookup_keys[key] = lookup_key
 
+    # :see: https://mypy.readthedocs.io/en/stable/generics.html#decorator-factories
+    @typing.overload
+    def register(self, key: typing.Type[T]) -> typing.Type[T]:
+        ...
+
+    @typing.overload
     def register(
-        self,
-        key: typing.Union[typing.Hashable, typing.Type[T]],
-    ) -> typing.Union[
-        typing.Type[T],
-        typing.Callable[[typing.Type[T]], typing.Type[T]],
-    ]:
+        self, key: typing.Hashable
+    ) -> typing.Callable[[typing.Type[T]], typing.Type[T]]:
+        ...
+
+    def register(self, key: typing.Union[typing.Hashable, typing.Type[T]]):
         """
         Decorator that registers a class with the registry.
 
