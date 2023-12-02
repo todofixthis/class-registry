@@ -68,7 +68,8 @@ autocompletion, etc.:
    # Your IDE will automatically infer that ``fire_fighter`` is a ``Pokemon``.
    fire_fighter = pokedex['fire']
 
-Alternatively, you can annotate the :py:class:`ClassRegistryInstanceCache` directly:
+Alternatively, you can apply the type parameter to the
+:py:class:`ClassRegistryInstanceCache` directly:
 
 .. code-block:: python
 
