@@ -72,11 +72,9 @@ class EntryPointClassRegistry(BaseRegistry[T]):
 
     def get_class(self, key: typing.Hashable) -> typing.Type[T]:
         try:
-            cls = self._get_cache()[key]
+            return self._get_cache()[key]
         except KeyError:
-            cls = self.__missing__(key)
-
-        return cls
+            return self.__missing__(key)
 
     def items(self) -> typing.ItemsView[typing.Hashable, T]:
         return self._get_cache().items()

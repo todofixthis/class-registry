@@ -62,12 +62,16 @@ class BaseRegistry(typing.Mapping[typing.Hashable, T], metaclass=ABCMeta):
             "Not implemented in {cls}.".format(cls=type(self).__name__),
         )
 
-    def __missing__(self, key) -> typing.Optional[typing.Any]:
+    def __missing__(self, key) -> typing.Type[T]:
         """
         Defines what to do when trying to access an unregistered key.
 
         Default behaviour is to throw a typed exception, but you could override
         this in a subclass, e.g., to return a default value.
+
+        .. note::
+
+           This method should return a class, not an instance.
         """
         raise RegistryKeyError(key)
 
