@@ -53,7 +53,7 @@ To create a class instance from a registry, use the subscript operator:
    If a ``ClassRegistry`` always returns objects derived from a particular base class,
    you can provide a
    `type parameter <https://typing.readthedocs.io/en/latest/source/generics.html#generics>`_
-   to help ype checking, autocomplete, etc.:
+   to help with type checking, autocomplete, etc.:
 
    .. code-block:: python
 
