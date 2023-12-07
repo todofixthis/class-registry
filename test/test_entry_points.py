@@ -55,19 +55,19 @@ def test_branding():
         assert getattr(Squirtle, "poke_type") == "water"
 
         # Instances, too!
-        assert registry["fire"].poke_type == "fire"
-        assert registry.get("water", "phil").poke_type == "water"
+        assert getattr(registry["fire"], "poke_type") == "fire"
+        assert getattr(registry.get("water", "phil"), "poke_type") == "water"
 
         # Registered functions and methods can't be branded this way,
         # though...
         assert not hasattr(PokemonFactory.create_psychic_pokemon, "poke_type")
 
         # ... but we can brand the resulting instances.
-        assert registry["psychic"].poke_type == "psychic"
-        assert registry.get("psychic").poke_type == "psychic"
+        assert getattr(registry["psychic"], "poke_type") == "psychic"
+        assert getattr(registry.get("psychic"), "poke_type") == "psychic"
     finally:
         # Clean up after ourselves.
-        for cls in registry.values():
+        for cls in registry.classes():
             if isinstance(cls, type):
                 try:
                     delattr(cls, "poke_type")

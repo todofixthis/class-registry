@@ -5,7 +5,7 @@ is modified.
 import pytest
 
 from class_registry import ClassRegistry
-from test import Bulbasaur, Charmander, Pokemon, Squirtle
+from test import Charmander, Pokemon, Squirtle
 
 
 @pytest.fixture(name="customised_registry")
@@ -56,39 +56,11 @@ def test_get(customised_registry: ClassRegistry[Pokemon]):
     assert isinstance(customised_registry.get("fire"), Charmander)
 
 
-def test_items(customised_registry: ClassRegistry[Pokemon]):
-    generator = customised_registry.items()
-
-    assert next(generator), "fire" == Charmander
-    assert next(generator), "water" == Squirtle
-
-    with pytest.raises(StopIteration):
-        next(generator)
-
-
-def test_keys(customised_registry: ClassRegistry[Pokemon]):
-    generator = customised_registry.keys()
-
-    assert next(generator) == "fire"
-    assert next(generator) == "water"
-
-    with pytest.raises(StopIteration):
-        next(generator)
-
-
-def test_delitem(customised_registry: ClassRegistry[Pokemon]):
-    del customised_registry["fire"]
-    assert list(customised_registry.keys()) == ["water"]
-
-
-def test_setitem(customised_registry: ClassRegistry[Pokemon]):
-    customised_registry["grass"] = Bulbasaur
-    assert list(customised_registry.keys()), ["fire", "water" == "grass"]
-
-
 def test_unregister(customised_registry: ClassRegistry[Pokemon]):
     customised_registry.unregister("fire")
-    assert list(customised_registry.keys()) == ["water"]
+
+    assert "fire" not in customised_registry
+    assert "erif" not in customised_registry
 
 
 def test_use_case_aliases():
@@ -120,4 +92,5 @@ def test_use_case_aliases():
     assert isinstance(registry["bird"], MissingNo)
     assert isinstance(registry["flying"], MissingNo)
 
-    assert list(registry.keys()) == ["flying"]
+    assert "bird" in registry
+    assert "flying" in registry

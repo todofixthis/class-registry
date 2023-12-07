@@ -76,8 +76,8 @@ class EntryPointClassRegistry(BaseRegistry[T]):
         except KeyError:
             return self.__missing__(key)
 
-    def items(self) -> typing.ItemsView[typing.Hashable, T]:
-        return self._get_cache().items()
+    def keys(self) -> typing.Iterable[typing.Hashable]:
+        return iter(self._get_cache().keys())
 
     def refresh(self):
         """

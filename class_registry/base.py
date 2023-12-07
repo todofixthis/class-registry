@@ -1,5 +1,6 @@
 import typing
 from abc import ABCMeta, abstractmethod as abstract_method
+from collections.abc import Container
 from inspect import isclass as is_class
 
 
@@ -17,7 +18,7 @@ class RegistryKeyError(KeyError):
 T = typing.TypeVar("T")
 
 
-class BaseRegistry(typing.Mapping[typing.Hashable, T], metaclass=ABCMeta):
+class BaseRegistry(Container[T], metaclass=ABCMeta):
     """
     Base functionality for registries.
     """
@@ -43,23 +44,19 @@ class BaseRegistry(typing.Mapping[typing.Hashable, T], metaclass=ABCMeta):
         """
         return self.get(key)
 
-    def __iter__(self) -> typing.Generator[typing.Hashable, None, None]:
+    def __iter__(self) -> typing.Iterator[typing.Hashable]:
         """
-        Returns a generator for iterating over registry keys, in the
-        order that they were registered.
+        Iterates over registry keys.
         """
-        return self.keys()
+        return iter(self.keys())
 
-    @abstract_method
     def __len__(self) -> int:
         """
         Returns the number of registered classes.
         """
-        raise NotImplementedError(
-            "Not implemented in {cls}.".format(cls=type(self).__name__),
-        )
+        return sum(1 for _ in self.keys())
 
-    def __missing__(self, key) -> typing.Type[T]:
+    def __missing__(self, key: typing.Hashable) -> typing.Type[T]:
         """
         Defines what to do when trying to access an unregistered key.
 
@@ -81,7 +78,7 @@ class BaseRegistry(typing.Mapping[typing.Hashable, T], metaclass=ABCMeta):
             "Not implemented in {cls}.".format(cls=type(self).__name__),
         )
 
-    def get(self, key: typing.Hashable, *args, **kwargs) -> T:
+    def get(self, key: typing.Hashable, *args: typing.Any, **kwargs: typing.Any) -> T:
         """
         Creates a new instance of the class matching the specified key.
 
@@ -103,6 +100,19 @@ class BaseRegistry(typing.Mapping[typing.Hashable, T], metaclass=ABCMeta):
         """
         return self.create_instance(self.get_class(key), *args, **kwargs)
 
+    @abstract_method
+    def keys(self) -> typing.Iterable[typing.Hashable]:
+        """
+        Returns the collection of registered keys.
+        """
+        raise NotImplementedError()
+
+    def classes(self) -> typing.Iterable[typing.Type[T]]:
+        """
+        Returns the collection of registered classes.
+        """
+        return iter(self.get_class(key) for key in self.keys())
+
     @staticmethod
     def gen_lookup_key(key: typing.Hashable) -> typing.Hashable:
         """
@@ -110,11 +120,16 @@ class BaseRegistry(typing.Mapping[typing.Hashable, T], metaclass=ABCMeta):
 
         You may override this method in a subclass, for example if you need to
         support legacy aliases, etc.
+
+        :param key: the key value provided to e.g., :py:meth:`__getitem__`
+        :returns: the registry key, used to look up the corresponding class.
         """
         return key
 
     @staticmethod
-    def create_instance(class_: type, *args, **kwargs) -> T:
+    def create_instance(
+        class_: typing.Type[T], *args: typing.Any, **kwargs: typing.Any
+    ) -> T:
         """
         Prepares the return value for :py:meth:`get`.
 
@@ -132,38 +147,8 @@ class BaseRegistry(typing.Mapping[typing.Hashable, T], metaclass=ABCMeta):
         """
         return class_(*args, **kwargs)
 
-    @abstract_method
-    def items(
-        self,
-    ) -> typing.Generator[typing.Tuple[typing.Hashable, typing.Type[T]], None, None]:
-        """
-        Iterates over registered classes and their corresponding keys, in the
-        order that they were registered.
-        """
-        raise NotImplementedError(
-            "Not implemented in {cls}.".format(cls=type(self).__name__),
-        )
 
-    def keys(self) -> typing.Generator[typing.Hashable, None, None]:
-        """
-        Returns a generator for iterating over registry keys, in the order that
-        they were registered.
-        """
-        for item in self.items():
-            yield item[0]
-
-    def values(self) -> typing.Generator[typing.Type[T], None, None]:
-        """
-        Returns a generator for iterating over registered classes, in the order
-        that they were registered.
-        """
-        for item in self.items():
-            yield item[1]
-
-
-class BaseMutableRegistry(
-    BaseRegistry[T], typing.MutableMapping[typing.Hashable, T], metaclass=ABCMeta
-):
+class BaseMutableRegistry(BaseRegistry[T], metaclass=ABCMeta):
     """
     Extends :py:class:`BaseRegistry` with methods that can be used to modify
     the registered classes.
@@ -184,27 +169,17 @@ class BaseMutableRegistry(
         # good enough at reflection black magic to figure out how to do that (:
         self._lookup_keys: dict[typing.Hashable, typing.Hashable] = {}
 
-    def __delitem__(self, key: typing.Hashable) -> None:
-        """
-        Provides alternate syntax for un-registering a class.
-        """
-        self._unregister(self.gen_lookup_key(key))
-        del self._lookup_keys[key]
-
     def __repr__(self) -> str:
         return "{type}({attr_name!r})".format(
             attr_name=self.attr_name,
             type=type(self).__name__,
         )
 
-    def __setitem__(self, key: typing.Hashable, class_: typing.Type[T]) -> None:
+    def keys(self) -> typing.Iterable[typing.Hashable]:
         """
-        Provides alternate syntax for registering a class.
+        Returns the collection of registry keys, in the order that they were registered.
         """
-        lookup_key = self.gen_lookup_key(key)
-
-        self._register(lookup_key, class_)
-        self._lookup_keys[key] = lookup_key
+        return iter(self._lookup_keys.keys())
 
     # :see: https://mypy.readthedocs.io/en/stable/generics.html#decorator-factories
     @typing.overload
@@ -294,7 +269,7 @@ class BaseMutableRegistry(
         """
         Registers a class with the registry.
 
-        :param key: Has already been processed by :py:meth:`gen_lookup_key`.
+        :param key: Return value from :py:meth:`gen_lookup_key`.
         """
         raise NotImplementedError(
             "Not implemented in {cls}.".format(cls=type(self).__name__),
@@ -305,7 +280,7 @@ class BaseMutableRegistry(
         """
         Unregisters the class at the specified key.
 
-        :param key: Has already been processed by :py:meth:`gen_lookup_key`.
+        :param key: Return value from :py:meth:`gen_lookup_key`.
         """
         raise NotImplementedError(
             "Not implemented in {cls}.".format(cls=type(self).__name__),

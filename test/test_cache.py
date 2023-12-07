@@ -66,25 +66,6 @@ def test_template_args(registry: ClassRegistry[Pokemon]):
     assert poke_2.name == "Bruce"
 
 
-def test_iterator(
-    cache: ClassRegistryInstanceCache[Pokemon],
-    registry: ClassRegistry[Pokemon],
-):
-    """
-    Creating an iterator using :py:func:`iter`.
-    """
-    # The cache's iterator only operates over cached instances.
-    assert list(iter(cache)) == []
-
-    poke_1 = cache["water"]
-    poke_2 = cache["grass"]
-    poke_3 = cache["fire"]
-
-    # The order that values are yielded depends on the ordering of
-    # the wrapped registry.
-    assert list(iter(cache)) == [poke_2, poke_3, poke_1]
-
-
 def test_len(
     cache: ClassRegistryInstanceCache[Pokemon],
     registry: ClassRegistry[Pokemon],
