@@ -17,16 +17,15 @@ Let's see what this looks like in action.  First, we'll create a
 .. code-block:: python
 
    from class_registry import ClassRegistry
-   from class_registry.cache import ClassRegistryInstanceCache
 
    pokedex = ClassRegistry('element')
 
    @pokedex.register
-   class Pikachu(object):
+   class Pikachu:
        element = 'electric'
 
    @pokedex.register
-   class Alakazam(object):
+   class Alakazam:
        element = 'psychic'
 
    # Accessing the ClassRegistry yields a different instance every time.
@@ -37,6 +36,8 @@ Let's see what this looks like in action.  First, we'll create a
 Next we'll wrap the registry in a :py:class:`ClassRegistryInstanceCache`:
 
 .. code-block:: python
+
+   from class_registry.cache import ClassRegistryInstanceCache
 
    fighters = ClassRegistryInstanceCache(pokedex)
 

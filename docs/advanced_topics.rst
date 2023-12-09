@@ -42,7 +42,8 @@ Here's an example:
 
    # Any non-abstract class that extends ``Pokemon`` will automatically get registered
    # in our Pokédex!
-   assert list(pokedex.items()) == [('bug', Butterfree), ('flying', Spearow)]
+   assert list(pokedex.keys()) == ['bug', 'flying']
+   assert list(pokedex.classes()) == [Butterfree, Spearow]
 
 In the above example, note that ``Butterfree`` and ``Spearow`` were added to
 ``pokedex`` automatically.  However, the ``Pokemon`` base class was not added,
@@ -64,8 +65,8 @@ because it is abstract.
           def get_abilities(self):
               return ['shock']
 
-      assert list(pokedex.items()) == \
-          [('bug', Butterfree), ('flying', Spearow), ('electric', ElectricPokemon)]
+      assert list(pokedex.keys()) == ['bug', 'flying', 'electric']
+      assert list(pokedex.classes()) == [Butterfree, Spearow, ElectricPokemon]
 
    Note in the above example that ``ElectricPokemon`` was added to ``pokedex``,
    even though it extends :py:class:`abc.ABC`.
@@ -97,10 +98,10 @@ purpose:
    pokedex = ClassRegistry('element')
 
    # Create a couple of new classes, but don't register them yet!
-   class Oddish(object):
+   class Oddish:
        element = 'grass'
 
-   class Meowth(object):
+   class Meowth:
        element = 'normal'
 
    # As expected, neither of these classes are registered.
@@ -129,7 +130,7 @@ already registered.
 .. code-block:: python
 
    @pokedex.register
-   class Squirtle(object):
+   class Squirtle:
        element = 'water'
 
    # Get your diving suit Meowth; we're going to Atlantis!
@@ -162,9 +163,12 @@ To customise this, create a subclass of ``ClassRegistry`` and override its
 
 .. code-block:: python
 
+   import typing
+   from class_registry import ClassRegistry
+
    class FacadeRegistry(ClassRegistry):
        @staticmethod
-       def gen_lookup_key(key: str) -> str:
+       def gen_lookup_key(key: typing.Hashable) -> typing.Hashable:
            """
            In a previous version of the codebase, some pokémon had the 'bird'
            type, but this was later dropped in favour of 'flying'.
@@ -177,11 +181,11 @@ To customise this, create a subclass of ``ClassRegistry`` and override its
    pokedex = FacadeRegistry('element')
 
    @pokedex.register
-   class MissingNo(Pokemon):
+   class MissingNo:
        element = 'flying'
 
    @pokedex.register
-   class Meowth(object):
+   class Meowth:
        element = 'normal'
 
    # MissingNo can be accessed by either key.

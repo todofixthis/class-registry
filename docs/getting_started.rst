@@ -13,7 +13,7 @@ to add classes to the registry:
    pokedex = ClassRegistry()
 
    @pokedex.register('fire')
-   class Charizard(object):
+   class Charizard:
        pass
 
 Once you've registered a class, you can then create a new instance using the
@@ -67,7 +67,7 @@ using that attribute:
    pokedex = ClassRegistry('element')
 
    @pokedex.register
-   class Squirtle(object):
+   class Squirtle:
        element = 'water'
 
    beauregard = pokedex['water']
@@ -85,11 +85,11 @@ What happens if two classes have the same registry key?
    pokedex = ClassRegistry('element')
 
    @pokedex.register
-   class Bulbasaur(object):
+   class Bulbasaur:
        element = 'grass'
 
    @pokedex.register
-   class Ivysaur(object):
+   class Ivysaur:
        element = 'grass'
 
    janet = pokedex['grass']
@@ -114,12 +114,12 @@ If you want to prevent collisions, you can pass ``unique=True`` to the
    pokedex = ClassRegistry('element', unique=True)
 
    @pokedex.register
-   class Bulbasaur(object):
+   class Bulbasaur:
        element = 'grass'
 
    try:
        @pokedex.register
-       class Ivysaur(object):
+       class Ivysaur:
            element = 'grass'
    except RegistryKeyError:
        pass
@@ -151,7 +151,7 @@ args and kwargs to the class initialiser using the registry's :py:meth:`get` met
    pokedex = ClassRegistry('element')
 
    @pokedex.register
-   class Caterpie(object):
+   class Caterpie:
        element = 'bug'
 
        def __init__(self, level=1):
