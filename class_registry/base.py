@@ -182,6 +182,21 @@ class BaseMutableRegistry(BaseRegistry[T], metaclass=ABCMeta):
         """
         return iter(self._lookup_keys.keys())
 
+    def items(self) -> typing.Iterable[tuple[typing.Hashable, typing.Type[T]]]:
+        """
+        DEPRECATED: use :py:meth:`keys` or :py:meth:`classes` instead.
+
+        Returns the collection of registered key-class pairs, in the order that they
+        were registered.
+        """
+        warn(
+            f"{type(self).__name__}.items() is deprecated and will be removed in a"
+            f"future version of ClassRegistry.  Use `zip({type(self).__name__}.keys(), "
+            f"{type(self).__name__}.classes())` instead.",
+            DeprecationWarning,
+        )
+        return iter(zip(self.keys(), self.classes()))
+
     def values(self) -> typing.Iterable[typing.Type[T]]:
         """
         DEPRECATED: use :py:meth:`classes` instead.
