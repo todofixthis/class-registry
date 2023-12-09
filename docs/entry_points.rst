@@ -49,11 +49,14 @@ Let's see what happens once the ``pokemon-generation-2`` package is installed::
 
    In [2]: pokedex = EntryPointClassRegistry('pokemon')
 
-   In [3]: list(pokedex.items())
-   Out[3]:
-   [('grass', <class 'gen2.pokemon.Chikorita'>),
-    ('fire', <class 'gen2.pokemon.Cyndaquil'>),
-    ('water', <class 'gen2.pokemon.Totodile'>)]
+   In [3]: list(pokedex.keys())
+   Out[3]: ['grass', 'fire', 'water']
+
+   In [4]: list(pokedex.classes())
+   Out[4]:
+   [<class 'gen2.pokemon.Chikorita'>,
+    <class 'gen2.pokemon.Cyndaquil'>,
+    <class 'gen2.pokemon.Totodile'>]
 
 Simply declare an :py:class:`EntryPointClassRegistry` instance, and it will
 automatically find any classes registered to that entry point group across every

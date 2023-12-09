@@ -1,3 +1,4 @@
+import typing
 from functools import cmp_to_key
 
 from class_registry.registry import SortedClassRegistry
@@ -31,7 +32,7 @@ def test_sort_key():
 
     # The registry iterates over registered classes in ascending order by
     # ``weight``.
-    assert list(registry.values()) == [Bellsprout, Machop, Geodude]
+    assert list(registry.classes()) == [Bellsprout, Machop, Geodude]
 
 
 def test_sort_key_reverse():
@@ -60,7 +61,7 @@ def test_sort_key_reverse():
         weight = 15
 
     # The registry iterates over registered classes in descending order by ``weight``.
-    assert list(registry.values()) == [Geodude, Machop, Bellsprout]
+    assert list(registry.classes()) == [Geodude, Machop, Bellsprout]
 
 
 def test_cmp_to_key():
@@ -100,7 +101,7 @@ def test_cmp_to_key():
 
     # The registry iterates over registered classes in descending order by
     # ``popularity``.
-    assert list(registry.values()) == [Cubone, Onix, Exeggcute]
+    assert list(registry.classes()) == [Cubone, Onix, Exeggcute]
 
 
 def test_gen_lookup_key_overridden():
@@ -118,12 +119,14 @@ def test_gen_lookup_key_overridden():
 
     class TestRegistry(SortedClassRegistry):
         @staticmethod
-        def gen_lookup_key(key: str) -> str:
+        def gen_lookup_key(key: typing.Hashable) -> typing.Hashable:
             """
             Simple override of `gen_lookup_key`, to ensure the sorting
             behaves as expected when the lookup key is different.
             """
-            return "".join(reversed(key))
+            if isinstance(key, str):
+                return "".join(reversed(key))
+            return key
 
     registry = TestRegistry(sort_key=cmp_to_key(compare_by_lookup_key))
 
@@ -131,8 +134,4 @@ def test_gen_lookup_key_overridden():
     registry.register("grass")(Bulbasaur)
     registry.register("water")(Squirtle)
 
-    assert list(registry.items()) == [
-        ("fire", Charmander),
-        ("water", Squirtle),
-        ("grass", Bulbasaur),
-    ]
+    assert list(registry.classes()) == [Charmander, Squirtle, Bulbasaur]

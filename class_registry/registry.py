@@ -1,13 +1,14 @@
 __all__ = ["ClassRegistry", "SortedClassRegistry"]
 
 import typing
-from collections import OrderedDict
 from functools import cmp_to_key
 
 from .base import BaseMutableRegistry, RegistryKeyError
 
+T = typing.TypeVar("T")
 
-class ClassRegistry(BaseMutableRegistry):
+
+class ClassRegistry(BaseMutableRegistry[T]):
     """
     Maintains a registry of classes and provides a generic factory for instantiating
     them.
@@ -29,22 +30,16 @@ class ClassRegistry(BaseMutableRegistry):
             - ``True``: A :py:class:`KeyError` will be raised.
             - ``False``: The second class will replace the first one.
         """
-        super(ClassRegistry, self).__init__(attr_name)
+        super().__init__(attr_name)
 
         self.unique = unique
 
-        self._registry: typing.OrderedDict[typing.Hashable, type] = OrderedDict()
-
-    def __len__(self) -> int:
-        """
-        Returns the number of registered classes.
-        """
-        return len(self._registry)
+        self._registry: dict[typing.Hashable, typing.Type[T]] = {}
 
     def __repr__(self) -> str:
         return f"{type(self).__name__}(attr_name={self.attr_name!r}, unique={self.unique!r})"
 
-    def get_class(self, key: typing.Hashable) -> typing.Optional[type]:
+    def get_class(self, key: typing.Hashable) -> typing.Type[T]:
         """
         Returns the class associated with the specified key.
         """
@@ -55,16 +50,7 @@ class ClassRegistry(BaseMutableRegistry):
         except KeyError:
             return self.__missing__(lookup_key)
 
-    def items(
-        self,
-    ) -> typing.Generator[typing.Tuple[typing.Hashable, type], None, None]:
-        """
-        Iterates over all registered classes, in the order they were added.
-        """
-        for key, lookup_key in self._lookup_keys.items():
-            yield key, self._registry[lookup_key]
-
-    def _register(self, key: typing.Hashable, class_: type) -> None:
+    def _register(self, key: typing.Hashable, class_: typing.Type[T]) -> None:
         """
         Registers a class with the registry.
 
@@ -83,7 +69,7 @@ class ClassRegistry(BaseMutableRegistry):
 
         self._registry[key] = class_
 
-    def _unregister(self, key: typing.Hashable) -> type:
+    def _unregister(self, key: typing.Hashable) -> typing.Type[T]:
         """
         Unregisters the class at the specified key.
 
@@ -94,7 +80,7 @@ class ClassRegistry(BaseMutableRegistry):
         )
 
 
-class SortedClassRegistry(ClassRegistry):
+class SortedClassRegistry(ClassRegistry[T]):
     """
     A ClassRegistry that uses a function to determine sort order when iterating.
     """
@@ -127,7 +113,7 @@ class SortedClassRegistry(ClassRegistry):
         :param reverse:
             Whether to reverse the sort ordering.
         """
-        super(SortedClassRegistry, self).__init__(attr_name, unique)
+        super().__init__(attr_name, unique)
 
         self._sort_key = (
             sort_key if callable(sort_key) else self.create_sorter(sort_key)
@@ -135,24 +121,25 @@ class SortedClassRegistry(ClassRegistry):
 
         self.reverse = reverse
 
-    def items(
-        self,
-    ) -> typing.Generator[typing.Tuple[typing.Hashable, type], None, None]:
-        for key, class_, _ in sorted(
-            # Provide both the human-readable key and actual lookup key to the sorter...
-            (
-                (key, class_, self.gen_lookup_key(key))
-                for (key, class_) in super().items()
-            ),
-            key=self._sort_key,
-            reverse=self.reverse,
-        ):
-            # ...but for parity with other ClassRegistry types, only include the
-            # human-readable key in the result.
-            yield key, class_
+    def keys(self) -> typing.Iterable[typing.Hashable]:
+        """
+        Returns the collection of registry keys, in the order that they were registered.
+        """
+        return iter(
+            key
+            for key, _, _ in sorted(
+                (
+                    # Provide both human-readable and lookup keys to the sorter.
+                    (key, self.get_class(key), self.gen_lookup_key(key))
+                    for key in super().keys()
+                ),
+                key=self._sort_key,
+                reverse=self.reverse,
+            )
+        )
 
     @staticmethod
-    def create_sorter(sort_key: str) -> typing.Any:
+    def create_sorter(sort_key: str):
         """
         Given a sort key, creates a function that can be used to sort items when
         iterating over the registry.

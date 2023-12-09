@@ -6,6 +6,9 @@ from . import RegistryKeyError
 from .base import BaseMutableRegistry
 
 
+T = typing.TypeVar("T")
+
+
 class RegistryPatcher(object):
     """
     Creates a context in which classes are temporarily registered with a class registry,
@@ -23,7 +26,12 @@ class RegistryPatcher(object):
 
         pass
 
-    def __init__(self, registry: BaseMutableRegistry, *args, **kwargs) -> None:
+    def __init__(
+        self,
+        registry: BaseMutableRegistry[T],
+        *args: typing.Type[T],
+        **kwargs: typing.Type[T]
+    ) -> None:
         """
         :param registry:
             A :py:class:`MutableRegistry` instance to patch.
@@ -43,15 +51,19 @@ class RegistryPatcher(object):
             In the event of a conflict, values in ``args`` override values in
             ``kwargs``.
         """
-        super(RegistryPatcher, self).__init__()
+        super().__init__()
 
+        assert registry.attr_name is not None
         for class_ in args:
             kwargs[getattr(class_, registry.attr_name)] = class_
 
-        self.target = registry
+        self.target: BaseMutableRegistry[T] = registry
 
-        self._new_values = kwargs
-        self._prev_values = {}
+        self._new_values: dict[str, typing.Type[T]] = kwargs
+        self._prev_values: dict[
+            typing.Hashable,
+            typing.Union[typing.Type[T], typing.Type[RegistryPatcher.DoesNotExist]],
+        ] = {}
 
     def __enter__(self) -> None:
         self.apply()
@@ -89,13 +101,13 @@ class RegistryPatcher(object):
             if value is not self.DoesNotExist:
                 self._set_value(key, value)
 
-    def _get_value(self, key: typing.Hashable, default=None) -> typing.Optional[type]:
+    def _get_value(self, key: typing.Hashable, default=None) -> typing.Any:
         try:
             return self.target.get_class(key)
         except RegistryKeyError:
             return default
 
-    def _set_value(self, key: typing.Hashable, value: type) -> None:
+    def _set_value(self, key: typing.Hashable, value: typing.Type[T]) -> None:
         self.target.register(key)(value)
 
     def _del_value(self, key: typing.Hashable) -> None:

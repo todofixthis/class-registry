@@ -6,7 +6,10 @@ from importlib.metadata import entry_points
 from .base import BaseRegistry
 
 
-class EntryPointClassRegistry(BaseRegistry):
+T = typing.TypeVar("T")
+
+
+class EntryPointClassRegistry(BaseRegistry[T]):
     """
     A class registry that loads classes using setuptools entry points.
     """
@@ -27,12 +30,12 @@ class EntryPointClassRegistry(BaseRegistry):
             Note: if a class already defines this attribute, the registry will overwrite
             it!
         """
-        super(EntryPointClassRegistry, self).__init__()
+        super().__init__()
 
         self.attr_name = attr_name
         self.group = group
 
-        self._cache: typing.Optional[typing.Dict[typing.Hashable, type]] = None
+        self._cache: typing.Optional[dict[typing.Hashable, typing.Type[T]]] = None
         """
         Caches registered classes locally, so that we don't have to keep iterating over
         entry points.
@@ -48,8 +51,8 @@ class EntryPointClassRegistry(BaseRegistry):
     def __repr__(self) -> str:
         return f"{type(self).__name__}(group={self.group!r})"
 
-    def get(self, key: typing.Hashable, *args, **kwargs) -> typing.Any:
-        instance = super(EntryPointClassRegistry, self).get(key, *args, **kwargs)
+    def get(self, key: typing.Hashable, *args, **kwargs) -> T:
+        instance = super().get(key, *args, **kwargs)
 
         if self.attr_name:
             # Apply branding to the instance explicitly.
@@ -59,16 +62,14 @@ class EntryPointClassRegistry(BaseRegistry):
 
         return instance
 
-    def get_class(self, key: typing.Hashable) -> typing.Optional[type]:
+    def get_class(self, key: typing.Hashable) -> typing.Type[T]:
         try:
-            cls = self._get_cache()[key]
+            return self._get_cache()[key]
         except KeyError:
-            cls = self.__missing__(key)
+            return self.__missing__(key)
 
-        return cls
-
-    def items(self) -> typing.ItemsView[typing.Hashable, type]:
-        return self._get_cache().items()
+    def keys(self) -> typing.Iterable[typing.Hashable]:
+        return iter(self._get_cache().keys())
 
     def refresh(self):
         """
@@ -79,7 +80,7 @@ class EntryPointClassRegistry(BaseRegistry):
         """
         self._cache = None
 
-    def _get_cache(self) -> typing.Dict[typing.Hashable, type]:
+    def _get_cache(self) -> dict[typing.Hashable, typing.Type[T]]:
         """
         Populates the cache (if necessary) and returns it.
         """
