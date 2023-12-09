@@ -181,18 +181,27 @@ class BaseMutableRegistry(BaseRegistry[T], metaclass=ABCMeta):
         """
         return iter(self._lookup_keys.keys())
 
-    # :see: https://mypy.readthedocs.io/en/stable/generics.html#decorator-factories
-    @typing.overload
-    def register(self, key: typing.Type[T]) -> typing.Type[T]:
-        ...
+    if typing.TYPE_CHECKING:
+        # :see: https://mypy.readthedocs.io/en/stable/generics.html#decorator-factories
+        @typing.overload
+        def register(self, key: typing.Type[T]) -> typing.Type[T]:
+            """Decorator variant"""
+            ...
 
-    @typing.overload
+        @typing.overload
+        def register(
+            self, key: typing.Hashable
+        ) -> typing.Callable[[typing.Type[T]], typing.Type[T]]:
+            """Decorator factory variant"""
+            ...
+
     def register(
-        self, key: typing.Hashable
-    ) -> typing.Callable[[typing.Type[T]], typing.Type[T]]:
-        ...
-
-    def register(self, key: typing.Union[typing.Hashable, typing.Type[T]]):
+        self,
+        key: typing.Union[typing.Hashable, typing.Type[T]],
+    ) -> typing.Union[
+        typing.Type[T],
+        typing.Callable[[typing.Type[T]], typing.Type[T]],
+    ]:
         """
         Decorator that registers a class with the registry.
 
@@ -216,6 +225,9 @@ class BaseMutableRegistry(BaseRegistry[T], metaclass=ABCMeta):
         """
         # ``@register`` usage:
         if is_class(key):
+            if typing.TYPE_CHECKING:
+                key = typing.cast(typing.Type[T], key)
+
             if self.attr_name:
                 attr_key = getattr(key, self.attr_name)
                 lookup_key = self.gen_lookup_key(attr_key)
