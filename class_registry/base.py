@@ -66,7 +66,7 @@ class BaseRegistry(Container[T], metaclass=ABCMeta):
 
         .. note::
 
-           This method should return a class, not an instance.
+           This method must return a class, not an instance.
         """
         raise RegistryKeyError(key)
 
