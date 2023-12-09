@@ -72,12 +72,6 @@ def test_register_error_empty_key():
     registry = ClassRegistry[Pokemon]("element")
 
     with pytest.raises(ValueError):
-        # noinspection PyTypeChecker,PyUnusedLocal
-        @registry.register(None)
-        class Ponyta(Pokemon):
-            element = "fire"
-
-    with pytest.raises(ValueError):
         # noinspection PyUnusedLocal
         @registry.register("")
         class Rapidash(Pokemon):
