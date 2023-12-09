@@ -10,7 +10,7 @@ def test_auto_register():
     """
     Using :py:func:`AutoRegister` to, well, auto-register classes.
     """
-    registry = ClassRegistry(attr_name="element")
+    registry = ClassRegistry["BasePokemon"](attr_name="element")
 
     # Note that we declare :py:func:`AutoRegister` as the metaclass
     # for our base class.
@@ -55,28 +55,22 @@ def test_auto_register():
         def evolve(self):
             return "Congratulations! Your EKANS evolved into ARBOK!"
 
-    assert list(registry.items()) == [
-        # Note that only non-abstract classes got registered.
-        ("ground", Sandslash),
-        ("poison", Ekans),
-    ]
+    # Note that only non-abstract classes got registered.
+    assert list(registry.classes()) == [Sandslash, Ekans]
 
 
 def test_abstract_strict_definition():
     """
     If a class has no unimplemented abstract methods, it gets registered.
     """
-    registry = ClassRegistry(attr_name="element")
+    registry = ClassRegistry["FightingPokemon"](attr_name="element")
 
     class FightingPokemon(metaclass=AutoRegister(registry)):
         element = "fighting"
 
-    assert list(registry.items()) == [
-        # :py:class:`FightingPokemon` does not define any
-        # abstract methods, so it is not considered to be
-        # abstract!
-        ("fighting", FightingPokemon),
-    ]
+    # :py:class:`FightingPokemon` does not define any abstract methods, so it is not
+    # considered to be abstract :shrug:
+    assert list(registry.classes()) == [FightingPokemon]
 
 
 def test_error_attr_name_missing():

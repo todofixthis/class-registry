@@ -27,6 +27,8 @@ jobs:
         run: |
           pip install poetry
           poetry install --with=test
+      - name: Type checking
+        run: poetry run mypy class_registry test
       - name: Run tests
         run: poetry run pytest
 

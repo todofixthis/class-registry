@@ -48,6 +48,21 @@ To create a class instance from a registry, use the subscript operator:
    # How come my rival always picks the type that my pokémon is weak against??
    fighter2 = pokedex['grass']
 
+.. tip::
+
+   If a ``ClassRegistry`` always returns objects derived from a particular base class,
+   you can provide a
+   `type parameter <https://typing.readthedocs.io/en/latest/source/generics.html#generics>`_
+   to help with type checking, autocomplete, etc.:
+
+   .. code-block:: python
+
+      # Add type parameter ``[Pokemon]``:
+      pokedex = ClassRegistry[Pokemon]()
+
+      # Your IDE will automatically infer that ``fighter1`` is a ``Pokemon``.
+      fighter1 = pokedex['fire']
+
 
 Advanced Usage
 ~~~~~~~~~~~~~~
@@ -106,16 +121,27 @@ To install the distribution for local development, some additional setup is requ
 
       poetry run autohooks activate --mode=poetry
 
-Running Unit Tests
-------------------
+Running Unit Tests and Type Checker
+-----------------------------------
 Run the tests for all supported versions of Python using
 `tox <https://tox.readthedocs.io/>`_::
 
    poetry run tox -p
 
-Or to run tests in the current virtualenv::
+.. note::
+
+   The first time this runs, it will take awhile, as mypy needs to build up its cache.
+   Subsequent runs should be much faster.
+
+If you just want to run unit tests in the current virtualenv (using
+`pytest <https://docs.pytest.org>`_)::
 
    poetry run pytest
+
+If you just want to run type checking in the current virtualenv (using
+`mypy <https://mypy.readthedocs.io>`_)::
+
+   poetry run mypy class_registry test
 
 Documentation
 -------------

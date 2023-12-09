@@ -7,8 +7,10 @@ __all__ = [
     "ClassRegistryInstanceCache",
 ]
 
+T = typing.TypeVar("T")
 
-class ClassRegistryInstanceCache(object):
+
+class ClassRegistryInstanceCache(typing.Mapping[typing.Hashable, T]):
     """
     Wraps a ClassRegistry instance, caching instances as they are created.
 
@@ -21,7 +23,12 @@ class ClassRegistryInstanceCache(object):
     ClassRegistry and the ClassRegistryInstanceCache.
     """
 
-    def __init__(self, class_registry: ClassRegistry, *args, **kwargs) -> None:
+    def __init__(
+        self,
+        class_registry: ClassRegistry[T],
+        *args,
+        **kwargs,
+    ) -> None:
         """
         :param class_registry:
             The wrapped ClassRegistry.
@@ -34,17 +41,17 @@ class ClassRegistryInstanceCache(object):
             Keyword arguments passed to the class registry's template function
             when creating new instances.
         """
-        super(ClassRegistryInstanceCache, self).__init__()
+        super().__init__()
 
-        self._registry = class_registry
-        self._cache: typing.Dict[typing.Hashable, type] = {}
+        self._registry: ClassRegistry[T] = class_registry
+        self._cache: dict[typing.Hashable, T] = {}
 
-        self._key_map: typing.Dict[typing.Hashable, list] = defaultdict(list)
+        self._key_map: dict[typing.Hashable, list] = defaultdict(list)
 
         self._template_args = args
         self._template_kwargs = kwargs
 
-    def __getitem__(self, key):
+    def __getitem__(self, key: typing.Hashable) -> T:
         """
         Returns the cached instance associated with the specified key.
         """
@@ -63,7 +70,7 @@ class ClassRegistryInstanceCache(object):
 
         return self._cache[instance_key]
 
-    def __iter__(self) -> typing.Generator[type, None, None]:
+    def __iter__(self) -> typing.Generator[T, None, None]:
         """
         Returns a generator for iterating over cached instances, using the
         wrapped registry to determine sort order.
@@ -73,6 +80,14 @@ class ClassRegistryInstanceCache(object):
         for lookup_key in self._registry.keys():
             for cache_key in self._key_map[lookup_key]:
                 yield self._cache[cache_key]
+
+    def __len__(self) -> int:
+        """
+        Returns the number of cached instances.
+
+        Does not reflect any registered classes that haven't been accessed yet.
+        """
+        return len(self._cache)
 
     def warm_cache(self) -> None:
         """

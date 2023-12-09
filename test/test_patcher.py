@@ -2,15 +2,15 @@ import pytest
 
 from class_registry import ClassRegistry, RegistryKeyError
 from class_registry.patcher import RegistryPatcher
-from test import Bulbasaur, Charmander, Charmeleon, Ivysaur, Squirtle
+from test import Bulbasaur, Charmander, Charmeleon, Ivysaur, Pokemon, Squirtle
 
 
 @pytest.fixture(name="registry")
-def fixture_registry() -> ClassRegistry:
+def fixture_registry() -> ClassRegistry[Pokemon]:
     return ClassRegistry(attr_name="element", unique=True)
 
 
-def test_patch_detect_keys(registry: ClassRegistry):
+def test_patch_detect_keys(registry: ClassRegistry[Pokemon]):
     """
     Patching a registry in a context, with registry keys detected
     automatically.
@@ -36,7 +36,7 @@ def test_patch_detect_keys(registry: ClassRegistry):
         registry.get("grass")
 
 
-def test_patch_manual_keys(registry: ClassRegistry):
+def test_patch_manual_keys(registry: ClassRegistry[Pokemon]):
     """
     Patching a registry in a context, specifying registry keys manually.
     """

@@ -3,9 +3,8 @@ Iterating Over Registries
 Sometimes, you want to iterate over all of the classes registered in a
 :py:class:`ClassRegistry`.  There are three methods included to help you do this:
 
-- :py:meth:`items` iterates over the registry keys and corresponding classes as tuples.
 - :py:meth:`keys` iterates over the registry keys.
-- :py:meth:`values` iterates over the registered classes.
+- :py:meth:`classes` iterates over the registered classes.
 
 Here's an example:
 
@@ -16,23 +15,19 @@ Here's an example:
    pokedex = ClassRegistry('element')
 
    @pokedex.register
-   class Geodude(object):
+   class Geodude:
        element = 'rock'
 
    @pokedex.register
-   class Machop(object):
+   class Machop:
        element = 'fighting'
 
    @pokedex.register
-   class Bellsprout(object):
+   class Bellsprout:
        element = 'grass'
 
-   assert list(pokedex.items()) == \
-       [('rock', Geodude), ('fighting', Machop), ('grass', Bellsprout)]
-
    assert list(pokedex.keys()) == ['rock', 'fighting', 'grass']
-
-   assert list(pokedex.values()) == [Geodude, Machop, Bellsprout]
+   assert list(pokedex.classes()) == [Geodude, Machop, Bellsprout]
 
 .. tip::
 
@@ -56,25 +51,21 @@ If you'd like to customise this ordering, use :py:class:`SortedClassRegistry`:
    pokedex = SortedClassRegistry(attr_name='element', sort_key='weight')
 
    @pokedex.register
-   class Geodude(object):
+   class Geodude:
        element = 'rock'
        weight = 1000
 
    @pokedex.register
-   class Machop(object):
+   class Machop:
        element = 'fighting'
        weight = 75
 
    @pokedex.register
-   class Bellsprout(object):
+   class Bellsprout:
        element = 'grass'
        weight = 15
 
-   assert list(pokedex.items()) == \
-       [('grass', Bellsprout), ('fighting', Machop), ('rock', Geodude)]
-
    assert list(pokedex.keys()) == ['grass', 'fighting', 'rock']
-
    assert list(pokedex.values()) == [Bellsprout, Machop, Geodude]
 
 In the above example, the code iterates over registered classes in ascending order by
@@ -115,25 +106,21 @@ are sorted:
        )
 
    @pokedex.register
-   class Horsea(object):
+   class Horsea:
        element = 'water'
        weight = 5
 
    @pokedex.register
-   class Koffing(object):
+   class Koffing:
        element = 'poison'
        weight = 20
 
    @pokedex.register
-   class Voltorb(object):
+   class Voltorb:
        element = 'electric'
        weight = 5
 
-   assert list(pokedex.items()) == \
-       [('poison', Koffing), ('electric', Voltorb), ('water', Horsea)]
-
    assert list(pokedex.keys()) == ['poison', 'electric', 'water']
-
    assert list(pokedex.values()) == [Koffing, Voltorb, Horsea]
 
 This time, the :py:class:`SortedClassRegistry` used our custom sorter function, so that

@@ -2,22 +2,26 @@
 Verifies registry behaviour when :py:func:`class_registry.ClassRegistry.gen_lookup_key`
 is modified.
 """
+import typing
+
 import pytest
 
 from class_registry import ClassRegistry
-from test import Bulbasaur, Charmander, Pokemon, Squirtle
+from test import Charmander, Pokemon, Squirtle
 
 
 @pytest.fixture(name="customised_registry")
-def fixture_customised_registry() -> ClassRegistry:
-    class CustomisedLookupRegistry(ClassRegistry):
+def fixture_customised_registry() -> ClassRegistry[Pokemon]:
+    class CustomisedLookupRegistry(ClassRegistry[Pokemon]):
         @staticmethod
-        def gen_lookup_key(key: str) -> str:
+        def gen_lookup_key(key: typing.Hashable) -> typing.Hashable:
             """
             Simple override of `gen_lookup_key`, to ensure the registry
             behaves as expected when the lookup key is different.
             """
-            return "".join(reversed(key))
+            if isinstance(key, str):
+                return "".join(reversed(key))
+            return key
 
     registry = CustomisedLookupRegistry()
     registry.register("fire")(Charmander)
@@ -25,20 +29,16 @@ def fixture_customised_registry() -> ClassRegistry:
     return registry
 
 
-def test_contains(customised_registry: ClassRegistry):
+def test_contains(customised_registry: ClassRegistry[Pokemon]):
     assert "fire" in customised_registry
     assert "erif" not in customised_registry
 
 
-def test_dir(customised_registry: ClassRegistry):
-    assert dir(customised_registry) == ["fire", "water"]
-
-
-def test_getitem(customised_registry: ClassRegistry):
+def test_getitem(customised_registry: ClassRegistry[Pokemon]):
     assert isinstance(customised_registry["fire"], Charmander)
 
 
-def test_iter(customised_registry: ClassRegistry):
+def test_iter(customised_registry: ClassRegistry[Pokemon]):
     generator = iter(customised_registry)
 
     assert next(generator) == "fire"
@@ -48,51 +48,23 @@ def test_iter(customised_registry: ClassRegistry):
         next(generator)
 
 
-def test_len(customised_registry: ClassRegistry):
+def test_len(customised_registry: ClassRegistry[Pokemon]):
     assert len(customised_registry) == 2
 
 
-def test_get_class(customised_registry: ClassRegistry):
+def test_get_class(customised_registry: ClassRegistry[Pokemon]):
     assert customised_registry.get_class("fire") is Charmander
 
 
-def test_get(customised_registry: ClassRegistry):
+def test_get(customised_registry: ClassRegistry[Pokemon]):
     assert isinstance(customised_registry.get("fire"), Charmander)
 
 
-def test_items(customised_registry: ClassRegistry):
-    generator = customised_registry.items()
-
-    assert next(generator), "fire" == Charmander
-    assert next(generator), "water" == Squirtle
-
-    with pytest.raises(StopIteration):
-        next(generator)
-
-
-def test_keys(customised_registry: ClassRegistry):
-    generator = customised_registry.keys()
-
-    assert next(generator) == "fire"
-    assert next(generator) == "water"
-
-    with pytest.raises(StopIteration):
-        next(generator)
-
-
-def test_delitem(customised_registry: ClassRegistry):
-    del customised_registry["fire"]
-    assert list(customised_registry.keys()) == ["water"]
-
-
-def test_setitem(customised_registry: ClassRegistry):
-    customised_registry["grass"] = Bulbasaur
-    assert list(customised_registry.keys()), ["fire", "water" == "grass"]
-
-
-def test_unregister(customised_registry: ClassRegistry):
+def test_unregister(customised_registry: ClassRegistry[Pokemon]):
     customised_registry.unregister("fire")
-    assert list(customised_registry.keys()) == ["water"]
+
+    assert "fire" not in customised_registry
+    assert "erif" not in customised_registry
 
 
 def test_use_case_aliases():
@@ -102,9 +74,9 @@ def test_use_case_aliases():
     registry).
     """
 
-    class TestRegistry(ClassRegistry):
+    class TestRegistry(ClassRegistry[Pokemon]):
         @staticmethod
-        def gen_lookup_key(key: str) -> str:
+        def gen_lookup_key(key: typing.Hashable) -> typing.Hashable:
             """
             Simulate a scenario where we renamed the key for a class in the
             registry, but we want to preserve backwards-compatibility with
@@ -124,4 +96,5 @@ def test_use_case_aliases():
     assert isinstance(registry["bird"], MissingNo)
     assert isinstance(registry["flying"], MissingNo)
 
-    assert list(registry.keys()) == ["flying"]
+    assert "bird" in registry
+    assert "flying" in registry
