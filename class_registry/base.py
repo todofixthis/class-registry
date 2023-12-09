@@ -190,7 +190,7 @@ class BaseMutableRegistry(BaseRegistry[T], metaclass=ABCMeta):
         were registered.
         """
         warn(
-            f"{type(self).__name__}.items() is deprecated and will be removed in a"
+            f"{type(self).__name__}.items() is deprecated and will be removed in a "
             f"future version of ClassRegistry.  Use `zip({type(self).__name__}.keys(), "
             f"{type(self).__name__}.classes())` instead.",
             DeprecationWarning,
@@ -205,7 +205,7 @@ class BaseMutableRegistry(BaseRegistry[T], metaclass=ABCMeta):
         registered.
         """
         warn(
-            f"{type(self).__name__}.values() is deprecated and will be removed in a"
+            f"{type(self).__name__}.values() is deprecated and will be removed in a "
             f"future version of ClassRegistry.  Use {type(self).__name__}.classes()"
             f"instead.",
             DeprecationWarning,
