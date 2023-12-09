@@ -1,8 +1,10 @@
-import typing
-
 __all__ = [
     "ClassRegistry",
+    "SortedClassRegistry",
 ]
+
+import typing
+from functools import cmp_to_key
 
 from .base import BaseMutableRegistry, RegistryKeyError
 
@@ -90,3 +92,76 @@ class ClassRegistry(BaseMutableRegistry[T]):
         return (
             self._registry.pop(key) if key in self._registry else self.__missing__(key)
         )
+
+
+class SortedClassRegistry(ClassRegistry[T]):
+    """
+    A ClassRegistry that uses a function to determine sort order when
+    iterating.
+    """
+
+    def __init__(
+        self,
+        sort_key: typing.Any,
+        attr_name: typing.Optional[str] = None,
+        unique: bool = False,
+        reverse: bool = False,
+    ) -> None:
+        """
+        :param sort_key:
+            Attribute name or callable, used to determine the sort value.
+
+            If callable, must accept two tuples of (key, class, lookup_key).
+
+            You can also use :py:func:`functools.cmp_to_key`.
+
+        :param attr_name:
+            If provided, :py:meth:`register` will automatically detect the key
+            to use when registering new classes.
+
+        :param unique:
+            Determines what happens when two classes are registered with the
+            same key:
+
+            - ``True``: The second class will replace the first one.
+            - ``False``: A ``ValueError`` will be raised.
+
+        :param reverse:
+            Whether to reverse the sort ordering.
+        """
+        super().__init__(attr_name, unique)
+
+        self._sort_key = (
+            sort_key if callable(sort_key) else self.create_sorter(sort_key)
+        )
+
+        self.reverse = reverse
+
+    def keys(self) -> typing.Iterable[typing.Hashable]:
+        return iter(
+            key
+            for key, _, _ in sorted(
+                (
+                    # Provide both human-readable and lookup keys to the sorter.
+                    (key, self.get_class(key), self.gen_lookup_key(key))
+                    for key in super().keys()
+                ),
+                key=self._sort_key,
+                reverse=self.reverse,
+            )
+        )
+
+    @staticmethod
+    def create_sorter(sort_key: str):
+        """
+        Given a sort key, creates a function that can be used to sort items
+        when iterating over the registry.
+        """
+
+        def sorter(a, b):
+            a_attr = getattr(a[1], sort_key)
+            b_attr = getattr(b[1], sort_key)
+
+            return (a_attr > b_attr) - (a_attr < b_attr)
+
+        return cmp_to_key(sorter)
