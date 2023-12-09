@@ -10,7 +10,7 @@ class Pokemon:
     element: str
 
     def __init__(self, name: typing.Optional[str] = None):
-        super(Pokemon, self).__init__()
+        super().__init__()
 
         self.name: typing.Optional[str] = name
 
