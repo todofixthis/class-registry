@@ -121,16 +121,27 @@ To install the distribution for local development, some additional setup is requ
 
       poetry run autohooks activate --mode=poetry
 
-Running Unit Tests
-------------------
+Running Unit Tests and Type Checker
+-----------------------------------
 Run the tests for all supported versions of Python using
 `tox <https://tox.readthedocs.io/>`_::
 
    poetry run tox -p
 
-Or to run tests in the current virtualenv::
+.. note::
+
+   The first time this runs, it will take awhile, as mypy needs to build up its cache.
+   Subsequent runs should be much faster.
+
+If you just want to run unit tests in the current virtualenv (using
+`pytest <https://docs.pytest.org>`_)::
 
    poetry run pytest
+
+If you just want to run type checking in the current virtualenv (using
+`mypy <https://mypy.readthedocs.io>`_)::
+
+   poetry run mypy class_registry test
 
 Documentation
 -------------
