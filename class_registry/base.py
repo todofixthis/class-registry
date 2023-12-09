@@ -1,7 +1,9 @@
+__all__ = ["AutoRegister", "BaseMutableRegistry", "BaseRegistry", "RegistryKeyError"]
+
 import typing
-from abc import ABCMeta, abstractmethod as abstract_method
+from abc import ABC, abstractmethod as abstract_method
 from collections.abc import Container
-from inspect import isclass as is_class
+from inspect import isabstract as is_abstract, isclass as is_class
 from warnings import warn
 
 
@@ -9,8 +11,8 @@ class RegistryKeyError(KeyError):
     """
     Used to differentiate a registry lookup from a standard KeyError.
 
-    This is especially useful when a registry class expects to extract values
-    from dicts to generate keys.
+    This is especially useful when a registry class expects to extract values from dicts
+    to generate keys.
     """
 
     pass
@@ -19,7 +21,7 @@ class RegistryKeyError(KeyError):
 T = typing.TypeVar("T")
 
 
-class BaseRegistry(Container[T], metaclass=ABCMeta):
+class BaseRegistry(Container[T], ABC):
     """
     Base functionality for registries.
     """
@@ -29,10 +31,9 @@ class BaseRegistry(Container[T], metaclass=ABCMeta):
         Returns whether the specified key is registered.
         """
         try:
-            # Use :py:meth:`get_class` instead of :py:meth:`__getitem__`, to
-            # avoid creating a new instance unnecessarily (i.e., prevent
-            # errors if the corresponding class' constructor requires
-            # arguments).
+            # Use :py:meth:`get_class` instead of :py:meth:`__getitem__`, to avoid
+            # creating a new instance unnecessarily (i.e., prevent errors if the
+            # corresponding class' constructor requires arguments).
             self.get_class(key)
         except RegistryKeyError:
             return False
@@ -61,8 +62,8 @@ class BaseRegistry(Container[T], metaclass=ABCMeta):
         """
         Defines what to do when trying to access an unregistered key.
 
-        Default behaviour is to throw a typed exception, but you could override
-        this in a subclass, e.g., to return a default value.
+        Default behaviour is to throw a typed exception, but you could override this in
+        a subclass, e.g., to return a default value.
 
         .. note::
 
@@ -75,9 +76,7 @@ class BaseRegistry(Container[T], metaclass=ABCMeta):
         """
         Returns the class associated with the specified key.
         """
-        raise NotImplementedError(
-            "Not implemented in {cls}.".format(cls=type(self).__name__),
-        )
+        raise NotImplementedError()
 
     def get(self, key: typing.Hashable, *args: typing.Any, **kwargs: typing.Any) -> T:
         """
@@ -88,13 +87,11 @@ class BaseRegistry(Container[T], metaclass=ABCMeta):
 
         :param args:
             Positional arguments passed to class initializer.
-            Ignored if the class registry was initialized with a null template
-            function.
+            Ignored if the class registry was initialized with a null template function.
 
         :param kwargs:
             Keyword arguments passed to class initializer.
-            Ignored if the class registry was initialized with a null template
-            function.
+            Ignored if the class registry was initialized with a null template function.
 
         References:
           - :py:meth:`__init__`
@@ -119,8 +116,8 @@ class BaseRegistry(Container[T], metaclass=ABCMeta):
         """
         Used by :py:meth:`get` to generate a lookup key.
 
-        You may override this method in a subclass, for example if you need to
-        support legacy aliases, etc.
+        You may override this method in a subclass, for example if you need to support
+        legacy aliases, etc.
 
         :param key: the key value provided to e.g., :py:meth:`__getitem__`
         :returns: the registry key, used to look up the corresponding class.
@@ -134,8 +131,8 @@ class BaseRegistry(Container[T], metaclass=ABCMeta):
         """
         Prepares the return value for :py:meth:`get`.
 
-        You may override this method in a subclass, if you want to customize
-        the way new instances are created.
+        You may override this method in a subclass, if you want to customize the way new
+        instances are created.
 
         :param class_:
             The requested class.
@@ -149,32 +146,29 @@ class BaseRegistry(Container[T], metaclass=ABCMeta):
         return class_(*args, **kwargs)
 
 
-class BaseMutableRegistry(BaseRegistry[T], metaclass=ABCMeta):
+class BaseMutableRegistry(BaseRegistry[T], ABC):
     """
-    Extends :py:class:`BaseRegistry` with methods that can be used to modify
-    the registered classes.
+    Extends :py:class:`BaseRegistry` with methods that can be used to modify the
+    registered classes.
     """
 
     def __init__(self, attr_name: typing.Optional[str] = None) -> None:
         """
         :param attr_name:
-            If provided, :py:meth:`register` will automatically detect the key
-            to use when registering new classes.
+            If provided, :py:meth:`register` will automatically detect the key to use
+            when registering new classes.
         """
         super().__init__()
 
         self.attr_name = attr_name
 
         # Map lookup keys to readable keys.
-        # Only needed when :py:meth:`gen_lookup_key` is overridden, but I'm not
-        # good enough at reflection black magic to figure out how to do that (:
+        # Only needed when :py:meth:`gen_lookup_key` is overridden, but I'm not good
+        # enough at reflection black magic to figure out how to do that (:
         self._lookup_keys: dict[typing.Hashable, typing.Hashable] = {}
 
     def __repr__(self) -> str:
-        return "{type}({attr_name!r})".format(
-            attr_name=self.attr_name,
-            type=type(self).__name__,
-        )
+        return f"{type(self).__name__}({self.attr_name!r})"
 
     def keys(self) -> typing.Iterable[typing.Hashable]:
         """
@@ -263,19 +257,14 @@ class BaseMutableRegistry(BaseRegistry[T], metaclass=ABCMeta):
                 attr_key = getattr(key, self.attr_name)
                 lookup_key = self.gen_lookup_key(attr_key)
 
-                # Note that ``getattr`` will raise an AttributeError if the
-                # class doesn't have the required attribute.
                 self._register(lookup_key, key)
                 self._lookup_keys[attr_key] = lookup_key
 
                 return key
             else:
                 raise ValueError(
-                    "Attempting to register {cls} to {registry} via decorator,"
-                    " but `{registry}.attr_key` is not set.".format(
-                        cls=key.__name__,
-                        registry=type(self).__name__,
-                    )
+                    f"Attempting to register {key.__name__} to {type(self).__name__}"
+                    f"via decorator, but `{type(self).__name__}.attr_key` is not set."
                 )
         else:
             # :see: https://github.com/python/mypy/issues/16640
@@ -318,9 +307,7 @@ class BaseMutableRegistry(BaseRegistry[T], metaclass=ABCMeta):
 
         :param key: Return value from :py:meth:`gen_lookup_key`.
         """
-        raise NotImplementedError(
-            "Not implemented in {cls}.".format(cls=type(self).__name__),
-        )
+        raise NotImplementedError()
 
     @abstract_method
     def _unregister(self, key: typing.Hashable) -> typing.Type[T]:
@@ -329,6 +316,51 @@ class BaseMutableRegistry(BaseRegistry[T], metaclass=ABCMeta):
 
         :param key: Return value from :py:meth:`gen_lookup_key`.
         """
-        raise NotImplementedError(
-            "Not implemented in {cls}.".format(cls=type(self).__name__),
-        )
+        raise NotImplementedError()
+
+
+def AutoRegister(registry: BaseMutableRegistry) -> type:
+    """
+    Creates a base class that automatically registers all non-abstract subclasses in the
+    specified registry.
+
+    Example::
+
+       commands = ClassRegistry(attr_name='command_name')
+
+       class BaseCommand(AutoRegister(commands), ABC):
+         @abstractmethod
+         def print(self):
+           raise NotImplementedError()
+
+       class PrintCommand(BaseCommand):
+         command_name = 'print'
+
+         def print(self):
+           ...
+
+       print(list(commands.items())) # [('print', PrintCommand)]
+
+    .. important::
+
+       Python defines abstract as "having at least one unimplemented abstract method";
+       adding :py:class:`abc.ABC` as a base class is not enough.
+
+    :param registry:
+        The registry that new classes will be added to.
+
+        .. note::
+
+           The registry's ``attr_name`` attribute must be set.
+    """
+    if not registry.attr_name:
+        raise ValueError(f"Missing `attr_name` in {registry}.")
+
+    class _Base:
+        def __init_subclass__(cls, **kwargs):
+            super().__init_subclass__(**kwargs)
+
+            if not is_abstract(cls):
+                registry.register(cls)
+
+    return _Base

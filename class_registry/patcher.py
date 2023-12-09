@@ -1,11 +1,9 @@
+__all__ = ["RegistryPatcher"]
+
 import typing
 
 from . import RegistryKeyError
 from .base import BaseMutableRegistry
-
-__all__ = [
-    "RegistryPatcher",
-]
 
 
 T = typing.TypeVar("T")
@@ -13,10 +11,12 @@ T = typing.TypeVar("T")
 
 class RegistryPatcher(object):
     """
-    Creates a context in which classes are temporarily registered with a class
-    registry, then removed when the context exits.
+    Creates a context in which classes are temporarily registered with a class registry,
+    then removed when the context exits.
 
-    Note: only mutable registries can be patched!
+    .. note::
+
+       Only mutable registries can be patched.
     """
 
     class DoesNotExist(object):
@@ -39,10 +39,11 @@ class RegistryPatcher(object):
         :param args:
             Classes to add to the registry.
 
-            This behaves the same as decorating each class with
-            ``@registry.register``.
+            This behaves the same as decorating each class with ``@registry.register``.
 
-            Note: ``registry.attr_name`` must be set!
+            .. note::
+
+               ``registry.attr_name`` must be set.
 
         :param kwargs:
             Same as ``args``, except you explicitly specify the registry keys.
@@ -81,8 +82,8 @@ class RegistryPatcher(object):
 
         # Patch values.
         for key, value in self._new_values.items():
-            # Remove the existing value first (prevents issues if the registry
-            # has ``unique=True``).
+            # Remove the existing value first (prevents issues if the registry has
+            # ``unique=True``).
             self._del_value(key)
 
             if value is not self.DoesNotExist:
@@ -92,10 +93,9 @@ class RegistryPatcher(object):
         """
         Restores previous settings.
         """
-        # Restore previous settings.
         for key, value in self._prev_values.items():
-            # Remove the existing value first (prevents issues if the registry
-            # has ``unique=True``).
+            # Remove the existing value first (prevents issues if the registry has
+            # ``unique=True``).
             self._del_value(key)
 
             if value is not self.DoesNotExist:

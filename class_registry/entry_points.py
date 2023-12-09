@@ -1,11 +1,9 @@
+__all__ = ["EntryPointClassRegistry"]
+
 import typing
 from importlib.metadata import entry_points
 
 from .base import BaseRegistry
-
-__all__ = [
-    "EntryPointClassRegistry",
-]
 
 
 T = typing.TypeVar("T")
@@ -23,16 +21,14 @@ class EntryPointClassRegistry(BaseRegistry[T]):
     ) -> None:
         """
         :param group:
-            The name of the entry point group that will be used to load new
-            classes.
+            The name of the entry point group that will be used to load new classes.
 
         :param attr_name:
-            If set, the registry will "brand" each class with its corresponding
-            registry key.  This makes it easier to perform reverse lookups
-            later.
+            If set, the registry will "brand" each class with its corresponding registry
+            key.  This makes it easier to perform reverse lookups later.
 
-            Note: if a class already defines this attribute, the registry will
-            overwrite it!
+            Note: if a class already defines this attribute, the registry will overwrite
+            it!
         """
         super().__init__()
 
@@ -41,12 +37,11 @@ class EntryPointClassRegistry(BaseRegistry[T]):
 
         self._cache: typing.Optional[dict[typing.Hashable, typing.Type[T]]] = None
         """
-        Caches registered classes locally, so that we don't have to keep
-        iterating over entry points.
+        Caches registered classes locally, so that we don't have to keep iterating over
+        entry points.
         """
 
-        # If :py:attr:`attr_name` is set, warm the cache immediately, to apply
-        # branding.
+        # If :py:attr:`attr_name` is set, warm the cache immediately, to apply branding.
         if self.attr_name:
             self._get_cache()
 
@@ -54,18 +49,15 @@ class EntryPointClassRegistry(BaseRegistry[T]):
         return len(self._get_cache())
 
     def __repr__(self) -> str:
-        return "{type}(group={group!r})".format(
-            group=self.group,
-            type=type(self).__name__,
-        )
+        return f"{type(self).__name__}(group={self.group!r})"
 
     def get(self, key: typing.Hashable, *args, **kwargs) -> T:
         instance = super().get(key, *args, **kwargs)
 
         if self.attr_name:
             # Apply branding to the instance explicitly.
-            # This is particularly important if the corresponding entry point
-            # references a function or method.
+            # This is particularly important if the corresponding entry point references
+            # a function or method.
             setattr(instance, self.attr_name, key)
 
         return instance
@@ -81,12 +73,10 @@ class EntryPointClassRegistry(BaseRegistry[T]):
 
     def refresh(self):
         """
-        Purges the local cache.  The next access attempt will reload all entry
-        points.
+        Purges the local cache.  The next access attempt will reload all entry points.
 
-        This is useful if you load a distribution at runtime... such as during
-        unit tests for class-registry.  Otherwise, it probably serves no useful
-        purpose
+        This is useful if you load a distribution at runtime...such as during unit tests
+        for ``phx-class-registry``.  Otherwise, it probably serves no useful purpose (:
         """
         self._cache = None
 
@@ -99,8 +89,8 @@ class EntryPointClassRegistry(BaseRegistry[T]):
             for e in entry_points(group=self.group):
                 cls = e.load()
 
-                # Try to apply branding, but only for compatible types (i.e.,
-                # functions and methods can't be branded this way).
+                # Try to apply branding, but only for compatible types (i.e., functions
+                # and methods can't be branded this way).
                 if self.attr_name and isinstance(cls, type):
                     setattr(cls, self.attr_name, e.name)
 
