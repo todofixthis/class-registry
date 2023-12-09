@@ -15,9 +15,11 @@ def test_register_manual_keys():
     class Charizard(Pokemon):
         pass
 
-    @registry.register("water")
     class Blastoise(Pokemon):
         pass
+
+    # Alternate syntax (rarely used; mostly just here to give mypy more to work with):
+    registry.register("water")(Blastoise)
 
     # By default, you have to specify a registry key when registering new
     # classes.  We'll see how to assign registry keys automatically in the
@@ -46,9 +48,11 @@ def test_register_detect_keys():
     class Charizard(Pokemon):
         element = "fire"
 
-    @registry.register
     class Blastoise(Pokemon):
         element = "water"
+
+    # Alternate syntax (rarely used; mostly just here to give mypy more to work with):
+    registry.register(Blastoise)
 
     # You can still override the registry key if you want.
     @registry.register("poison")
@@ -177,13 +181,21 @@ def test_register_function():
     def pokemon_factory(name=None):
         return Charmeleon(name=name)
 
-    poke = registry.get("fire", name="trogdor")
+    # Alternate syntax (rarely used; mostly just here to give mypy more to work with):
+    # PyCharm doesn't like it, but mypy thinks it's fine :shrug:
+    # noinspection PyTypeChecker
+    registry.register("water")(pokemon_factory)
 
-    assert isinstance(poke, Charmeleon)
-    assert poke.name == "trogdor"
+    poke1 = registry.get("fire", name="trogdor")
+    assert isinstance(poke1, Charmeleon)
+    assert poke1.name == "trogdor"
+
+    poke2 = registry.get("water", name="leeroy")
+    assert isinstance(poke2, Charmeleon)
+    assert poke2.name == "leeroy"
 
 
-def test_contains_when_class_init_requires_arguments():
+def test_regression_contains_when_class_init_requires_arguments():
     """
     Special case when checking if a class is registered, and that class'
     initializer requires arguments.
@@ -197,4 +209,5 @@ def test_contains_when_class_init_requires_arguments():
         def __init__(self, name):
             super(Butterfree, self).__init__(name)
 
+    # This line should not raise a TypeError.
     assert "bug" in registry
