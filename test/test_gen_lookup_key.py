@@ -2,6 +2,8 @@
 Verifies registry behaviour when :py:func:`class_registry.ClassRegistry.gen_lookup_key`
 is modified.
 """
+import typing
+
 import pytest
 
 from class_registry import ClassRegistry
@@ -12,12 +14,14 @@ from test import Charmander, Pokemon, Squirtle
 def fixture_customised_registry() -> ClassRegistry[Pokemon]:
     class CustomisedLookupRegistry(ClassRegistry[Pokemon]):
         @staticmethod
-        def gen_lookup_key(key: str) -> str:
+        def gen_lookup_key(key: typing.Hashable) -> typing.Hashable:
             """
             Simple override of `gen_lookup_key`, to ensure the registry
             behaves as expected when the lookup key is different.
             """
-            return "".join(reversed(key))
+            if isinstance(key, str):
+                return "".join(reversed(key))
+            return key
 
     registry = CustomisedLookupRegistry()
     registry.register("fire")(Charmander)
@@ -72,7 +76,7 @@ def test_use_case_aliases():
 
     class TestRegistry(ClassRegistry[Pokemon]):
         @staticmethod
-        def gen_lookup_key(key: str) -> str:
+        def gen_lookup_key(key: typing.Hashable) -> typing.Hashable:
             """
             Simulate a scenario where we renamed the key for a class in the
             registry, but we want to preserve backwards-compatibility with

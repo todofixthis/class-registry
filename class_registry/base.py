@@ -234,17 +234,21 @@ class BaseMutableRegistry(BaseRegistry[T], metaclass=ABCMeta):
                         registry=type(self).__name__,
                     )
                 )
+        else:
+            # :see: https://github.com/python/mypy/issues/16640
+            if typing.TYPE_CHECKING:
+                key = typing.cast(typing.Hashable, key)
 
-        # ``@register('some_attr')`` usage:
-        def _decorator(cls: typing.Type[T]) -> typing.Type[T]:
-            lookup_key_ = self.gen_lookup_key(key)
+            # ``@register('some_attr')`` usage:
+            def _decorator(cls: typing.Type[T]) -> typing.Type[T]:
+                lookup_key_ = self.gen_lookup_key(key)
 
-            self._register(lookup_key_, cls)
-            self._lookup_keys[key] = lookup_key_
+                self._register(lookup_key_, cls)
+                self._lookup_keys[key] = lookup_key_
 
-            return cls
+                return cls
 
-        return _decorator
+            return _decorator
 
     def unregister(self, key: typing.Hashable) -> typing.Type[T]:
         """
