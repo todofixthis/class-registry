@@ -2,6 +2,7 @@ import typing
 from abc import ABCMeta, abstractmethod as abstract_method
 from collections.abc import Container
 from inspect import isclass as is_class
+from warnings import warn
 
 
 class RegistryKeyError(KeyError):
@@ -180,6 +181,21 @@ class BaseMutableRegistry(BaseRegistry[T], metaclass=ABCMeta):
         Returns the collection of registry keys, in the order that they were registered.
         """
         return iter(self._lookup_keys.keys())
+
+    def values(self) -> typing.Iterable[typing.Type[T]]:
+        """
+        DEPRECATED: use :py:meth:`classes` instead.
+
+        Returns the collection of registered classes, in the order that they were
+        registered.
+        """
+        warn(
+            f"{type(self).__name__}.values() is deprecated and will be removed in a"
+            f"future version of ClassRegistry.  Use {type(self).__name__}.classes()"
+            f"instead.",
+            DeprecationWarning,
+        )
+        return self.classes()
 
     if typing.TYPE_CHECKING:
         # :see: https://mypy.readthedocs.io/en/stable/generics.html#decorator-factories
