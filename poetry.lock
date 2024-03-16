@@ -34,18 +34,19 @@ trio = ["trio (>=0.23)"]
 
 [[package]]
 name = "autohooks"
-version = "23.10.0"
+version = "24.2.0"
 description = "Library for managing git hooks"
 optional = false
 python-versions = ">=3.9,<4.0"
 files = [
-    {file = "autohooks-23.10.0-py3-none-any.whl", hash = "sha256:a4fdf33097daae47068c1ce6ec075a1d5fc692a0a182b0c69e8abda75b45c39e"},
-    {file = "autohooks-23.10.0.tar.gz", hash = "sha256:4de41476ed72e0a3670c40b1fc9b7d67c66eb788ab01b6a7b516fcebb2283166"},
+    {file = "autohooks-24.2.0-py3-none-any.whl", hash = "sha256:a2097de2e092fa7b78a17b63b73980d3cc42b01065feb2caf0d41e2bb506621b"},
+    {file = "autohooks-24.2.0.tar.gz", hash = "sha256:ee929a9f7ff68e61c73201de817b679df168b4465be1026550a71956b419200b"},
 ]
 
 [package.dependencies]
 pontos = ">=22.8.0"
 rich = ">=12.5.1"
+shtab = ">=1.7.0"
 tomlkit = ">=0.5.11"
 
 [[package]]
@@ -1039,6 +1040,20 @@ testing = ["build[virtualenv]", "filelock (>=3.4.0)", "flake8-2020", "ini2toml[l
 testing-integration = ["build[virtualenv] (>=1.0.3)", "filelock (>=3.4.0)", "jaraco.envs (>=2.2)", "jaraco.path (>=3.2.0)", "packaging (>=23.1)", "pytest", "pytest-enabler", "pytest-xdist", "tomli", "virtualenv (>=13.0.0)", "wheel"]
 
 [[package]]
+name = "shtab"
+version = "1.7.1"
+description = "Automagic shell tab completion for Python CLI applications"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "shtab-1.7.1-py3-none-any.whl", hash = "sha256:32d3d2ff9022d4c77a62492b6ec875527883891e33c6b479ba4d41a51e259983"},
+    {file = "shtab-1.7.1.tar.gz", hash = "sha256:4e4bcb02eeb82ec45920a5d0add92eac9c9b63b2804c9196c1f1fdc2d039243c"},
+]
+
+[package.extras]
+dev = ["pytest (>=6)", "pytest-cov", "pytest-timeout"]
+
+[[package]]
 name = "six"
 version = "1.16.0"
 description = "Python 2 and 3 compatibility utilities"
@@ -1341,4 +1356,4 @@ test = ["covdefaults (>=2.3)", "coverage (>=7.2.7)", "coverage-enable-subprocess
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "bc91542d0d83d64aa37591e42b369bd074752e942b5219e32b398fbf658a3d9a"
+content-hash = "c134256374d95ecb4fc549f4ae85a51757d799d21079e99903046fab8ad9bb10"
