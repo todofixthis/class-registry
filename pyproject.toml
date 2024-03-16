@@ -49,7 +49,7 @@ exclude = ["docs/_build"]
 python = "^3.10"
 
 [tool.poetry.group.dev.dependencies]
-autohooks = "^23.10.0"
+autohooks = ">=23.10,<25.0"
 autohooks-plugin-black = "^23.10.0"
 autohooks-plugin-mypy = "^23.10.0"
 autohooks-plugin-pytest = "^23.10.0"
