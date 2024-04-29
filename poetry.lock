@@ -1106,20 +1106,6 @@ files = [
 dev = ["pytest (>=6)", "pytest-cov", "pytest-timeout"]
 
 [[package]]
-name = "shtab"
-version = "1.7.1"
-description = "Automagic shell tab completion for Python CLI applications"
-optional = false
-python-versions = ">=3.7"
-files = [
-    {file = "shtab-1.7.1-py3-none-any.whl", hash = "sha256:32d3d2ff9022d4c77a62492b6ec875527883891e33c6b479ba4d41a51e259983"},
-    {file = "shtab-1.7.1.tar.gz", hash = "sha256:4e4bcb02eeb82ec45920a5d0add92eac9c9b63b2804c9196c1f1fdc2d039243c"},
-]
-
-[package.extras]
-dev = ["pytest (>=6)", "pytest-cov", "pytest-timeout"]
-
-[[package]]
 name = "six"
 version = "1.16.0"
 description = "Python 2 and 3 compatibility utilities"
@@ -1414,4 +1400,4 @@ test = ["covdefaults (>=2.3)", "coverage (>=7.2.7)", "coverage-enable-subprocess
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "c134256374d95ecb4fc549f4ae85a51757d799d21079e99903046fab8ad9bb10"
+content-hash = "0fce283b35241686a98a8440acff66759d9cf40d65cb10679301479f084ef646"
