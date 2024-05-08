@@ -9,6 +9,7 @@ ClassRegistry
    iterating_over_registries
    entry_points
    advanced_topics
+   upgrading_to_v5
 
 
 ClassRegistry
@@ -20,6 +21,14 @@ At the intersection of the Registry and Factory patterns lies the ``ClassRegistr
 - Integrate with setuptools's ``entry_points`` system to make your registries infinitely
   extensible by 3rd-party libraries!
 - And more!
+
+Upgrading from ClassRegistry v4
+-------------------------------
+.. important::
+
+   ClassRegistry v5 introduces some changes that can break code that was previously
+   using ClassRegistry v4.  If you are upgrading from ClassRegistry v4 to ClassRegistry
+   v5, please read :doc:`upgrading_to_v5`!
 
 Getting Started
 ---------------

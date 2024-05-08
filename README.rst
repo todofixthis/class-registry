@@ -13,6 +13,14 @@ At the intersection of the Registry and Factory patterns lies the ``ClassRegistr
   extensible by 3rd-party libraries!
 - And more!
 
+Upgrading from ClassRegistry v4
+-------------------------------
+.. important::
+
+   ClassRegistry v5 introduces some changes that can break code that was previously
+   using ClassRegistry v4.  If you are upgrading from ClassRegistry v4 to ClassRegistry
+   v5, please read `Upgrading to ClassRegistry v5 <./docs/upgrading_to_v5.rst>`_.
+
 
 Getting Started
 ---------------
