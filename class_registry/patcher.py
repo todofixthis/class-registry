@@ -5,11 +5,10 @@ import typing
 from . import RegistryKeyError
 from .base import BaseMutableRegistry
 
-
 T = typing.TypeVar("T")
 
 
-class RegistryPatcher(object):
+class RegistryPatcher(typing.Generic[T]):
     """
     Creates a context in which classes are temporarily registered with a class registry,
     then removed when the context exits.
@@ -99,6 +98,10 @@ class RegistryPatcher(object):
             self._del_value(key)
 
             if value is not self.DoesNotExist:
+                if typing.TYPE_CHECKING:
+                    # Convince mypy that ``value`` cannot be ``self.DoesNotExist``.
+                    value = typing.cast(typing.Type[T], value)
+
                 self._set_value(key, value)
 
     def _get_value(self, key: typing.Hashable, default=None) -> typing.Any:
