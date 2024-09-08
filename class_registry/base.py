@@ -40,6 +40,14 @@ class BaseRegistry(Container[T], ABC):
         else:
             return True
 
+    def __dir__(self) -> typing.Iterable[str]:
+        """
+        Attempts to return the list of registered keys.
+
+        :raises: TypeError if a key cannot be cast as a string.
+        """
+        return list(map(str, self.keys()))
+
     def __getitem__(self, key: typing.Hashable) -> T:
         """
         Shortcut for calling :py:meth:`get` with empty args/kwargs.

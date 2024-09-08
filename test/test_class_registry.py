@@ -6,8 +6,8 @@ from test import Bulbasaur, Charmander, Charmeleon, Pokemon, Squirtle, Wartortle
 
 def test_register_manual_keys():
     """
-    Registers a few classes with manually-assigned identifiers and verifies
-    that the factory returns them correctly.
+    Registers a few classes with manually-assigned identifiers and verifies that the
+    factory returns them correctly.
     """
     registry = ClassRegistry[Pokemon]()
 
@@ -21,9 +21,8 @@ def test_register_manual_keys():
     # Alternate syntax (rarely used; mostly just here to give mypy more to work with):
     registry.register("water")(Blastoise)
 
-    # By default, you have to specify a registry key when registering new
-    # classes.  We'll see how to assign registry keys automatically in the
-    # next test.
+    # By default, you have to specify a registry key when registering new classes.
+    # We'll see how to assign registry keys automatically in the next test.
     with pytest.raises(ValueError):
         # noinspection PyUnusedLocal
         @registry.register
@@ -39,8 +38,8 @@ def test_register_manual_keys():
 
 def test_register_detect_keys():
     """
-    If an attribute name is passed to ClassRegistry's constructor, it will
-    automatically check for this attribute when registering classes.
+    If an attribute name is passed to ClassRegistry's constructor, it will automatically
+    check for this attribute when registering classes.
     """
     registry = ClassRegistry[Pokemon](attr_name="element")
 
@@ -96,8 +95,8 @@ def test_register_error_empty_key():
 
 def test_unique_keys():
     """
-    Specifying ``unique=True`` when creating the registry requires all keys
-    to be unique.
+    Specifying ``unique=True`` when creating the registry requires all keys to be
+    unique.
     """
     registry = ClassRegistry[Pokemon](attr_name="element", unique=True)
 
@@ -115,8 +114,8 @@ def test_unregister():
     Removing a class from the registry.
 
     .. note::
-       This is not used that often outside unit tests (e.g., to remove
-       artefacts when a test has to add a class to a global registry).
+       This is not used that often outside unit tests (e.g., to remove artefacts when a
+       test has to add a class to a global registry).
     """
     registry = ClassRegistry[Pokemon](attr_name="element")
     registry.register(Charmander)
@@ -144,12 +143,12 @@ def test_constructor_params():
     registry = ClassRegistry[Pokemon](attr_name="element")
     registry.register(Bulbasaur)
 
-    # Goofus uses positional arguments, which are magical and make his code
-    # more difficult to read.
+    # Goofus uses positional arguments, which are magical and make his code more
+    # difficult to read.
     goofus = registry.get("grass", "goofus")
 
-    # Gallant uses keyword arguments, producing self-documenting code and
-    # being courteous to his fellow developers.
+    # Gallant uses keyword arguments, producing self-documenting code and being
+    # courteous to his fellow developers.
     # He still names his pokémon after himself, though. Narcissist.
     gallant = registry.get("grass", name="gallant")
 
@@ -172,8 +171,7 @@ def test_new_instance_every_time():
 
 def test_register_function():
     """
-    Functions can be registered as well (so long as they walk and quack
-    like a class).
+    Functions can be registered as well (so long as they walk and quack like a class).
     """
     registry = ClassRegistry[Pokemon]()
 
@@ -197,8 +195,8 @@ def test_register_function():
 
 def test_regression_contains_when_class_init_requires_arguments():
     """
-    Special case when checking if a class is registered, and that class'
-    initializer requires arguments.
+    Special case when checking if a class is registered, and that class' initialiser
+    requires arguments.
     """
     registry = ClassRegistry[Pokemon](attr_name="element")
 
@@ -209,5 +207,5 @@ def test_regression_contains_when_class_init_requires_arguments():
         def __init__(self, name):
             super(Butterfree, self).__init__(name)
 
-    # This line should not raise a TypeError.
+    # This line would raise a TypeError in a previous version of ClassRegistry.
     assert "bug" in registry

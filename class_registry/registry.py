@@ -36,6 +36,9 @@ class ClassRegistry(BaseMutableRegistry[T]):
 
         self._registry: dict[typing.Hashable, typing.Type[T]] = {}
 
+    def __len__(self) -> int:
+        return len(self._registry)
+
     def __repr__(self) -> str:
         return f"{type(self).__name__}(attr_name={self.attr_name!r}, unique={self.unique!r})"
 
