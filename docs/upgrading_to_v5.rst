@@ -223,4 +223,5 @@ New Methods
 -----------
 The following methods have been added:
 
+- :py:meth:`BaseRegistry.__dir__` method returns the list of registered keys as strings.
 - :py:meth:`BaseRegistry.__len__` method returns the number of registered symbols.
