@@ -1,5 +1,6 @@
 Upgrading to ClassRegistry v5
 =============================
+
 `ClassRegistry v5 <https://github.com/todofixthis/class-registry/releases/tag/5.0.0>`_
 introduces some changes that can break code that was previously using ClassRegistry v4.
 If you are upgrading from ClassRegistry v4 to ClassRegistry v5, you'll need to make the
@@ -48,11 +49,11 @@ Alternatively, you can apply the type parameter to the
 
 Imports
 -------
+Now for the tricky parts.
+
 In ClassRegistry v5 many symbols were removed from the top-level ``class_registry``
 namespace.  The table below shows how to import each symbol in ClassRegistry v5 in your
 code:
-
-.. table
 
 ======================================  ===================================================================
 Symbol                                  How to Import in ClassRegistry v5
@@ -74,16 +75,16 @@ metaclass.  The example below shows how to update classes that use
 
 ClassRegistry v4:
 
-.. code-block:: py
+.. code-block:: python
 
    from class_registry import AutoRegister
 
-      class MyBaseClass(metaclass=AutoRegister(my_registry)):
-          ...
+   class MyBaseClass(metaclass=AutoRegister(my_registry)):
+       ...
 
 ClassRegistry v5:
 
-.. code-block:: py
+.. code-block:: python
 
    from abc import ABC
    from class_registry.base import AutoRegister
@@ -102,6 +103,124 @@ ClassRegistry v5:
    `post in the ClassRegistry issue tracker <https://github.com/todofixthis/class-registry/issues>`_,
    and I'll have a look 🙂
 
-Removed/Renamed Methods
------------------------
-The following methods have been removed or renamed:
+Other Changes
+-------------
+
+BaseRegistry
+^^^^^^^^^^^^
+
+.. important::
+   :py:class:`BaseRegistry` no longer implements :py:class:`typing.Mapping` due to
+   violations of the Liskov Substitutability Principle:
+
+   .. code-block:: python
+
+      >>> isinstance(ClassRegistry(), typing.Mapping)
+      False
+
+   If your code relies on the previous behaviour,
+   `post in the ClassRegistry issue tracker <https://github.com/todofixthis/class-registry/issues>`_,
+   so that we can find an alternative solution.
+
+Additionally, the following methods have been deprecated and will be removed in a future
+version:
+
+- :py:meth:`BaseRegistry.items` is deprecated. If you still need this functionality, use
+  the following workaround:
+
+  ClassRegistry v4:
+
+  .. code-block:: python
+
+     registry.items()
+
+  ClassRegistry v5:
+
+  .. code-block:: python
+
+     zip(registry.keys(), registry.classes())
+
+- :py:meth:`BaseRegistry.values` is now renamed to :py:meth:`BaseRegistry.classes`:
+
+  ClassRegistry v4:
+
+  .. code-block:: python
+
+     registry.values()
+
+  ClassRegistry v5:
+
+  .. code-block:: python
+
+     registry.classes()
+
+BaseMutableRegistry
+^^^^^^^^^^^^^^^^^^^
+
+.. important::
+   :py:class:`BaseMutableRegistry` no longer implements
+   :py:class:`typing.MutableMapping` due to violations of the Liskov Substitutability
+   Principle:
+
+   .. code-block:: python
+
+      >>> isinstance(ClassRegistry(), typing.MutableMapping)
+      False
+
+   If your code relies on the previous behaviour,
+   `post in the ClassRegistry issue tracker <https://github.com/todofixthis/class-registry/issues>`_,
+   so that we can find an alternative solution.
+
+- ``BaseMutableRegistry.__delitem__()`` method has been removed. Use the
+  ``unregister()`` method instead:
+
+  ClassRegistry v4:
+
+  .. code-block:: python
+
+     del registry["fire"]
+
+  ClassRegistry v5:
+
+  .. code-block:: python
+
+     registry.unregister("fire")
+
+- ``BaseMutableRegistry.__setitem__()`` method has been removed. Use the ``register()``
+  method instead:
+
+  ClassRegistry v4:
+
+  .. code-block:: python
+
+     registry["fire"] = Charizard
+
+  ClassRegistry v5:
+
+  .. code-block:: python
+
+     registry.register("fire")(Charizard)
+
+  .. note::
+
+     If you initialised the :py:class:`ClassRegistry` with ``unique=True``, you will
+     need to ``unregister()`` the key first:
+
+     .. code-block:: python
+
+        >>> registry = ClassRegistry(unique=True)
+        >>> registry.register(Charmander)
+
+        # Attempting to register over an existing class will fail.
+        >>> registry.register("fire")(Charizard)
+        RegistryKeyError: <class Charmander>
+
+        # Instead, unregister the current class and then register the new one.
+        >>> registry.unregister("fire")
+        >>> registry.register("fire")(Charizard)
+
+New Methods
+-----------
+The following methods have been added:
+
+- :py:meth:`BaseRegistry.__len__` method returns the number of registered symbols.
