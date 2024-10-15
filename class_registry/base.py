@@ -214,27 +214,21 @@ class BaseMutableRegistry(BaseRegistry[T], ABC):
         )
         return self.classes()
 
-    if typing.TYPE_CHECKING:
-        # :see: https://mypy.readthedocs.io/en/stable/generics.html#decorator-factories
-        @typing.overload
-        def register(self, key: typing.Type[T]) -> typing.Type[T]:
-            """Decorator variant"""
-            ...
+    # :see: https://mypy.readthedocs.io/en/stable/generics.html#decorator-factories
+    # :see: https://docs.python.org/3/library/typing.html#typing.overload
+    @typing.overload
+    def register(self, key: typing.Type[T]) -> typing.Type[T]:
+        """Decorator variant"""
+        ...
 
-        @typing.overload
-        def register(
-            self, key: typing.Hashable
-        ) -> typing.Callable[[typing.Type[T]], typing.Type[T]]:
-            """Decorator factory variant"""
-            ...
-
+    @typing.overload
     def register(
-        self,
-        key: typing.Union[typing.Hashable, typing.Type[T]],
-    ) -> typing.Union[
-        typing.Type[T],
-        typing.Callable[[typing.Type[T]], typing.Type[T]],
-    ]:
+        self, key: typing.Hashable
+    ) -> typing.Callable[[typing.Type[T]], typing.Type[T]]:
+        """Decorator factory variant"""
+        ...
+
+    def register(self, key):
         """
         Decorator that registers a class with the registry.
 
