@@ -41,7 +41,7 @@ classifiers = [
 include = [
     { path = "LICENCE.txt", format = "sdist" },
     { path = "docs", format = "sdist" },
-    { path = "test", format = "sdist" }
+    { path = "test", format = "sdist" },
 ]
 exclude = ["docs/_build"]
 packages = [{ include = "class_registry", from = "src" }]

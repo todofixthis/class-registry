@@ -10,7 +10,7 @@ def fixture_registry() -> ClassRegistry[Pokemon]:
     return ClassRegistry(attr_name="element", unique=True)
 
 
-def test_patch_detect_keys(registry: ClassRegistry[Pokemon]):
+def test_patch_detect_keys(registry: ClassRegistry[Pokemon]) -> None:
     """
     Patching a registry in a context, with registry keys detected
     automatically.
@@ -36,7 +36,7 @@ def test_patch_detect_keys(registry: ClassRegistry[Pokemon]):
         registry.get("grass")
 
 
-def test_patch_manual_keys(registry: ClassRegistry[Pokemon]):
+def test_patch_manual_keys(registry: ClassRegistry[Pokemon]) -> None:
     """
     Patching a registry in a context, specifying registry keys manually.
     """

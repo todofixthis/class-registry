@@ -1,3 +1,4 @@
+import typing
 from importlib.metadata import entry_points
 
 import pytest
@@ -9,14 +10,14 @@ from test.helper import DummyDistributionFinder
 
 
 @pytest.fixture(name="distro", autouse=True)
-def fixture_distro():
+def fixture_distro() -> typing.Generator[None, None, None]:
     # Inject a distribution that defines some entry points.
     DummyDistributionFinder.install()
     yield
     DummyDistributionFinder.uninstall()
 
 
-def test_happy_path():
+def test_happy_path() -> None:
     """
     Loading classes automatically via entry points.
 
@@ -43,7 +44,7 @@ def test_happy_path():
     assert psychic.name == "snuggles"
 
 
-def test_branding():
+def test_branding() -> None:
     """
     Configuring the registry to "brand" each class/instance with its
     corresponding key.
@@ -75,7 +76,7 @@ def test_branding():
                     pass
 
 
-def test_len():
+def test_len() -> None:
     """
     Getting the length of an entry point class registry.
     """
@@ -91,7 +92,7 @@ def test_len():
     assert len(registry) == expected
 
 
-def test_error_wrong_group():
+def test_error_wrong_group() -> None:
     """
     The registry can't find entry points associated with the wrong group.
     """

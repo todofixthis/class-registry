@@ -24,7 +24,7 @@ def fixture_cache(
 def test_get(
     cache: ClassRegistryInstanceCache[Pokemon],
     registry: ClassRegistry[Pokemon],
-):
+) -> None:
     """
     When an instance is returned from
     :py:meth:`ClassRegistryInstanceCache.get`, future invocations return
@@ -47,7 +47,7 @@ def test_get(
     assert poke_3 is not poke_4
 
 
-def test_template_args(registry: ClassRegistry[Pokemon]):
+def test_template_args(registry: ClassRegistry[Pokemon]) -> None:
     """
     Extra params passed to the cache constructor are passed to the template
     function when creating new instances.
@@ -69,7 +69,7 @@ def test_template_args(registry: ClassRegistry[Pokemon]):
 def test_len(
     cache: ClassRegistryInstanceCache[Pokemon],
     registry: ClassRegistry[Pokemon],
-):
+) -> None:
     """
     Checking the length of a cache.
     """

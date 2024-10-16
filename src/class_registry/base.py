@@ -2,7 +2,6 @@ __all__ = ["AutoRegister", "BaseMutableRegistry", "BaseRegistry", "RegistryKeyEr
 
 import typing
 from abc import ABC, abstractmethod as abstract_method
-from collections.abc import Container
 from inspect import isabstract as is_abstract, isclass as is_class
 from warnings import warn
 
@@ -24,7 +23,7 @@ T = typing.TypeVar("T")
 D = typing.TypeVar("D", bound=typing.Callable[..., typing.Any])
 
 
-class BaseRegistry(Container[T], ABC):
+class BaseRegistry(typing.Generic[T], ABC):
     """
     Base functionality for registries.
     """
@@ -231,7 +230,10 @@ class BaseMutableRegistry(BaseRegistry[T], ABC):
         """Decorator factory variant"""
         ...
 
-    def register(self, key):
+    def register(self, key: typing.Union[D, typing.Hashable]) -> typing.Union[
+        D,
+        typing.Callable[[D], D],
+    ]:
         """
         Decorator that registers a class with the registry.
 
@@ -256,13 +258,13 @@ class BaseMutableRegistry(BaseRegistry[T], ABC):
         # ``@register`` usage:
         if is_class(key):
             if typing.TYPE_CHECKING:
-                key = typing.cast(typing.Type[T], key)
+                key = typing.cast(D, key)
 
             if self.attr_name:
                 attr_key = getattr(key, self.attr_name)
                 lookup_key = self.gen_lookup_key(attr_key)
 
-                self._register(lookup_key, key)
+                self._register(lookup_key, typing.cast(typing.Type[T], key))
                 self._lookup_keys[attr_key] = lookup_key
 
                 return key
@@ -277,10 +279,10 @@ class BaseMutableRegistry(BaseRegistry[T], ABC):
                 key = typing.cast(typing.Hashable, key)
 
             # ``@register('some_attr')`` usage:
-            def _decorator(cls: typing.Type[T]) -> typing.Type[T]:
+            def _decorator(cls: D) -> D:
                 lookup_key_ = self.gen_lookup_key(key)
 
-                self._register(lookup_key_, cls)
+                self._register(lookup_key_, typing.cast(typing.Type[T], cls))
                 self._lookup_keys[key] = lookup_key_
 
                 return cls
@@ -324,7 +326,7 @@ class BaseMutableRegistry(BaseRegistry[T], ABC):
         raise NotImplementedError()
 
 
-def AutoRegister(registry: BaseMutableRegistry) -> type:
+def AutoRegister(registry: BaseMutableRegistry[T]) -> typing.Any:
     """
     Creates a base class that automatically registers all non-abstract subclasses in the
     specified registry.
@@ -362,7 +364,7 @@ def AutoRegister(registry: BaseMutableRegistry) -> type:
         raise ValueError(f"Missing `attr_name` in {registry}.")
 
     class _Base:
-        def __init_subclass__(cls, **kwargs):
+        def __init_subclass__(cls, **kwargs: typing.Any) -> None:
             super().__init_subclass__(**kwargs)
 
             if not is_abstract(cls):

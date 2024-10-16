@@ -5,12 +5,12 @@ from class_registry.registry import SortedClassRegistry
 from test import Bulbasaur, Charmander, Pokemon, Squirtle
 
 
-def test_sort_key():
+def test_sort_key() -> None:
     """
     When iterating over a SortedClassRegistry, classes are returned in
     sorted order rather than inclusion order.
     """
-    registry = SortedClassRegistry(
+    registry = SortedClassRegistry[Pokemon](
         attr_name="element",
         sort_key="weight",
     )
@@ -35,11 +35,11 @@ def test_sort_key():
     assert list(registry.classes()) == [Bellsprout, Machop, Geodude]
 
 
-def test_sort_key_reverse():
+def test_sort_key_reverse() -> None:
     """
     Reversing the order of a sort key.
     """
-    registry = SortedClassRegistry(
+    registry = SortedClassRegistry[Pokemon](
         attr_name="element",
         sort_key="weight",
         reverse=True,
@@ -64,13 +64,19 @@ def test_sort_key_reverse():
     assert list(registry.classes()) == [Geodude, Machop, Bellsprout]
 
 
-def test_cmp_to_key():
+def test_cmp_to_key() -> None:
     """
     If you want to use a ``cmp`` function to define the ordering,
     you must use the :py:func:`cmp_to_key` function.
     """
 
-    def compare_pokemon(a, b):
+    class PopularPokemon(Pokemon):
+        popularity: int
+
+    def compare_pokemon(
+        a: typing.Tuple[typing.Hashable, typing.Type[PopularPokemon], typing.Hashable],
+        b: typing.Tuple[typing.Hashable, typing.Type[PopularPokemon], typing.Hashable],
+    ) -> int:
         """
         Sort in descending order by popularity.
 
@@ -79,23 +85,23 @@ def test_cmp_to_key():
         """
         return (a[1].popularity < b[1].popularity) - (a[1].popularity > b[1].popularity)
 
-    registry = SortedClassRegistry(
+    registry = SortedClassRegistry[PopularPokemon](
         attr_name="element",
         sort_key=cmp_to_key(compare_pokemon),
     )
 
     @registry.register
-    class Onix(Pokemon):
+    class Onix(PopularPokemon):
         element = "rock"
         popularity = 50
 
     @registry.register
-    class Cubone(Pokemon):
+    class Cubone(PopularPokemon):
         element = "water"
         popularity = 100
 
     @registry.register
-    class Exeggcute(Pokemon):
+    class Exeggcute(PopularPokemon):
         element = "grass"
         popularity = 10
 
@@ -104,20 +110,23 @@ def test_cmp_to_key():
     assert list(registry.classes()) == [Cubone, Onix, Exeggcute]
 
 
-def test_gen_lookup_key_overridden():
+def test_gen_lookup_key_overridden() -> None:
     """
     When a ``SortedClassRegistry`` overrides the ``gen_lookup_key`` method,
     it can sort by lookup keys if desired.
     """
 
-    def compare_by_lookup_key(a, b):
+    def compare_by_lookup_key(
+        a: typing.Tuple[str, typing.Type[Pokemon], str],
+        b: typing.Tuple[str, typing.Type[Pokemon], str],
+    ) -> int:
         """
         :param a: Tuple of (key, class, lookup_key)
         :param b: Tuple of (key, class, lookup_key)
         """
         return (a[2] > b[2]) - (a[2] < b[2])
 
-    class TestRegistry(SortedClassRegistry):
+    class TestRegistry(SortedClassRegistry[Pokemon]):
         @staticmethod
         def gen_lookup_key(key: typing.Hashable) -> typing.Hashable:
             """

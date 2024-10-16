@@ -51,5 +51,5 @@ class PokemonFactory:
     """
 
     @classmethod
-    def create_psychic_pokemon(cls, name: typing.Optional[str] = None):
+    def create_psychic_pokemon(cls, name: typing.Optional[str] = None) -> Mew:
         return Mew(name)

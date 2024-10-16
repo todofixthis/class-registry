@@ -5,6 +5,9 @@ from functools import cmp_to_key
 
 from .base import BaseMutableRegistry, RegistryKeyError
 
+if typing.TYPE_CHECKING:
+    from _typeshed import SupportsAllComparisons
+
 T = typing.TypeVar("T")
 
 
@@ -142,16 +145,19 @@ class SortedClassRegistry(ClassRegistry[T]):
         )
 
     @staticmethod
-    def create_sorter(sort_key: str):
+    def create_sorter(sort_key: str) -> typing.Callable[..., "SupportsAllComparisons"]:
         """
         Given a sort key, creates a function that can be used to sort items when
         iterating over the registry.
         """
 
-        def sorter(a, b):
+        def sorter(
+            a: typing.Tuple[typing.Hashable, typing.Type[T], typing.Hashable],
+            b: typing.Tuple[typing.Hashable, typing.Type[T], typing.Hashable],
+        ) -> int:
             a_attr = getattr(a[1], sort_key)
             b_attr = getattr(b[1], sort_key)
 
-            return (a_attr > b_attr) - (a_attr < b_attr)
+            return typing.cast(int, (a_attr > b_attr) - (a_attr < b_attr))
 
         return cmp_to_key(sorter)
