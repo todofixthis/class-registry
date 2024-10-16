@@ -188,7 +188,9 @@ class BaseMutableRegistry(BaseRegistry[T], ABC):
 
     def items(self) -> typing.Iterable[tuple[typing.Hashable, typing.Type[T]]]:
         """
-        DEPRECATED: use :py:meth:`keys` or :py:meth:`classes` instead.
+        .. warning::
+
+           DEPRECATED: use :py:meth:`keys` or :py:meth:`classes` instead.
 
         Returns the collection of registered key-class pairs, in the order that they
         were registered.
@@ -203,7 +205,9 @@ class BaseMutableRegistry(BaseRegistry[T], ABC):
 
     def values(self) -> typing.Iterable[typing.Type[T]]:
         """
-        DEPRECATED: use :py:meth:`classes` instead.
+        .. warning::
+
+           DEPRECATED: use :py:meth:`classes` instead.
 
         Returns the collection of registered classes, in the order that they were
         registered.
@@ -337,13 +341,13 @@ def AutoRegister(registry: BaseMutableRegistry[T]) -> type:
 
        class BaseCommand(AutoRegister(commands), ABC):
          @abstractmethod
-         def print(self):
+         def exec(self):
            raise NotImplementedError()
 
        class PrintCommand(BaseCommand):
          command_name = 'print'
 
-         def print(self):
+         def exec(self):
            ...
 
        print(list(commands.items())) # [('print', PrintCommand)]

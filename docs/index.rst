@@ -10,6 +10,7 @@ ClassRegistry
    entry_points
    advanced_topics
    upgrading_to_v5
+   api
 
 
 ClassRegistry
