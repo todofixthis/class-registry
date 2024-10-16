@@ -5,6 +5,10 @@ from functools import cmp_to_key
 
 from .base import BaseMutableRegistry, RegistryKeyError
 
+# :see: https://github.com/python/typeshed/blob/main/stdlib/_typeshed/README.md
+if typing.TYPE_CHECKING:
+    from _typeshed import SupportsAllComparisons
+
 T = typing.TypeVar("T")
 
 
@@ -142,16 +146,24 @@ class SortedClassRegistry(ClassRegistry[T]):
         )
 
     @staticmethod
-    def create_sorter(sort_key: str):
+    def create_sorter(sort_key: str) -> typing.Callable[..., "SupportsAllComparisons"]:
         """
         Given a sort key, creates a function that can be used to sort items when
         iterating over the registry.
         """
 
-        def sorter(a, b):
+        def sorter(
+            a: typing.Tuple[typing.Hashable, typing.Type[T], typing.Hashable],
+            b: typing.Tuple[typing.Hashable, typing.Type[T], typing.Hashable],
+        ) -> int:
             a_attr = getattr(a[1], sort_key)
             b_attr = getattr(b[1], sort_key)
 
-            return (a_attr > b_attr) - (a_attr < b_attr)
+            # Technically ``typing.Hashable`` objects don't have to implement comparison
+            # support, so this is slightly unsafe. But, in the vast majority of cases we
+            # expect keys to be str values, so this should be fine (:O
+            #
+            # Incidentally, that's why we need a seemingly-unnecessary ``cast`` here.
+            return typing.cast(int, (a_attr > b_attr) - (a_attr < b_attr))
 
         return cmp_to_key(sorter)

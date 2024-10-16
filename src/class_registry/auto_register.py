@@ -1,3 +1,7 @@
+# This module is deprecated and will be removed in a future version of ClassRegistry, so
+# not going to bother getting the type hints just right (aka it was too difficult for
+# me to figure out, and so I looked for a justification for giving up XD).
+# type: ignore
 __all__ = ["AutoRegister"]
 
 from abc import ABCMeta

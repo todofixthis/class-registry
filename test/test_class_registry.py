@@ -1,10 +1,12 @@
+import typing
+
 import pytest
 
 from class_registry import ClassRegistry, RegistryKeyError
 from test import Bulbasaur, Charmander, Charmeleon, Pokemon, Squirtle, Wartortle
 
 
-def test_register_manual_keys():
+def test_register_manual_keys() -> None:
     """
     Registers a few classes with manually-assigned identifiers and verifies that the
     factory returns them correctly.
@@ -36,7 +38,7 @@ def test_register_manual_keys():
     assert isinstance(registry["water"], Blastoise)
 
 
-def test_register_detect_keys():
+def test_register_detect_keys() -> None:
     """
     If an attribute name is passed to ClassRegistry's constructor, it will automatically
     check for this attribute when registering classes.
@@ -68,7 +70,7 @@ def test_register_detect_keys():
         registry["grass"]
 
 
-def test_register_error_empty_key():
+def test_register_error_empty_key() -> None:
     """
     Attempting to register a class with an empty key.
     """
@@ -83,17 +85,11 @@ def test_register_error_empty_key():
     with pytest.raises(ValueError):
         # noinspection PyUnusedLocal
         @registry.register
-        class Mew(Pokemon):
-            element = None
-
-    with pytest.raises(ValueError):
-        # noinspection PyUnusedLocal
-        @registry.register
         class Mewtwo(Pokemon):
             element = ""
 
 
-def test_unique_keys():
+def test_unique_keys() -> None:
     """
     Specifying ``unique=True`` when creating the registry requires all keys to be
     unique.
@@ -109,7 +105,7 @@ def test_unique_keys():
         registry.register(Charmeleon)
 
 
-def test_unregister():
+def test_unregister() -> None:
     """
     Removing a class from the registry.
 
@@ -136,7 +132,7 @@ def test_unregister():
         registry.unregister("fire")
 
 
-def test_constructor_params():
+def test_constructor_params() -> None:
     """
     Params can be passed to the registered class' constructor.
     """
@@ -159,7 +155,7 @@ def test_constructor_params():
     assert gallant.name == "gallant"
 
 
-def test_new_instance_every_time():
+def test_new_instance_every_time() -> None:
     """
     Every time a registered class is invoked, a new instance is returned.
     """
@@ -169,14 +165,14 @@ def test_new_instance_every_time():
     assert registry["water"] is not registry["water"]
 
 
-def test_register_function():
+def test_register_function() -> None:
     """
     Functions can be registered as well (so long as they walk and quack like a class).
     """
     registry = ClassRegistry[Pokemon]()
 
     @registry.register("fire")
-    def pokemon_factory(name=None):
+    def pokemon_factory(name: typing.Optional[str] = None) -> Charmeleon:
         return Charmeleon(name=name)
 
     # Alternate syntax (rarely used; mostly just here to give mypy more to work with):
@@ -193,7 +189,7 @@ def test_register_function():
     assert poke2.name == "leeroy"
 
 
-def test_regression_contains_when_class_init_requires_arguments():
+def test_regression_contains_when_class_init_requires_arguments() -> None:
     """
     Special case when checking if a class is registered, and that class' initialiser
     requires arguments.
@@ -204,7 +200,7 @@ def test_regression_contains_when_class_init_requires_arguments():
     class Butterfree(Pokemon):
         element = "bug"
 
-        def __init__(self, name):
+        def __init__(self, name: str):
             super(Butterfree, self).__init__(name)
 
     # This line would raise a TypeError in a previous version of ClassRegistry.

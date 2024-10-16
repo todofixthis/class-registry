@@ -1,3 +1,7 @@
+# This module is deprecated and will be removed in a future version of ClassRegistry, so
+# not going to bother getting the type hints just right (aka it was too difficult for
+# me to figure out, and so I looked for a justification for giving up XD).
+# type: ignore
 """
 Unit tests for the deprecated :py:class:`class_registry.auto_register.AutoRegister`
 function.
@@ -5,6 +9,7 @@ function.
 This function is deprecated; use :py:class:`class_registry.base.AutoRegister` instead.
 :see: https://github.com/todofixthis/class-registry/issues/14
 """
+
 from abc import ABC, abstractmethod as abstract_method
 
 import pytest

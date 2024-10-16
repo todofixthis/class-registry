@@ -5,7 +5,6 @@ from importlib.metadata import entry_points
 
 from .base import BaseRegistry
 
-
 T = typing.TypeVar("T")
 
 
@@ -51,7 +50,7 @@ class EntryPointClassRegistry(BaseRegistry[T]):
     def __repr__(self) -> str:
         return f"{type(self).__name__}(group={self.group!r})"
 
-    def get(self, key: typing.Hashable, *args, **kwargs) -> T:
+    def get(self, key: typing.Hashable, *args: typing.Any, **kwargs: typing.Any) -> T:
         instance = super().get(key, *args, **kwargs)
 
         if self.attr_name:
@@ -71,7 +70,7 @@ class EntryPointClassRegistry(BaseRegistry[T]):
     def keys(self) -> typing.Iterable[typing.Hashable]:
         return iter(self._get_cache().keys())
 
-    def refresh(self):
+    def refresh(self) -> None:
         """
         Purges the local cache.  The next access attempt will reload all entry points.
 

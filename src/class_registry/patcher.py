@@ -1,6 +1,7 @@
 __all__ = ["RegistryPatcher"]
 
 import typing
+from types import TracebackType
 
 from . import RegistryKeyError
 from .base import BaseMutableRegistry
@@ -67,7 +68,12 @@ class RegistryPatcher(typing.Generic[T]):
     def __enter__(self) -> None:
         self.apply()
 
-    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
+    def __exit__(
+        self,
+        exc_type: typing.Optional[typing.Type[BaseException]],
+        exc_val: typing.Optional[BaseException],
+        exc_tb: typing.Optional[TracebackType],
+    ) -> None:
         self.restore()
 
     def apply(self) -> None:
@@ -104,7 +110,11 @@ class RegistryPatcher(typing.Generic[T]):
 
                 self._set_value(key, value)
 
-    def _get_value(self, key: typing.Hashable, default=None) -> typing.Any:
+    def _get_value(
+        self,
+        key: typing.Hashable,
+        default: typing.Any = None,
+    ) -> typing.Any:
         try:
             return self.target.get_class(key)
         except RegistryKeyError:

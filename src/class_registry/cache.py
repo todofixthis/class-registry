@@ -24,8 +24,8 @@ class ClassRegistryInstanceCache(typing.Mapping[typing.Hashable, T]):
     def __init__(
         self,
         class_registry: ClassRegistry[T],
-        *args,
-        **kwargs,
+        *args: typing.Any,
+        **kwargs: typing.Any,
     ) -> None:
         """
         :param class_registry:
@@ -44,7 +44,7 @@ class ClassRegistryInstanceCache(typing.Mapping[typing.Hashable, T]):
         self._registry: ClassRegistry[T] = class_registry
         self._cache: dict[typing.Hashable, T] = {}
 
-        self._key_map: dict[typing.Hashable, list] = defaultdict(list)
+        self._key_map: dict[typing.Hashable, list[typing.Hashable]] = defaultdict(list)
 
         self._template_args = args
         self._template_kwargs = kwargs

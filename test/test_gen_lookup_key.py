@@ -2,6 +2,7 @@
 Verifies registry behaviour when :py:func:`class_registry.ClassRegistry.gen_lookup_key`
 is modified.
 """
+
 import typing
 
 import pytest
@@ -29,16 +30,16 @@ def fixture_customised_registry() -> ClassRegistry[Pokemon]:
     return registry
 
 
-def test_contains(customised_registry: ClassRegistry[Pokemon]):
+def test_contains(customised_registry: ClassRegistry[Pokemon]) -> None:
     assert "fire" in customised_registry
     assert "erif" not in customised_registry
 
 
-def test_getitem(customised_registry: ClassRegistry[Pokemon]):
+def test_getitem(customised_registry: ClassRegistry[Pokemon]) -> None:
     assert isinstance(customised_registry["fire"], Charmander)
 
 
-def test_iter(customised_registry: ClassRegistry[Pokemon]):
+def test_iter(customised_registry: ClassRegistry[Pokemon]) -> None:
     generator = iter(customised_registry)
 
     assert next(generator) == "fire"
@@ -48,26 +49,26 @@ def test_iter(customised_registry: ClassRegistry[Pokemon]):
         next(generator)
 
 
-def test_len(customised_registry: ClassRegistry[Pokemon]):
+def test_len(customised_registry: ClassRegistry[Pokemon]) -> None:
     assert len(customised_registry) == 2
 
 
-def test_get_class(customised_registry: ClassRegistry[Pokemon]):
+def test_get_class(customised_registry: ClassRegistry[Pokemon]) -> None:
     assert customised_registry.get_class("fire") is Charmander
 
 
-def test_get(customised_registry: ClassRegistry[Pokemon]):
+def test_get(customised_registry: ClassRegistry[Pokemon]) -> None:
     assert isinstance(customised_registry.get("fire"), Charmander)
 
 
-def test_unregister(customised_registry: ClassRegistry[Pokemon]):
+def test_unregister(customised_registry: ClassRegistry[Pokemon]) -> None:
     customised_registry.unregister("fire")
 
     assert "fire" not in customised_registry
     assert "erif" not in customised_registry
 
 
-def test_use_case_aliases():
+def test_use_case_aliases() -> None:
     """
     A common use case for overriding `gen_lookup_key` is to specify some
     aliases (e.g., for backwards-compatibility when refactoring an existing

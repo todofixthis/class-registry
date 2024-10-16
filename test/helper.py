@@ -1,4 +1,5 @@
 import sys
+import typing
 from importlib.metadata import DistributionFinder, PathDistribution
 from os import path
 from pathlib import Path
@@ -15,7 +16,7 @@ class DummyDistributionFinder(DistributionFinder):
     DUMMY_PACKAGE_DIR = "dummy_package.egg-info"
 
     @classmethod
-    def install(cls):
+    def install(cls) -> None:
         for finder in sys.meta_path:
             if isinstance(finder, cls):
                 # If we've already installed an instance of the class, then
@@ -25,7 +26,7 @@ class DummyDistributionFinder(DistributionFinder):
         sys.meta_path.append(cls())
 
     @classmethod
-    def uninstall(cls):
+    def uninstall(cls) -> None:
         for i, finder in enumerate(sys.meta_path):
             if isinstance(finder, cls):
                 sys.meta_path.pop(i)
@@ -35,7 +36,9 @@ class DummyDistributionFinder(DistributionFinder):
             # something is probably wrong with our tests.
             raise ValueError(f"{cls.__name__} was not installed")
 
-    def find_distributions(self, context=...) -> list[PathDistribution]:
+    # ``context`` should be a ``DistributionFinder.Context``, but that type isn't
+    # compatible with ``EllipsisType``, and mypy isn't having any of it, so :shrug:
+    def find_distributions(self, context: typing.Any = ...) -> list[PathDistribution]:
         return [
             PathDistribution(
                 Path(path.join(path.dirname(__file__), self.DUMMY_PACKAGE_DIR))
