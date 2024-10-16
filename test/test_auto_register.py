@@ -22,7 +22,8 @@ def test_auto_register() -> None:
     registry = ClassRegistry["BasePokemon"](attr_name="element")
 
     # Note that we declare :py:func:`AutoRegister` as a base class.
-    # Dynamic sub-classes are not supported by mypy, so have to ignore type check here.
+    # Dynamic subclasses are not supported by mypy, so have to ignore type check here.
+    # :see: https://github.com/python/mypy/wiki/Unsupported-Python-Features
     class BasePokemon(AutoRegister(registry), ABC):  # type: ignore
         """
         Abstract base class; will not get registered.
@@ -74,7 +75,8 @@ def test_abstract_strict_definition() -> None:
     """
     registry = ClassRegistry["FightingPokemon"](attr_name="element")
 
-    # Dynamic sub-classes are not supported by mypy, so have to ignore type check here.
+    # Dynamic subclasses are not supported by mypy, so have to ignore type check here.
+    # :see: https://github.com/python/mypy/wiki/Unsupported-Python-Features
     class FightingPokemon(AutoRegister(registry)):  # type: ignore
         element = "fighting"
 
