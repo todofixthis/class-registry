@@ -26,11 +26,26 @@ jobs:
       - name: Install dependencies
         run: |
           pip install poetry
-          poetry install --with=test
-      - name: Type checking
-        run: poetry run mypy class_registry test
+          poetry install --with=ci
       - name: Run tests
         run: poetry run pytest
+
+  type-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clone repo
+        uses: actions/checkout@v3
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          pip install poetry
+          poetry install --with=ci
+      - name: Type checking
+        run: poetry run mypy class_registry test
 
   docs:
     runs-on: ubuntu-latest
