@@ -45,15 +45,12 @@ class EntryPointClassRegistry(BaseRegistry[T]):
         if self.attr_name:
             self._get_cache()
 
-    @typing.override
     def __len__(self) -> int:
         return len(self._get_cache())
 
-    @typing.override
     def __repr__(self) -> str:
         return f"{type(self).__name__}(group={self.group!r})"
 
-    @typing.override
     def get(self, key: typing.Hashable, *args: typing.Any, **kwargs: typing.Any) -> T:
         instance = super().get(key, *args, **kwargs)
 
@@ -65,14 +62,12 @@ class EntryPointClassRegistry(BaseRegistry[T]):
 
         return instance
 
-    @typing.override
     def get_class(self, key: typing.Hashable) -> typing.Type[T]:
         try:
             return self._get_cache()[key]
         except KeyError:
             return self.__missing__(key)
 
-    @typing.override
     def keys(self) -> typing.Iterable[typing.Hashable]:
         return iter(self._get_cache().keys())
 

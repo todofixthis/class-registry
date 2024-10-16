@@ -183,7 +183,6 @@ class BaseMutableRegistry(BaseRegistry[T], ABC):
         # enough at reflection black magic to figure out how to do that (:
         self._lookup_keys: dict[typing.Hashable, typing.Hashable] = {}
 
-    @typing.override
     def __repr__(self) -> str:
         return f"{type(self).__name__}({self.attr_name!r})"
 
