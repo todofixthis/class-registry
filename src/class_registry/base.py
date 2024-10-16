@@ -19,7 +19,7 @@ class RegistryKeyError(KeyError):
 
 T = typing.TypeVar("T")
 
-# [#53] Fx incorrect return type from ``register``
+# [#53] Fix incorrect return type from ``register``
 D = typing.TypeVar("D", bound=typing.Callable[..., typing.Any])
 
 
