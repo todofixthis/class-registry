@@ -18,7 +18,7 @@ strict = true
 # :see: https://python-poetry.org/docs/pyproject/
 [tool.poetry]
 name = "phx-class-registry"
-version = "5.0.0"
+version = "5.1.0"
 authors = ["Phoenix Zerin <phx@phx.nz>"]
 license = "MIT"
 readme = "README.rst"
