@@ -33,23 +33,25 @@ class RegistryPatcher(typing.Generic[T]):
         **kwargs: typing.Type[T]
     ) -> None:
         """
-        :param registry:
-            A :py:class:`MutableRegistry` instance to patch.
+        Args:
+            registry:
+                A :py:class:`MutableRegistry` instance to patch.
 
-        :param args:
-            Classes to add to the registry.
+            args:
+                Classes to add to the registry.
 
-            This behaves the same as decorating each class with ``@registry.register``.
+                This behaves the same as decorating each class with
+                ``@registry.register``.
 
-            .. note::
+                .. note::
 
-               ``registry.attr_name`` must be set.
+                   ``registry.attr_name`` must be set.
 
-        :param kwargs:
-            Same as ``args``, except you explicitly specify the registry keys.
+            kwargs:
+                Same as ``args``, except you explicitly specify the registry keys.
 
-            In the event of a conflict, values in ``args`` override values in
-            ``kwargs``.
+                In the event of a conflict, values in ``args`` override values in
+                ``kwargs``.
         """
         super().__init__()
 

@@ -39,6 +39,7 @@ intersphinx_mapping = {
 # -- Options for autodoc extension -------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/extensions/autodoc.html#configuration
 autodoc_default_options = {
+    "class-doc-from": "both",
     "members": True,
     "member-order": "alphabetical",
     "special-members": False,

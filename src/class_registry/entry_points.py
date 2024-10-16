@@ -19,15 +19,16 @@ class EntryPointClassRegistry(BaseRegistry[T]):
         attr_name: typing.Optional[str] = None,
     ) -> None:
         """
-        :param group:
-            The name of the entry point group that will be used to load new classes.
+        Args:
+            group:
+                The name of the entry point group that will be used to load new classes.
 
-        :param attr_name:
-            If set, the registry will "brand" each class with its corresponding registry
-            key.  This makes it easier to perform reverse lookups later.
+            attr_name:
+                If set, the registry will "brand" each class with its corresponding
+                registry key.  This makes it easier to perform reverse lookups later.
 
-            Note: if a class already defines this attribute, the registry will overwrite
-            it!
+                Note: if a class already defines this attribute, the registry will
+                overwrite it!
         """
         super().__init__()
 
@@ -44,12 +45,15 @@ class EntryPointClassRegistry(BaseRegistry[T]):
         if self.attr_name:
             self._get_cache()
 
+    @typing.override
     def __len__(self) -> int:
         return len(self._get_cache())
 
+    @typing.override
     def __repr__(self) -> str:
         return f"{type(self).__name__}(group={self.group!r})"
 
+    @typing.override
     def get(self, key: typing.Hashable, *args: typing.Any, **kwargs: typing.Any) -> T:
         instance = super().get(key, *args, **kwargs)
 
@@ -61,12 +65,14 @@ class EntryPointClassRegistry(BaseRegistry[T]):
 
         return instance
 
+    @typing.override
     def get_class(self, key: typing.Hashable) -> typing.Type[T]:
         try:
             return self._get_cache()[key]
         except KeyError:
             return self.__missing__(key)
 
+    @typing.override
     def keys(self) -> typing.Iterable[typing.Hashable]:
         return iter(self._get_cache().keys())
 
