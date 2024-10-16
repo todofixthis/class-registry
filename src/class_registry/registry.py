@@ -5,6 +5,7 @@ from functools import cmp_to_key
 
 from .base import BaseMutableRegistry, RegistryKeyError
 
+# :see: https://github.com/python/typeshed/blob/main/stdlib/_typeshed/README.md
 if typing.TYPE_CHECKING:
     from _typeshed import SupportsAllComparisons
 
