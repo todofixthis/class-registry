@@ -326,7 +326,7 @@ class BaseMutableRegistry(BaseRegistry[T], ABC):
         raise NotImplementedError()
 
 
-def AutoRegister(registry: BaseMutableRegistry[T]) -> typing.Any:
+def AutoRegister(registry: BaseMutableRegistry[T]) -> type:
     """
     Creates a base class that automatically registers all non-abstract subclasses in the
     specified registry.
