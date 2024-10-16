@@ -5,6 +5,7 @@ function.
 This function is deprecated; use :py:class:`class_registry.base.AutoRegister` instead.
 :see: https://github.com/todofixthis/class-registry/issues/14
 """
+
 from abc import ABC, abstractmethod as abstract_method
 
 import pytest

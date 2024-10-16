@@ -1,5 +1,5 @@
 [build-system]
-requires = ["poetry-core=^1.8"]
+requires = ["poetry-core>=1.8.0"]
 build-backend = "poetry.core.masonry.api"
 
 # :see: https://greenbone.github.io/autohooks/installation.html
@@ -11,6 +11,9 @@ pre-commit = [
     "autohooks.plugins.mypy",
     "autohooks.plugins.pytest"
 ]
+
+[tool.mypy]
+strict = true
 
 # :see: https://python-poetry.org/docs/pyproject/
 [tool.poetry]
@@ -35,15 +38,13 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules",
 ]
 
-packages = [
-    { include = "class_registry" },
-]
 include = [
     { path = "LICENCE.txt", format = "sdist" },
     { path = "docs", format = "sdist" },
     { path = "test", format = "sdist" }
 ]
 exclude = ["docs/_build"]
+packages = [{ include = "class_registry", from = "src" }]
 
 [tool.poetry.dependencies]
 python = "^3.10"
@@ -70,3 +71,6 @@ sphinx_rtd_theme = "^2"
 [tool.poetry.urls]
 Changelog = "https://github.com/todofixthis/class-registry/releases"
 Issues = "https://github.com/todofixthis/class-registry/issues"
+
+[tool.pytest.ini_options]
+testpaths = ["test"]

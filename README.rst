@@ -149,7 +149,7 @@ If you just want to run unit tests in the current virtualenv (using
 If you just want to run type checking in the current virtualenv (using
 `mypy <https://mypy.readthedocs.io>`_)::
 
-   poetry run mypy class_registry test
+   poetry run mypy src test
 
 Documentation
 -------------
