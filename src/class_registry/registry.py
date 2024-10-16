@@ -159,6 +159,11 @@ class SortedClassRegistry(ClassRegistry[T]):
             a_attr = getattr(a[1], sort_key)
             b_attr = getattr(b[1], sort_key)
 
+            # Technically ``typing.Hashable`` objects don't have to implement comparison
+            # support, so this is slightly unsafe. But, in the vast majority of cases we
+            # expect keys to be str values, so this should be fine (:O
+            #
+            # Incidentally, that's why we need a seemingly-unnecessary ``cast`` here.
             return typing.cast(int, (a_attr > b_attr) - (a_attr < b_attr))
 
         return cmp_to_key(sorter)
