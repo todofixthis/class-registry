@@ -36,6 +36,8 @@ class DummyDistributionFinder(DistributionFinder):
             # something is probably wrong with our tests.
             raise ValueError(f"{cls.__name__} was not installed")
 
+    # ``context`` should be a ``DistributionFinder.Context``, but that type isn't
+    # compatible with ``EllipsisType``, and mypy isn't having any of it, so :shrug:
     def find_distributions(self, context: typing.Any = ...) -> list[PathDistribution]:
         return [
             PathDistribution(
