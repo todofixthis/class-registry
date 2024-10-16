@@ -20,6 +20,9 @@ class RegistryKeyError(KeyError):
 
 T = typing.TypeVar("T")
 
+# [#53] Fx incorrect return type from ``register``
+D = typing.TypeVar("D", bound=typing.Callable[..., typing.Any])
+
 
 class BaseRegistry(Container[T], ABC):
     """
@@ -214,17 +217,17 @@ class BaseMutableRegistry(BaseRegistry[T], ABC):
         )
         return self.classes()
 
+    # [#53] Using ``D`` instead of ``T`` to prevent scrubbing type info when decorating
+    # a class.
     # :see: https://mypy.readthedocs.io/en/stable/generics.html#decorator-factories
     # :see: https://docs.python.org/3/library/typing.html#typing.overload
     @typing.overload
-    def register(self, key: typing.Type[T]) -> typing.Type[T]:
-        """Decorator variant"""
+    def register(self, key: D, /) -> D:
+        """Bare decorator variant"""
         ...
 
     @typing.overload
-    def register(
-        self, key: typing.Hashable
-    ) -> typing.Callable[[typing.Type[T]], typing.Type[T]]:
+    def register(self, key: typing.Hashable) -> typing.Callable[[D], D]:
         """Decorator factory variant"""
         ...
 
