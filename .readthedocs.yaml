@@ -5,6 +5,8 @@ build:
   os: ubuntu-22.04
   tools:
     python: "latest"
+
+  # Install the package, so that Sphinx can generate autodocs.
   # https://docs.readthedocs.io/en/stable/build-customization.html#install-dependencies-with-poetry
   jobs:
     post_create_environment:
