@@ -10,5 +10,4 @@ build:
     # https://github.com/readthedocs/readthedocs.org/issues/9740
     - poetry config virtualenvs.create false
     - poetry install --with=ci
-    - cd docs
     - python -m sphinx -T -b html -d _build/doctrees -D language=en . $READTHEDOCS_OUTPUT/html
