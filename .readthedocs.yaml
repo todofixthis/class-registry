@@ -5,9 +5,19 @@ build:
   os: ubuntu-22.04
   tools:
     python: "latest"
-  commands:
-    - pip install poetry
-    # https://github.com/readthedocs/readthedocs.org/issues/9740
-    - poetry config virtualenvs.create false
-    - poetry install --with=ci
-    - python -m sphinx -T -b html -d _build/doctrees -D language=en . $READTHEDOCS_OUTPUT/html
+  # https://docs.readthedocs.io/en/stable/build-customization.html#install-dependencies-with-poetry
+  jobs:
+    post_create_environment:
+      # Install poetry
+      # https://python-poetry.org/docs/#installing-manually
+      - pip install poetry
+    post_install:
+      # Install dependencies with 'docs' dependency group
+      # https://python-poetry.org/docs/managing-dependencies/#dependency-groups
+      # VIRTUAL_ENV needs to be set manually for now.
+      # See https://github.com/readthedocs/readthedocs.org/pull/11152/
+      - VIRTUAL_ENV=$READTHEDOCS_VIRTUALENV_PATH poetry install --with=ci
+
+sphinx:
+  # Needed even with overridden build above, so that Sphinx can find
+  configuration: docs/conf.py
