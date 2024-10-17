@@ -7,7 +7,7 @@ build:
     python: "latest"
   commands:
     - pip install poetry
-    - poetry install . --with=ci
+    - poetry install --with=ci
 
 sphinx:
   configuration: docs/conf.py
