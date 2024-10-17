@@ -36,10 +36,10 @@ jobs:
     steps:
       - name: Clone repo
         uses: actions/checkout@v4
-      - name: Set up Python ${{ matrix.python-version }}
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: "3.13"
       - name: Install dependencies
         run: |
           pip install poetry
@@ -56,7 +56,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: "3.13"
       - name: Install dependencies
         run: |
           pip install poetry

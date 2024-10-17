@@ -24,15 +24,17 @@ class ClassRegistry(BaseMutableRegistry[T]):
         unique: bool = False,
     ) -> None:
         """
-        :param attr_name:
-            If provided, :py:meth:`register` will automatically detect the key to use
-            when registering new classes.
+        Args:
+            attr_name:
+                If provided, :py:meth:`register` will automatically detect the key to
+                use when registering new classes.
 
-        :param unique:
-            Determines what happens when two classes are registered with the same key:
+            unique:
+                Determines what happens when two classes are registered with the same
+                key:
 
-            - ``True``: A :py:class:`KeyError` will be raised.
-            - ``False``: The second class will replace the first one.
+                - ``True``: A :py:class:`KeyError` will be raised.
+                - ``False``: The second class will replace the first one.
         """
         super().__init__(attr_name)
 
@@ -61,7 +63,9 @@ class ClassRegistry(BaseMutableRegistry[T]):
         """
         Registers a class with the registry.
 
-        :param key: Has already been processed by :py:meth:`gen_lookup_key`.
+        Args:
+            key:
+                Has already been processed by :py:meth:`gen_lookup_key`.
         """
         if key in ["", None]:
             raise ValueError(
@@ -80,7 +84,9 @@ class ClassRegistry(BaseMutableRegistry[T]):
         """
         Unregisters the class at the specified key.
 
-        :param key: Has already been processed by :py:meth:`gen_lookup_key`.
+        Args:
+            key:
+                Has already been processed by :py:meth:`gen_lookup_key`.
         """
         return (
             self._registry.pop(key) if key in self._registry else self.__missing__(key)
@@ -100,25 +106,24 @@ class SortedClassRegistry(ClassRegistry[T]):
         reverse: bool = False,
     ) -> None:
         """
-        :param sort_key:
-            Attribute name or callable, used to determine the sort value.
+        Args:
+            sort_key:
+                Attribute name or callable, used to determine the sort value.
 
-            If callable, must accept two tuples of (key, class, lookup_key).
+                If callable, must accept two tuples of (key, class, lookup_key).
 
-            You can also use :py:func:`functools.cmp_to_key`.
+                You can also use :py:func:`functools.cmp_to_key`.
+            attr_name:
+                If provided, :py:meth:`register` will automatically detect the key to
+                use when registering new classes.
+            unique:
+                Determines what happens when two classes are registered with the same
+                key:
 
-        :param attr_name:
-            If provided, :py:meth:`register` will automatically detect the key to use
-            when registering new classes.
-
-        :param unique:
-            Determines what happens when two classes are registered with the same key:
-
-            - ``True``: The second class will replace the first one.
-            - ``False``: A ``ValueError`` will be raised.
-
-        :param reverse:
-            Whether to reverse the sort ordering.
+                - ``True``: The second class will replace the first one.
+                - ``False``: A ``ValueError`` will be raised.
+            reverse:
+                Whether to reverse the sort ordering.
         """
         super().__init__(attr_name, unique)
 

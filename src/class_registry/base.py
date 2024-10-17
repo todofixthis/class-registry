@@ -46,7 +46,8 @@ class BaseRegistry(typing.Generic[T], ABC):
         """
         Attempts to return the list of registered keys.
 
-        :raises: TypeError if a key cannot be cast as a string.
+        Raises:
+            TypeError: if a key cannot be cast as a string.
         """
         return list(map(str, self.keys()))
 
@@ -92,16 +93,17 @@ class BaseRegistry(typing.Generic[T], ABC):
         """
         Creates a new instance of the class matching the specified key.
 
-        :param key:
-            The corresponding load key.
-
-        :param args:
-            Positional arguments passed to class initializer.
-            Ignored if the class registry was initialized with a null template function.
-
-        :param kwargs:
-            Keyword arguments passed to class initializer.
-            Ignored if the class registry was initialized with a null template function.
+        Args:
+            key:
+                The corresponding load key.
+            args:
+                Positional arguments passed to class initializer.
+                Ignored if the class registry was initialized with a null template
+                function.
+            kwargs:
+                Keyword arguments passed to class initializer.
+                Ignored if the class registry was initialized with a null template
+                function.
 
         References:
           - :py:meth:`__init__`
@@ -129,8 +131,12 @@ class BaseRegistry(typing.Generic[T], ABC):
         You may override this method in a subclass, for example if you need to support
         legacy aliases, etc.
 
-        :param key: the key value provided to e.g., :py:meth:`__getitem__`
-        :returns: the registry key, used to look up the corresponding class.
+        Args:
+            key:
+                The key value provided to e.g., :py:meth:`__getitem__`
+
+        Returns:
+            The registry key, used to look up the corresponding class.
         """
         return key
 
@@ -144,14 +150,13 @@ class BaseRegistry(typing.Generic[T], ABC):
         You may override this method in a subclass, if you want to customize the way new
         instances are created.
 
-        :param class_:
-            The requested class.
-
-        :param args:
-            Positional keywords passed to :py:meth:`get`.
-
-        :param kwargs:
-            Keyword arguments passed to :py:meth:`get`.
+        Args:
+            class_:
+                The requested class.
+            args:
+                Positional keywords passed to :py:meth:`get`.
+            kwargs:
+                Keyword arguments passed to :py:meth:`get`.
         """
         return class_(*args, **kwargs)
 
@@ -164,9 +169,10 @@ class BaseMutableRegistry(BaseRegistry[T], ABC):
 
     def __init__(self, attr_name: typing.Optional[str] = None) -> None:
         """
-        :param attr_name:
-            If provided, :py:meth:`register` will automatically detect the key to use
-            when registering new classes.
+        Args:
+            attr_name:
+                If provided, :py:meth:`register` will automatically detect the key to
+                use when registering new classes.
         """
         super().__init__()
 
@@ -188,7 +194,9 @@ class BaseMutableRegistry(BaseRegistry[T], ABC):
 
     def items(self) -> typing.Iterable[tuple[typing.Hashable, typing.Type[T]]]:
         """
-        DEPRECATED: use :py:meth:`keys` or :py:meth:`classes` instead.
+        .. warning::
+
+           DEPRECATED: use :py:meth:`keys` or :py:meth:`classes` instead.
 
         Returns the collection of registered key-class pairs, in the order that they
         were registered.
@@ -203,7 +211,9 @@ class BaseMutableRegistry(BaseRegistry[T], ABC):
 
     def values(self) -> typing.Iterable[typing.Type[T]]:
         """
-        DEPRECATED: use :py:meth:`classes` instead.
+        .. warning::
+
+           DEPRECATED: use :py:meth:`classes` instead.
 
         Returns the collection of registered classes, in the order that they were
         registered.
@@ -251,9 +261,10 @@ class BaseMutableRegistry(BaseRegistry[T], ABC):
            class AdvancedWidget(BaseWidget):
              ...
 
-        :param key:
-            The registry key to use for the registered class.
-            Optional if the registry's :py:attr:`attr_name` is set.
+        Args:
+            key:
+                The registry key to use for the registered class.
+                Optional if the registry's :py:attr:`attr_name` is set.
         """
         # ``@register`` usage:
         if is_class(key):
@@ -293,14 +304,15 @@ class BaseMutableRegistry(BaseRegistry[T], ABC):
         """
         Unregisters the class with the specified key.
 
-        :param key:
-            The registry key to remove (not the registered class!).
+        Args:
+            key:
+                The registry key to remove (not the registered class!).
 
-        :return:
+        Returns:
             The class that was unregistered.
 
-        :raise:
-            - :py:class:`KeyError` if the key is not registered.
+        Raises:
+            KeyError: if the key is not registered.
         """
         result = self._unregister(self.gen_lookup_key(key))
         del self._lookup_keys[key]
@@ -312,7 +324,9 @@ class BaseMutableRegistry(BaseRegistry[T], ABC):
         """
         Registers a class with the registry.
 
-        :param key: Return value from :py:meth:`gen_lookup_key`.
+        Args:
+            key:
+                Return value from :py:meth:`gen_lookup_key`.
         """
         raise NotImplementedError()
 
@@ -321,7 +335,9 @@ class BaseMutableRegistry(BaseRegistry[T], ABC):
         """
         Unregisters the class at the specified key.
 
-        :param key: Return value from :py:meth:`gen_lookup_key`.
+        Args:
+            key:
+                Return value from :py:meth:`gen_lookup_key`.
         """
         raise NotImplementedError()
 
@@ -337,13 +353,13 @@ def AutoRegister(registry: BaseMutableRegistry[T]) -> type:
 
        class BaseCommand(AutoRegister(commands), ABC):
          @abstractmethod
-         def print(self):
+         def exec(self):
            raise NotImplementedError()
 
        class PrintCommand(BaseCommand):
          command_name = 'print'
 
-         def print(self):
+         def exec(self):
            ...
 
        print(list(commands.items())) # [('print', PrintCommand)]
@@ -353,12 +369,15 @@ def AutoRegister(registry: BaseMutableRegistry[T]) -> type:
        Python defines abstract as "having at least one unimplemented abstract method";
        adding :py:class:`abc.ABC` as a base class is not enough.
 
-    :param registry:
-        The registry that new classes will be added to.
+    Args:
+        registry:
+            The registry that new classes will be added to.
 
-        .. note::
+            .. note::
 
-           The registry's ``attr_name`` attribute must be set.
+               The registry's ``attr_name`` attribute must be set.
+
+
     """
     if not registry.attr_name:
         raise ValueError(f"Missing `attr_name` in {registry}.")

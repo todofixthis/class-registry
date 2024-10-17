@@ -19,15 +19,16 @@ class EntryPointClassRegistry(BaseRegistry[T]):
         attr_name: typing.Optional[str] = None,
     ) -> None:
         """
-        :param group:
-            The name of the entry point group that will be used to load new classes.
+        Args:
+            group:
+                The name of the entry point group that will be used to load new classes.
 
-        :param attr_name:
-            If set, the registry will "brand" each class with its corresponding registry
-            key.  This makes it easier to perform reverse lookups later.
+            attr_name:
+                If set, the registry will "brand" each class with its corresponding
+                registry key.  This makes it easier to perform reverse lookups later.
 
-            Note: if a class already defines this attribute, the registry will overwrite
-            it!
+                Note: if a class already defines this attribute, the registry will
+                overwrite it!
         """
         super().__init__()
 

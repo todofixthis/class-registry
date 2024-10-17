@@ -10,6 +10,7 @@ ClassRegistry
    entry_points
    advanced_topics
    upgrading_to_v5
+   api
 
 
 ClassRegistry
@@ -97,9 +98,9 @@ Requirements
 ------------
 ClassRegistry is known to be compatible with the following Python versions:
 
+- 3.13
 - 3.12
 - 3.11
-- 3.10
 
 .. note::
 
