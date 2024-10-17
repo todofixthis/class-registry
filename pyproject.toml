@@ -47,7 +47,7 @@ exclude = ["docs/_build"]
 packages = [{ include = "class_registry", from = "src" }]
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = "^3.11"
 
 [tool.poetry.group.dev.dependencies]
 autohooks = "^24.2.0"
