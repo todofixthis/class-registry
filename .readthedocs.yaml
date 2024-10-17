@@ -19,5 +19,4 @@ build:
       - VIRTUAL_ENV=$READTHEDOCS_VIRTUALENV_PATH poetry install --with=ci
 
 sphinx:
-  # Needed even with overridden build above, so that Sphinx can find
   configuration: docs/conf.py
