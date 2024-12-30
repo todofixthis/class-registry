@@ -55,7 +55,7 @@ autohooks-plugin-black = "^23.10.0"
 autohooks-plugin-mypy = "^23.10.0"
 autohooks-plugin-pytest = "^23.10.0"
 autohooks-plugin-ruff = "^24.1.0"
-mypy = "^1.10.0"
+mypy = "^1.14.1"
 pytest = "^8.1.0"
 sphinx = "^8.1.3"
 sphinx_rtd_theme = "^3.0.1"
@@ -63,7 +63,7 @@ tox = "^4.21.2"
 
 # Used by GitHub Actions.
 [tool.poetry.group.ci.dependencies]
-mypy = "^1.9.0"
+mypy = "^1.14.1"
 pytest = "^8.1.0"
 sphinx = "^8.1.3"
 sphinx_rtd_theme = "^3.0.1"
