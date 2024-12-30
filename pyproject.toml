@@ -74,3 +74,18 @@ Issues = "https://github.com/todofixthis/class-registry/issues"
 
 [tool.pytest.ini_options]
 testpaths = ["test"]
+
+[tool.tox]
+legacy_tox_ini = """
+[tox]
+envlist = py3{13,12,11}
+isolated_build = true
+
+[testenv]
+allowlist_externals = poetry
+commands_pre = poetry install --with=ci
+commands =
+    poetry run pytest
+    poetry run mypy src test
+skip_install = true
+"""
