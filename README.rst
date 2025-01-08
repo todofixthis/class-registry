@@ -136,6 +136,9 @@ Run the tests for all supported versions of Python using
 
    poetry run tox -p
 
+The ``-p`` flag runs tests for each version of Python in parallel. Omit it if you want
+to see the tests run for one Python version at a time.
+
 .. note::
 
    The first time this runs, it will take awhile, as mypy needs to build up its cache.
