@@ -2,7 +2,7 @@
 version: 2
 
 build:
-  os: ubuntu-22.04
+  os: ubuntu-24.04
   tools:
     python: "latest"
 
@@ -10,15 +10,14 @@ build:
   # https://docs.readthedocs.io/en/stable/build-customization.html#install-dependencies-with-poetry
   jobs:
     post_create_environment:
-      # Install poetry
-      # https://python-poetry.org/docs/#installing-manually
-      - pip install poetry
+      # Install uv
+      # https://github.com/astral-sh/uv/issues/10074#issuecomment-2593075059
+      - pip install uv
     post_install:
-      # Install dependencies with 'docs' dependency group
-      # https://python-poetry.org/docs/managing-dependencies/#dependency-groups
-      # VIRTUAL_ENV needs to be set manually for now.
+      # Virtualenv path needs to be set manually for now.
       # See https://github.com/readthedocs/readthedocs.org/pull/11152/
-      - VIRTUAL_ENV=$READTHEDOCS_VIRTUALENV_PATH poetry install --with=ci
+      - UV_PROJECT_ENVIRONMENT=$READTHEDOCS_VIRTUALENV_PATH uv sync --group ci
 
 sphinx:
   configuration: docs/conf.py
+  fail_on_warning: true

@@ -127,7 +127,7 @@ To install the distribution for local development, some additional setup is requ
 
 #. Activate pre-commit hook::
 
-      uv run autohooks activate --mode=pip
+      uv run autohooks activate --mode=pythonpath
 
 Running Unit Tests and Type Checker
 -----------------------------------
