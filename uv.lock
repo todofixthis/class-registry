@@ -80,15 +80,15 @@ wheels = [
 
 [[package]]
 name = "autohooks-plugin-ruff"
-version = "24.1.0"
+version = "25.2.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "autohooks" },
     { name = "ruff" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/e0/f6/9e32e22520393d3fe0d910b78ee84e738cfb27d5227613bb6a8d688b3532/autohooks_plugin_ruff-24.1.0.tar.gz", hash = "sha256:1a8dd732a2e7215c1c66faa79ac499195859c499af7ce52284ee6003ece4f25c", size = 33000 }
+sdist = { url = "https://files.pythonhosted.org/packages/83/59/0c9ae7d7a44f71fb0616030ad216e9da655e0a0d08405dee20499e127b18/autohooks_plugin_ruff-25.2.0.tar.gz", hash = "sha256:3290cd5b1939d80113e5a3b6408e4728e1c2bed0960b8101479897a196dc69d6", size = 33341 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/29/14/453e200fc582aa7850de1307d92024a099bd7d8f3f728647cbee5baff8b7/autohooks_plugin_ruff-24.1.0-py3-none-any.whl", hash = "sha256:2a072805b60abb63311abab84a6600cde9112840ab68f39af53f517648341651", size = 16371 },
+    { url = "https://files.pythonhosted.org/packages/bf/ca/efd78e1b1227be7d38d0abb9d50cbc6c829f506fde7f4c600eabacc38083/autohooks_plugin_ruff-25.2.0-py3-none-any.whl", hash = "sha256:b0e3bbfb2d8bb94c509dad291801af1f6821877147b7f02f7e93812f8aef6ba1", size = 17836 },
 ]
 
 [[package]]
@@ -603,7 +603,7 @@ dev = [
     { name = "autohooks-plugin-black", specifier = ">=23,<24" },
     { name = "autohooks-plugin-mypy", specifier = ">=23,<24" },
     { name = "autohooks-plugin-pytest", specifier = ">=23,<24" },
-    { name = "autohooks-plugin-ruff", specifier = ">=24,<25" },
+    { name = "autohooks-plugin-ruff", specifier = ">=25,<26" },
     { name = "mypy", specifier = ">=1,<2" },
     { name = "pytest", specifier = ">=8,<9" },
     { name = "sphinx", specifier = ">=8,<9" },
