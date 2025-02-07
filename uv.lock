@@ -26,7 +26,7 @@ wheels = [
 
 [[package]]
 name = "autohooks"
-version = "24.2.0"
+version = "25.2.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "pontos" },
@@ -34,9 +34,9 @@ dependencies = [
     { name = "shtab" },
     { name = "tomlkit" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/8b/9d/29e14a12211fedd24eb971ccda2eefba745f73b738098662651c4a7b2083/autohooks-24.2.0.tar.gz", hash = "sha256:ee929a9f7ff68e61c73201de817b679df168b4465be1026550a71956b419200b", size = 74073 }
+sdist = { url = "https://files.pythonhosted.org/packages/8e/c1/653f4d1f9d93c9481cc0368168f2786390b99e4a2d18b34b35563d11209c/autohooks-25.2.0.tar.gz", hash = "sha256:e306a24801fbc815628ebe48b063e2853a0857eb00bbdae733175e06e0ce8a84", size = 79662 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/f0/56/782de8fe79c99777cfdef761bfdd232f1557b7e24b3e81cc676f59006f95/autohooks-24.2.0-py3-none-any.whl", hash = "sha256:a2097de2e092fa7b78a17b63b73980d3cc42b01065feb2caf0d41e2bb506621b", size = 35548 },
+    { url = "https://files.pythonhosted.org/packages/81/9e/5fa1ef776621c9f2a30b39ef15805da03395fc9caa301a72fb365fe58a64/autohooks-25.2.0-py3-none-any.whl", hash = "sha256:5a2ed5fc03d899725638d2ca6bcb367f025a6196b225a5ea177e502fdf1bb065", size = 35650 },
 ]
 
 [[package]]
@@ -599,7 +599,7 @@ ci = [
     { name = "tox-uv", specifier = ">=1,<2" },
 ]
 dev = [
-    { name = "autohooks", specifier = ">=24,<25" },
+    { name = "autohooks", specifier = ">=25,<26" },
     { name = "autohooks-plugin-black", specifier = ">=23,<24" },
     { name = "autohooks-plugin-mypy", specifier = ">=23,<24" },
     { name = "autohooks-plugin-pytest", specifier = ">=23,<24" },
