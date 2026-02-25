@@ -30,7 +30,7 @@ Issues = "https://github.com/todofixthis/class-registry/issues"
 
 [dependency-groups]
 dev = [
-    "autohooks>=25,<26",
+    "autohooks>=26,<27",
     "autohooks-plugin-black>=23,<24",
     "autohooks-plugin-mypy>=23,<24",
     "autohooks-plugin-pytest>=23,<24",
