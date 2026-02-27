@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "phx-class-registry"
-version = "5.2.0"
+version = "5.2.1"
 description = "Factory+Registry pattern for Python classes"
 authors = [{ name = "Phoenix Zerin", email = "phx@phx.nz" }]
 requires-python = ">=3.12"
@@ -90,3 +90,6 @@ commands = [
     ["mypy", "src", "test"]
 ]
 runner = "uv-venv-lock-runner"
+
+[tool.uv]
+keyring-provider = "subprocess"
