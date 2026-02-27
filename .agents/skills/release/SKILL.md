@@ -8,8 +8,8 @@ description: Use when preparing or publishing a new release of class-registry â€
 
 ### 1. Gather changes since last release
 ```bash
-git describe --tags --abbrev=0          # find last release tag
-git log <last-tag>..HEAD --oneline      # all commits since
+gh release list --limit 1 --json tagName --jq '.[0].tagName'   # find last release tag
+git log <last-tag>..HEAD --oneline                              # all commits since
 ```
 
 ### 2. Look up PR and issue context
