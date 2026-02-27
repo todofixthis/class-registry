@@ -91,9 +91,9 @@ Requirements
 ------------
 ClassRegistry is known to be compatible with the following Python versions:
 
+- 3.14
 - 3.13
 - 3.12
-- 3.11
 
 .. note::
 
@@ -118,23 +118,26 @@ Maintainers
 ===========
 To install the distribution for local development, some additional setup is required:
 
-#. `Install poetry <https://python-poetry.org/docs/#installation>`_ (only needs to be
-   done once).
+#. `Install uv <https://docs.astral.sh/uv/getting-started/installation/>`_ (only needs
+   to be done once).
 
 #. Run the following command to install additional dependencies::
 
-      poetry install --with=dev
+      uv sync --group=dev
 
 #. Activate pre-commit hook::
 
-      poetry run autohooks activate --mode=poetry
+      uv run autohooks activate --mode=pythonpath
 
 Running Unit Tests and Type Checker
 -----------------------------------
 Run the tests for all supported versions of Python using
 `tox <https://tox.readthedocs.io/>`_::
 
-   poetry run tox -p
+   uv run tox -p
+
+The ``-p`` flag runs tests for each version of Python in parallel. Omit it if you want
+to see the tests run for one Python version at a time.
 
 .. note::
 
@@ -144,12 +147,12 @@ Run the tests for all supported versions of Python using
 If you just want to run unit tests in the current virtualenv (using
 `pytest <https://docs.pytest.org>`_)::
 
-   poetry run pytest
+   uv run pytest
 
 If you just want to run type checking in the current virtualenv (using
 `mypy <https://mypy.readthedocs.io>`_)::
 
-   poetry run mypy src test
+   uv run mypy src test
 
 Documentation
 -------------
@@ -161,7 +164,7 @@ To build the documentation locally:
 
 #. Build the documentation::
 
-    make html
+    uv run make html
 
 Releases
 --------
@@ -181,7 +184,7 @@ Steps to build releases are based on
 
 #. Run the build::
 
-    poetry build
+    uv build
 
 #. The build artefacts will be located in the ``dist`` directory at the top
    level of the project.
@@ -193,7 +196,7 @@ Steps to build releases are based on
 #. Increment the version number in ``pyproject.toml``.
 #. Upload build artefacts to PyPI::
 
-    poetry publish
+    uv publish
 
 3. Create GitHub Release
 ~~~~~~~~~~~~~~~~~~~~~~~~

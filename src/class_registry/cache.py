@@ -86,6 +86,13 @@ class ClassRegistryInstanceCache(typing.Mapping[typing.Hashable, T]):
         """
         return len(self._cache)
 
+    @property
+    def registry(self) -> ClassRegistry[T]:
+        """
+        Accessor for the wrapped class registry.
+        """
+        return self._registry
+
     def warm_cache(self) -> None:
         """
         Warms up the cache, ensuring that an instance is created for every key currently
