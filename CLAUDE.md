@@ -8,7 +8,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 # Install dev dependencies
 uv sync --group=dev
 
-# Run tests + type checking across all supported Python versions (3.11–3.13)
+# Run tests + type checking across all supported Python versions (3.12–3.14)
 uv run tox -p
 
 # Run tests only (current venv)
@@ -27,7 +27,7 @@ uv run mypy src test
 cd docs && uv run make html
 ```
 
-Pre-commit hooks (black, mypy, pytest, ruff) are activated via autohooks.
+Pre-commit hooks (black, mypy, pytest, ruff) are activated via autohooks; use `uv run git commit` so the virtualenv is active when hooks run.
 
 ## Architecture
 

@@ -7,7 +7,7 @@ name = "phx-class-registry"
 version = "5.1.1"
 description = "Factory+Registry pattern for Python classes"
 authors = [{ name = "Phoenix Zerin", email = "phx@phx.nz" }]
-requires-python = "~=3.11"
+requires-python = ">=3.12"
 readme = "README.rst"
 license = "MIT"
 keywords = [
@@ -82,7 +82,7 @@ strict = true
 testpaths = ["test"]
 
 [tool.tox]
-env_list = ["py313", "py312", "py311"]
+env_list = ["py314", "py313", "py312"]
 
 [tool.tox.env_run_base]
 commands = [
