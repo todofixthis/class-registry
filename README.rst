@@ -193,19 +193,20 @@ Steps to build releases are based on
 ~~~~~~~~~~~~~~~~~
 #. `Create a PyPI API token <https://pypi.org/manage/account/token/>`_ (you only have to
    do this once).
-#. Increment the version number in ``pyproject.toml``.
+#. Bump the version (also updates ``uv.lock``)::
+
+      uv version <version>
+
 #. Upload build artefacts to PyPI::
 
-    uv publish
+    uv publish --username __token__
 
 3. Create GitHub Release
 ~~~~~~~~~~~~~~~~~~~~~~~~
 #. Create a tag and push to GitHub::
 
-      git tag <version>
-      git push <version>
-
-   ``<version>`` must match the updated version number in ``pyproject.toml``.
+      git tag -a <version> -m "Release <version>"
+      git push origin <version>
 
 #. Go to the `Releases page for the repo`_.
 #. Click ``Draft a new release``.

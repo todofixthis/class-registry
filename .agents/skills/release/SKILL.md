@@ -40,9 +40,10 @@ Based on the changes, recommend a semver bump:
 ## Phase 2 — Publish (after confirmation)
 
 ### 5. Bump version on `develop`
-- Increment the version number in `pyproject.toml` to the confirmed version
-- Run `uv sync` to update `uv.lock`
-- Commit both files and push to `develop`
+```bash
+uv version <version>
+```
+This updates `pyproject.toml` and re-locks `uv.lock` in one step. Commit both files and push to `develop`.
 
 ### 6. Open release PR
 ```bash
@@ -57,15 +58,15 @@ git checkout main && git pull
 
 ### 8. Build
 ```bash
-rm dist/*
+rm -f dist/*
 uv build
 ```
 Artefacts land in `dist/`.
 
 ### 9. Tag and push
 ```bash
-git tag <version>
-git push <version>
+git tag -a <version> -m "Release <version>"
+git push origin <version>
 ```
 `<version>` must match `pyproject.toml`.
 
@@ -109,7 +110,7 @@ gh release create <version> dist/* \
 
 ### 11. Upload to PyPI
 ```bash
-uv publish
+uv publish --username __token__
 ```
 
 ### 12. Clean up
