@@ -2,6 +2,12 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Writing for coding agents
+
+- Do not document information that already exists in the coding agent's training data or could be easily discovered by reading the code.
+- Do not list individual files; list high-level directories so the agent knows where to look.
+- Aim for concise style that optimises token count without sacrificing clarity.
+
 ## Commands
 
 ```bash
@@ -27,7 +33,7 @@ uv run mypy src test
 cd docs && uv run make html
 ```
 
-Pre-commit hooks (black, mypy, pytest, ruff) are activated via autohooks; use `uv run git commit` so the virtualenv is active when hooks run.
+Pre-commit hooks (black, mypy, pytest, ruff) are activated via autohooks; use `uv run git commit` so the virtualenv is active when hooks run. Always use the `creative-commits` skill when creating commits.
 
 ## Architecture
 
