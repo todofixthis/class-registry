@@ -50,6 +50,11 @@ jobs:
         uses: actions/setup-python@v6
         with:
           python-version-file: "pyproject.toml"
+      - name: Install system dependencies
+        # Required to build lxml from source on Python 3.14, which has no wheel yet.
+        # lxml is a transitive dependency via autohooks -> pontos -> lxml.
+        # Remove this step once lxml publishes a 3.14 wheel or is dropped from the chain.
+        run: sudo apt-get install -y libxml2-dev libxslt1-dev
       - name: Install dependencies
         run: uv sync --group ci
       - name: Type checking
@@ -67,6 +72,11 @@ jobs:
         uses: actions/setup-python@v6
         with:
           python-version-file: "pyproject.toml"
+      - name: Install system dependencies
+        # Required to build lxml from source on Python 3.14, which has no wheel yet.
+        # lxml is a transitive dependency via autohooks -> pontos -> lxml.
+        # Remove this step once lxml publishes a 3.14 wheel or is dropped from the chain.
+        run: sudo apt-get install -y libxml2-dev libxslt1-dev
       - name: Install dependencies
         run: uv sync --group ci
       - name: Check docs build
