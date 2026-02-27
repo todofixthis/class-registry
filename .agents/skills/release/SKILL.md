@@ -41,7 +41,8 @@ Based on the changes, recommend a semver bump:
 
 ### 5. Bump version on `develop`
 - Increment the version number in `pyproject.toml` to the confirmed version
-- Commit and push to `develop`
+- Run `uv sync` to update `uv.lock`
+- Commit both files and push to `develop`
 
 ### 6. Merge to `main`
 - Merge `develop` into `main` and confirm CI is green
