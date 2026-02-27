@@ -44,34 +44,41 @@ Based on the changes, recommend a semver bump:
 - Run `uv sync` to update `uv.lock`
 - Commit both files and push to `develop`
 
-### 6. Merge to `main`
-- Merge `develop` into `main` and confirm CI is green
+### 6. Open release PR
+```bash
+gh pr create --base main --title "Release v<version>" --body-file release-<version>.md
+```
+**Stop here. Wait for the user to confirm the PR is merged before continuing.**
 
-### 7. Build
+### 7. Switch to `main`
+```bash
+git checkout main && git pull
+```
+
+### 8. Build
 ```bash
 rm dist/*
 uv build
 ```
 Artefacts land in `dist/`.
 
-### 8. Tag and push
+### 9. Tag and push
 ```bash
 git tag <version>
 git push <version>
 ```
 `<version>` must match `pyproject.toml`.
 
-### 9. Create GitHub release
+### 10. Create GitHub release
 
-**a. Write release notes + checksums to a file:**
+**a. Append checksums to the release notes file:**
 ```bash
-sha256sum dist/phx_class_registry-* >> release-notes.md
+sha256sum dist/phx_class_registry-* >> release-<version>.md
 ```
-Prepend the release notes before the checksums.
 
 **b. GPG-sign the document:**
 ```bash
-gpg --clearsign release-notes.md   # → release-notes.md.asc
+gpg --clearsign release-<version>.md   # → release-<version>.md.asc
 ```
 
 **c. Sign each build artefact:**
@@ -82,26 +89,32 @@ for f in dist/phx_class_registry-*; do gpg --detach-sign "$f"; done
 
 **d. Build the release body** — concatenate the notes and the signed copy:
 ```
-<contents of release-notes.md>
+<contents of release-<version>.md>
 
 ---
 
 ````
-<contents of release-notes.md.asc>
+<contents of release-<version>.md.asc>
 ````
 ```
+Write this to `release-<version>-body.md`.
 
 **e. Create the release and upload all artefacts:**
 ```bash
 gh release create <version> dist/* \
   --title "ClassRegistry v<version>" \
-  --notes-file release-body.md
+  --notes-file release-<version>-body.md
 ```
 `dist/*` picks up the `.whl`, `.tar.gz`, and `.sig` files.
 
-### 10. Upload to PyPI
+### 11. Upload to PyPI
 ```bash
 uv publish
+```
+
+### 12. Clean up
+```bash
+rm release-<version>.md release-<version>.md.asc release-<version>-body.md
 ```
 
 ---

@@ -10,6 +10,9 @@ dist
 # dotenv
 .env
 
+# Release skill working files
+release-*.md*
+
 # Sphinx documentation
 docs/_build/
 
