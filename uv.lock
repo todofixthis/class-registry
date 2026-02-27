@@ -514,7 +514,7 @@ wheels = [
 
 [[package]]
 name = "phx-class-registry"
-version = "5.1.1"
+version = "5.2.0"
 source = { editable = "." }
 
 [package.dev-dependencies]
