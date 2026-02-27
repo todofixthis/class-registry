@@ -176,6 +176,21 @@ Steps to build releases are based on
    Make sure to build releases off of the ``main`` branch, and check that all changes
    from ``develop`` have been merged before creating the release!
 
+One-time Setup
+~~~~~~~~~~~~~~
+#. Install the ``keyring`` tool and add it to your ``PATH``::
+
+      uv tool install keyring
+      uv tool update-shell
+
+   Restart your shell after running ``update-shell``.
+#. `Create a PyPI API token <https://pypi.org/manage/account/#api-tokens>`_ and store it
+   in the OS keychain::
+
+      keyring set https://upload.pypi.org/legacy/ __token__
+
+   Paste the ``pypi-...`` token when prompted.
+
 1. Build the Project
 ~~~~~~~~~~~~~~~~~~~~
 #. Delete artefacts from previous builds, if applicable::
@@ -191,8 +206,6 @@ Steps to build releases are based on
 
 2. Upload to PyPI
 ~~~~~~~~~~~~~~~~~
-#. `Create a PyPI API token <https://pypi.org/manage/account/token/>`_ (you only have to
-   do this once).
 #. Bump the version (also updates ``uv.lock``)::
 
       uv version <version>
