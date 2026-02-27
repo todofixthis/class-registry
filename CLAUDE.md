@@ -33,7 +33,7 @@ uv run mypy src test
 cd docs && uv run make html
 ```
 
-Pre-commit hooks (black, mypy, pytest, ruff) are activated via autohooks; use `uv run git commit` so the virtualenv is active when hooks run. Always use the `creative-commits` skill when creating commits.
+Pre-commit hooks (black, mypy, pytest, ruff) are activated via autohooks.
 
 ## Architecture
 
