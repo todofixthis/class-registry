@@ -116,6 +116,7 @@ uv publish --username __token__
 ### 12. Clean up
 ```bash
 rm release-<version>.md release-<version>.md.asc release-<version>-body.md
+git checkout develop && git pull
 ```
 
 ---
