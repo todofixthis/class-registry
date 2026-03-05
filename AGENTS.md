@@ -33,7 +33,7 @@ uv run mypy src test
 cd docs && uv run make html
 ```
 
-Pre-commit hooks (black, mypy, pytest, ruff) are activated via autohooks.
+Pre-commit hooks (black, mypy, pytest, ruff) are activated via autohooks. Always commit via `uv run git commit` so hooks run correctly.
 
 ## Architecture
 
