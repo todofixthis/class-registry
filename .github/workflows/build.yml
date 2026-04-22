@@ -23,7 +23,7 @@ jobs:
       - name: Clone repo
         uses: actions/checkout@v6
       - name: Install uv
-        uses: astral-sh/setup-uv@v7
+        uses: astral-sh/setup-uv@v8.1.0
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v6
         with:
@@ -45,7 +45,7 @@ jobs:
       - name: Clone repo
         uses: actions/checkout@v6
       - name: Install uv
-        uses: astral-sh/setup-uv@v7
+        uses: astral-sh/setup-uv@v8.1.0
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
@@ -67,7 +67,7 @@ jobs:
       - name: Clone repo
         uses: actions/checkout@v6
       - name: Install uv
-        uses: astral-sh/setup-uv@v7
+        uses: astral-sh/setup-uv@v8.1.0
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
