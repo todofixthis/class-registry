@@ -37,7 +37,7 @@ dev = [
     "autohooks-plugin-ruff>=25,<26",
     # >=3.29 fixes an OSError on Docker/macOS volume mounts (fcntl file locking)
     "filelock>=3.29",
-    "mypy>=1,<2",
+    "mypy>=2,<3",
     "pytest>=9,<10",
     "sphinx>=8,<10",
     "sphinx_rtd_theme>=3.1,<4",
@@ -45,7 +45,7 @@ dev = [
     "tox-uv>=1,<2",
 ]
 ci = [
-    "mypy>=1,<2",
+    "mypy>=2,<3",
     "pytest>=9,<10",
     "sphinx>=8,<10",
     "sphinx_rtd_theme>=3.1,<4",
