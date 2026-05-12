@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "phx-class-registry"
-version = "5.2.1"
+version = "5.2.2"
 description = "Factory+Registry pattern for Python classes"
 authors = [{ name = "Phoenix Zerin", email = "phx@phx.nz" }]
 requires-python = ">=3.12"
@@ -35,18 +35,20 @@ dev = [
     "autohooks-plugin-mypy>=23,<24",
     "autohooks-plugin-pytest>=23,<24",
     "autohooks-plugin-ruff>=25,<26",
-    "mypy>=1,<2",
+    # >=3.29 fixes an OSError on Docker/macOS volume mounts (fcntl file locking)
+    "filelock>=3.29",
+    "mypy>=2,<3",
     "pytest>=9,<10",
-    "sphinx>=8,<9",
-    "sphinx_rtd_theme>=3,<4",
+    "sphinx>=9,<10",
+    "sphinx_rtd_theme>=3.1,<4",
     "tox>=4,<5",
     "tox-uv>=1,<2",
 ]
 ci = [
-    "mypy>=1,<2",
+    "mypy>=2,<3",
     "pytest>=9,<10",
-    "sphinx>=8,<9",
-    "sphinx_rtd_theme>=3,<4",
+    "sphinx>=9,<10",
+    "sphinx_rtd_theme>=3.1,<4",
     "tox-uv>=1,<2",
 ]
 
@@ -93,3 +95,5 @@ runner = "uv-venv-lock-runner"
 
 [tool.uv]
 keyring-provider = "subprocess"
+# Fix SSL errors when running in Leash containers
+system-certs = true
