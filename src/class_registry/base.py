@@ -285,10 +285,6 @@ class BaseMutableRegistry(BaseRegistry[T], ABC):
                     f"via decorator, but `{type(self).__name__}.attr_key` is not set."
                 )
         else:
-            # :see: https://github.com/python/mypy/issues/16640
-            if typing.TYPE_CHECKING:
-                key = typing.cast(typing.Hashable, key)
-
             # ``@register('some_attr')`` usage:
             def _decorator(cls: D) -> D:
                 lookup_key_ = self.gen_lookup_key(key)

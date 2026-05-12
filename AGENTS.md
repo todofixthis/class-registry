@@ -23,6 +23,7 @@ uv sync --group=dev                                    # sync deps after pulling
 uv run pytest                                          # run tests (current Python)
 uv run tox -p                                          # run tests (all supported versions)
 uv run pytest --collect-only                           # verify test count (note at start of mahi; confirm it increases when done)
+uv run mypy src test                                   # type check
 uv run ruff check                                      # lint
 uv run make -C docs clean && uv run make -C docs html  # build docs
 ```
