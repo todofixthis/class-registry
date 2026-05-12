@@ -25,7 +25,7 @@ gh issue view <number> --json title,body,labels
 ```
 
 ### 3. Draft release notes
-Using the commit list, PR descriptions, and issue context, draft the release notes following the _Writing Release Notes_ guide below. Present the draft to the developer for review and incorporate feedback before proceeding.
+Using the commit list, PR descriptions, and issue context, draft the release notes following the _Writing Release Notes_ guide below. When a bullet relates to a GitHub issue, prefix it with `[#number]`. Run the `nz-english` skill on the draft, then present it to the developer for review and incorporate feedback before proceeding.
 
 ### 4. Recommend version number
 Based on the changes, recommend a semver bump:
@@ -58,10 +58,11 @@ git checkout main && git pull
 
 ### 8. Build
 ```bash
+uv sync --group=dev
 rm -f dist/*
 uv build
 ```
-Artefacts land in `dist/`.
+Sync first — pulling `main` may have brought in dependency changes. Artefacts land in `dist/`.
 
 ### 9. Tag and push
 ```bash
@@ -77,18 +78,15 @@ git push origin <version>
 sha256sum dist/phx_class_registry-* >> release-<version>.md
 ```
 
-**b. GPG-sign the document:**
+**b. GPG-sign the document and each build artefact:**
 ```bash
-gpg --clearsign release-<version>.md   # → release-<version>.md.asc
-```
-
-**c. Sign each build artefact:**
-```bash
-for f in dist/phx_class_registry-*; do gpg --detach-sign "$f"; done
+GPG_KEY=$(git config user.email)
+gpg --local-user "$GPG_KEY" --clearsign release-<version>.md   # → release-<version>.md.asc
+for f in dist/phx_class_registry-*; do gpg --local-user "$GPG_KEY" --detach-sign "$f"; done
 # Creates dist/phx_class_registry-*.sig alongside each artefact
 ```
 
-**d. Build the release body** — concatenate the notes and the signed copy:
+**c. Build the release body** — concatenate the notes and the signed copy:
 ```
 <contents of release-<version>.md>
 
@@ -100,7 +98,7 @@ for f in dist/phx_class_registry-*; do gpg --detach-sign "$f"; done
 ```
 Write this to `release-<version>-body.md`.
 
-**e. Create the release and upload all artefacts:**
+**d. Create the release and upload all artefacts:**
 ```bash
 gh release create <version> dist/* \
   --title "ClassRegistry v<version>" \
@@ -118,6 +116,19 @@ uv publish --username __token__
 rm release-<version>.md release-<version>.md.asc release-<version>-body.md
 git checkout develop && git pull
 ```
+
+### 13. Close related GitHub issues
+For every issue referenced in the release notes, close it with a comment:
+```bash
+gh issue close <number> --comment "Implemented in [v<version>](https://github.com/todofixthis/class-registry/releases/tag/<version>)."
+```
+
+### 14. Rebase `develop` onto `main`
+```bash
+git rebase origin/main
+git push
+```
+Because `develop` now contains all of `main`'s commits, the histories no longer diverge and a regular (non-force) push succeeds.
 
 ---
 
@@ -137,6 +148,14 @@ git checkout develop && git pull
 ## New features
 ## Enhancements
 ## Bug fixes
+
+> [!NOTE]
+> **Verifying release artefacts**
+> 1. Import the signing key: `curl https://github.com/todofixthis.gpg | gpg --import`
+> 2. Download the `.whl` or `.tar.gz` and its matching `.sig` file from the release assets
+> 3. Verify: `gpg --verify phx_class_registry-<version>-py3-none-any.whl.sig phx_class_registry-<version>-py3-none-any.whl`
+>
+> Key fingerprint: `457997A2A506270F918D7BD1925CC6E316680401`
 
 # SHA256 Checksums
 ```
