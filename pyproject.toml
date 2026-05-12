@@ -39,7 +39,7 @@ dev = [
     "filelock>=3.29",
     "mypy>=2,<3",
     "pytest>=9,<10",
-    "sphinx>=8,<10",
+    "sphinx>=9,<10",
     "sphinx_rtd_theme>=3.1,<4",
     "tox>=4,<5",
     "tox-uv>=1,<2",
@@ -47,7 +47,7 @@ dev = [
 ci = [
     "mypy>=2,<3",
     "pytest>=9,<10",
-    "sphinx>=8,<10",
+    "sphinx>=9,<10",
     "sphinx_rtd_theme>=3.1,<4",
     "tox-uv>=1,<2",
 ]
@@ -96,4 +96,4 @@ runner = "uv-venv-lock-runner"
 [tool.uv]
 keyring-provider = "subprocess"
 # Fix SSL errors when running in Leash containers
-native-tls = true
+system-certs = true
