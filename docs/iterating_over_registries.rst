@@ -37,6 +37,44 @@ Here's an example:
    non-abstract subclasses of a particular base class.  See :doc:`advanced_topics` for
    more information.
 
+Specifying the Key Type
+-----------------------
+By default, registry keys are typed as :py:class:`str`.  This means that
+``registry.keys()`` and ``for key in registry`` both yield :py:class:`str`
+values — no explicit ``str()`` coercion needed.
+
+:py:class:`ClassRegistry` accepts an optional second type argument for the key
+type.  The first argument is always the value type::
+
+   ClassRegistry[ValueType, KeyType]
+
+For example, to use integer keys::
+
+   from class_registry import ClassRegistry
+
+   pokedex: ClassRegistry[Pokemon, int] = ClassRegistry('pokedex_id')
+
+   @pokedex.register
+   class Geodude:
+       pokedex_id = 74
+
+   assert list(pokedex.keys()) == [74]
+
+To retain the original permissive behaviour (any :py:class:`~collections.abc.Hashable`
+as a key), declare the key type explicitly::
+
+   from collections.abc import Hashable
+   from class_registry import ClassRegistry
+
+   pokedex: ClassRegistry[Pokemon, Hashable] = ClassRegistry('element')
+
+.. note::
+
+   If you have existing code that uses non-:py:class:`str` keys under a bare
+   ``ClassRegistry[Foo]``, your type checker will now report errors (runtime
+   behaviour is unchanged).  The fix is to declare the key type explicitly, e.g.
+   ``ClassRegistry[Foo, Hashable]``.
+
 Changing the Sort Order
 -----------------------
 As you probably noticed, these functions iterate over classes in the order that they are
