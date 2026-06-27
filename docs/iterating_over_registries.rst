@@ -52,16 +52,20 @@ For example, to use integer keys::
 
    from class_registry import ClassRegistry
 
+   class Pokemon:
+       pass
+
    pokedex: ClassRegistry[Pokemon, int] = ClassRegistry('pokedex_id')
 
    @pokedex.register
-   class Geodude:
+   class Geodude(Pokemon):
        pokedex_id = 74
 
    assert list(pokedex.keys()) == [74]
 
-To retain the original permissive behaviour (any :py:class:`~collections.abc.Hashable`
-as a key), declare the key type explicitly::
+To retain the original permissive behaviour (any
+:py:class:`~collections.abc.Hashable` as a key), declare the key type
+explicitly::
 
    from collections.abc import Hashable
    from class_registry import ClassRegistry
