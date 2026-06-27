@@ -28,6 +28,8 @@ uv run ruff check                                      # lint
 uv run make -C docs clean && uv run make -C docs html  # build docs
 ```
 
+**In a worktree:** the shell can silently reset to the main checkout, so always prefix state-mutating commands (`uv add`/`sync`/`run`) with `cd <worktree> &&` to ensure they hit the worktree.
+
 ## Architecture
 
 The package is in `src/class_registry/`. The public API (`__init__.py`) exports only `ClassRegistry` and `RegistryKeyError`.
