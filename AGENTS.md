@@ -78,6 +78,10 @@ Place comments on the line preceding the code they document, not as trailing com
 
 ## Git Worktrees
 
-Use `.worktrees/` for isolated workspaces (project-local, gitignored).
+Use the `using-git-worktrees` skill; it creates worktrees via the native `EnterWorktree` tool under `.agents/worktrees/` (gitignored). Don't hand-roll `git worktree add` when the native tool is available.
 
-After switching to a worktree, run the autohooks activate command (see Commands) to install the pre-commit hook for that worktree.
+After creating a worktree, install its pre-commit hook (see the autohooks activate command in Commands). A fresh worktree has no per-worktree hooks directory, so create it first:
+
+```bash
+mkdir -p "$(git rev-parse --git-dir)/hooks"
+```
