@@ -22,7 +22,7 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules",
 ]
 dependencies = [
-    "typing-extensions>=4.6,<5 ; python_full_version < '3.13'",
+    "typing-extensions>=4.6,<5 ; python_version < '3.13'",
 ]
 
 [project.urls]
