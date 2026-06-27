@@ -23,7 +23,7 @@ class ClassRegistryInstanceCache(typing.Mapping[typing.Hashable, T]):
 
     def __init__(
         self,
-        class_registry: ClassRegistry[T],
+        class_registry: ClassRegistry[T, typing.Any],
         *args: typing.Any,
         **kwargs: typing.Any,
     ) -> None:
@@ -40,7 +40,7 @@ class ClassRegistryInstanceCache(typing.Mapping[typing.Hashable, T]):
         """
         super().__init__()
 
-        self._registry: ClassRegistry[T] = class_registry
+        self._registry: ClassRegistry[T, typing.Any] = class_registry
         self._cache: dict[typing.Hashable, T] = {}
 
         self._key_map: dict[typing.Hashable, list[typing.Hashable]] = defaultdict(list)
@@ -87,7 +87,7 @@ class ClassRegistryInstanceCache(typing.Mapping[typing.Hashable, T]):
         return len(self._cache)
 
     @property
-    def registry(self) -> ClassRegistry[T]:
+    def registry(self) -> ClassRegistry[T, typing.Any]:
         """
         Accessor for the wrapped class registry.
         """

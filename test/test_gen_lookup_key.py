@@ -14,8 +14,7 @@ from test import Charmander, Pokemon, Squirtle
 @pytest.fixture(name="customised_registry")
 def fixture_customised_registry() -> ClassRegistry[Pokemon]:
     class CustomisedLookupRegistry(ClassRegistry[Pokemon]):
-        @staticmethod
-        def gen_lookup_key(key: typing.Hashable) -> typing.Hashable:
+        def gen_lookup_key(self, key: typing.Hashable) -> typing.Hashable:
             """
             Simple override of `gen_lookup_key`, to ensure the registry
             behaves as expected when the lookup key is different.
@@ -76,8 +75,7 @@ def test_use_case_aliases() -> None:
     """
 
     class TestRegistry(ClassRegistry[Pokemon]):
-        @staticmethod
-        def gen_lookup_key(key: typing.Hashable) -> typing.Hashable:
+        def gen_lookup_key(self, key: typing.Hashable) -> typing.Hashable:
             """
             Simulate a scenario where we renamed the key for a class in the
             registry, but we want to preserve backwards-compatibility with

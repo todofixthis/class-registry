@@ -28,9 +28,9 @@ class RegistryPatcher(typing.Generic[T]):
 
     def __init__(
         self,
-        registry: BaseMutableRegistry[T],
+        registry: BaseMutableRegistry[T, typing.Any],
         *args: typing.Type[T],
-        **kwargs: typing.Type[T]
+        **kwargs: typing.Type[T],
     ) -> None:
         """
         Args:
@@ -59,7 +59,7 @@ class RegistryPatcher(typing.Generic[T]):
         for class_ in args:
             kwargs[getattr(class_, registry.attr_name)] = class_
 
-        self.target: BaseMutableRegistry[T] = registry
+        self.target: BaseMutableRegistry[T, typing.Any] = registry
 
         self._new_values: dict[str, typing.Type[T]] = kwargs
         self._prev_values: dict[

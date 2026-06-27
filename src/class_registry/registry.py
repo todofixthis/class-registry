@@ -3,16 +3,14 @@ __all__ = ["ClassRegistry", "SortedClassRegistry"]
 import typing
 from functools import cmp_to_key
 
-from .base import BaseMutableRegistry, RegistryKeyError
+from .base import BaseMutableRegistry, K, RegistryKeyError, T
 
 # :see: https://github.com/python/typeshed/blob/main/stdlib/_typeshed/README.md
 if typing.TYPE_CHECKING:
     from _typeshed import SupportsAllComparisons
 
-T = typing.TypeVar("T")
 
-
-class ClassRegistry(BaseMutableRegistry[T]):
+class ClassRegistry(BaseMutableRegistry[T, K]):
     """
     Maintains a registry of classes and provides a generic factory for instantiating
     them.
@@ -48,7 +46,7 @@ class ClassRegistry(BaseMutableRegistry[T]):
     def __repr__(self) -> str:
         return f"{type(self).__name__}(attr_name={self.attr_name!r}, unique={self.unique!r})"
 
-    def get_class(self, key: typing.Hashable) -> typing.Type[T]:
+    def get_class(self, key: K) -> typing.Type[T]:
         """
         Returns the class associated with the specified key.
         """
@@ -93,7 +91,7 @@ class ClassRegistry(BaseMutableRegistry[T]):
         )
 
 
-class SortedClassRegistry(ClassRegistry[T]):
+class SortedClassRegistry(ClassRegistry[T, K]):
     """
     A ClassRegistry that uses a function to determine sort order when iterating.
     """
@@ -133,7 +131,7 @@ class SortedClassRegistry(ClassRegistry[T]):
 
         self.reverse = reverse
 
-    def keys(self) -> typing.Iterable[typing.Hashable]:
+    def keys(self) -> typing.Iterable[K]:
         """
         Returns the collection of registry keys, in the order that they were registered.
         """
@@ -158,8 +156,8 @@ class SortedClassRegistry(ClassRegistry[T]):
         """
 
         def sorter(
-            a: typing.Tuple[typing.Hashable, typing.Type[T], typing.Hashable],
-            b: typing.Tuple[typing.Hashable, typing.Type[T], typing.Hashable],
+            a: typing.Tuple[K, typing.Type[T], typing.Hashable],
+            b: typing.Tuple[K, typing.Type[T], typing.Hashable],
         ) -> int:
             a_attr = getattr(a[1], sort_key)
             b_attr = getattr(b[1], sort_key)

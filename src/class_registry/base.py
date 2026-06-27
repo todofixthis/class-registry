@@ -1,9 +1,17 @@
 __all__ = ["AutoRegister", "BaseMutableRegistry", "BaseRegistry", "RegistryKeyError"]
 
+import sys
 import typing
 from abc import ABC, abstractmethod as abstract_method
 from inspect import isabstract as is_abstract, isclass as is_class
 from warnings import warn
+
+# PEP 696 ``TypeVar`` defaults are native to ``typing`` in 3.13+; on 3.12 they
+# come from ``typing_extensions`` (see docs/adr/001).
+if sys.version_info >= (3, 13):
+    from typing import TypeVar
+else:
+    from typing_extensions import TypeVar
 
 
 class RegistryKeyError(KeyError):
@@ -17,18 +25,22 @@ class RegistryKeyError(KeyError):
     pass
 
 
-T = typing.TypeVar("T")
+T = TypeVar("T")
+
+# ``K`` parametrises the public/human-readable key. Lookup keys (produced by
+# ``gen_lookup_key``) stay ``Hashable`` — see docs/adr/002.
+K = TypeVar("K", bound=typing.Hashable, default=str)
 
 # [#53] Fix incorrect return type from ``register``
-D = typing.TypeVar("D", bound=typing.Callable[..., typing.Any])
+D = TypeVar("D", bound=typing.Callable[..., typing.Any])
 
 
-class BaseRegistry(typing.Generic[T], ABC):
+class BaseRegistry(typing.Generic[T, K], ABC):
     """
     Base functionality for registries.
     """
 
-    def __contains__(self, key: typing.Hashable) -> bool:
+    def __contains__(self, key: K) -> bool:
         """
         Returns whether the specified key is registered.
         """
@@ -51,13 +63,13 @@ class BaseRegistry(typing.Generic[T], ABC):
         """
         return list(map(str, self.keys()))
 
-    def __getitem__(self, key: typing.Hashable) -> T:
+    def __getitem__(self, key: K) -> T:
         """
         Shortcut for calling :py:meth:`get` with empty args/kwargs.
         """
         return self.get(key)
 
-    def __iter__(self) -> typing.Iterator[typing.Hashable]:
+    def __iter__(self) -> typing.Iterator[K]:
         """
         Iterates over registry keys.
         """
@@ -83,13 +95,13 @@ class BaseRegistry(typing.Generic[T], ABC):
         raise RegistryKeyError(key)
 
     @abstract_method
-    def get_class(self, key: typing.Hashable) -> typing.Type[T]:
+    def get_class(self, key: K) -> typing.Type[T]:
         """
         Returns the class associated with the specified key.
         """
         raise NotImplementedError()
 
-    def get(self, key: typing.Hashable, *args: typing.Any, **kwargs: typing.Any) -> T:
+    def get(self, key: K, *args: typing.Any, **kwargs: typing.Any) -> T:
         """
         Creates a new instance of the class matching the specified key.
 
@@ -111,7 +123,7 @@ class BaseRegistry(typing.Generic[T], ABC):
         return self.create_instance(self.get_class(key), *args, **kwargs)
 
     @abstract_method
-    def keys(self) -> typing.Iterable[typing.Hashable]:
+    def keys(self) -> typing.Iterable[K]:
         """
         Returns the collection of registered keys.
         """
@@ -123,8 +135,7 @@ class BaseRegistry(typing.Generic[T], ABC):
         """
         return iter(self.get_class(key) for key in self.keys())
 
-    @staticmethod
-    def gen_lookup_key(key: typing.Hashable) -> typing.Hashable:
+    def gen_lookup_key(self, key: K) -> typing.Hashable:
         """
         Used by :py:meth:`get` to generate a lookup key.
 
@@ -161,7 +172,7 @@ class BaseRegistry(typing.Generic[T], ABC):
         return class_(*args, **kwargs)
 
 
-class BaseMutableRegistry(BaseRegistry[T], ABC):
+class BaseMutableRegistry(BaseRegistry[T, K], ABC):
     """
     Extends :py:class:`BaseRegistry` with methods that can be used to modify the
     registered classes.
@@ -181,18 +192,18 @@ class BaseMutableRegistry(BaseRegistry[T], ABC):
         # Map lookup keys to readable keys.
         # Only needed when :py:meth:`gen_lookup_key` is overridden, but I'm not good
         # enough at reflection black magic to figure out how to do that (:
-        self._lookup_keys: dict[typing.Hashable, typing.Hashable] = {}
+        self._lookup_keys: dict[K, typing.Hashable] = {}
 
     def __repr__(self) -> str:
         return f"{type(self).__name__}({self.attr_name!r})"
 
-    def keys(self) -> typing.Iterable[typing.Hashable]:
+    def keys(self) -> typing.Iterable[K]:
         """
         Returns the collection of registry keys, in the order that they were registered.
         """
         return iter(self._lookup_keys.keys())
 
-    def items(self) -> typing.Iterable[tuple[typing.Hashable, typing.Type[T]]]:
+    def items(self) -> typing.Iterable[tuple[K, typing.Type[T]]]:
         """
         .. warning::
 
@@ -236,11 +247,11 @@ class BaseMutableRegistry(BaseRegistry[T], ABC):
         ...
 
     @typing.overload
-    def register(self, key: typing.Hashable) -> typing.Callable[[D], D]:
+    def register(self, key: K) -> typing.Callable[[D], D]:
         """Decorator factory variant"""
         ...
 
-    def register(self, key: typing.Union[D, typing.Hashable]) -> typing.Union[
+    def register(self, key: typing.Union[D, K]) -> typing.Union[
         D,
         typing.Callable[[D], D],
     ]:
@@ -287,16 +298,17 @@ class BaseMutableRegistry(BaseRegistry[T], ABC):
         else:
             # ``@register('some_attr')`` usage:
             def _decorator(cls: D) -> D:
-                lookup_key_ = self.gen_lookup_key(key)
+                key_ = typing.cast(K, key)
+                lookup_key_ = self.gen_lookup_key(key_)
 
                 self._register(lookup_key_, typing.cast(typing.Type[T], cls))
-                self._lookup_keys[key] = lookup_key_
+                self._lookup_keys[key_] = lookup_key_
 
                 return cls
 
             return _decorator
 
-    def unregister(self, key: typing.Hashable) -> typing.Type[T]:
+    def unregister(self, key: K) -> typing.Type[T]:
         """
         Unregisters the class with the specified key.
 
@@ -338,7 +350,7 @@ class BaseMutableRegistry(BaseRegistry[T], ABC):
         raise NotImplementedError()
 
 
-def AutoRegister(registry: BaseMutableRegistry[T]) -> type:
+def AutoRegister(registry: BaseMutableRegistry[T, typing.Any]) -> type:
     """
     Creates a base class that automatically registers all non-abstract subclasses in the
     specified registry.

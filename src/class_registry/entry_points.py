@@ -3,12 +3,10 @@ __all__ = ["EntryPointClassRegistry"]
 import typing
 from importlib.metadata import entry_points
 
-from .base import BaseRegistry
-
-T = typing.TypeVar("T")
+from .base import BaseRegistry, T
 
 
-class EntryPointClassRegistry(BaseRegistry[T]):
+class EntryPointClassRegistry(BaseRegistry[T, str]):
     """
     A class registry that loads classes using setuptools entry points.
     """
@@ -35,7 +33,7 @@ class EntryPointClassRegistry(BaseRegistry[T]):
         self.attr_name = attr_name
         self.group = group
 
-        self._cache: typing.Optional[dict[typing.Hashable, typing.Type[T]]] = None
+        self._cache: typing.Optional[dict[str, typing.Type[T]]] = None
         """
         Caches registered classes locally, so that we don't have to keep iterating over
         entry points.
@@ -51,7 +49,7 @@ class EntryPointClassRegistry(BaseRegistry[T]):
     def __repr__(self) -> str:
         return f"{type(self).__name__}(group={self.group!r})"
 
-    def get(self, key: typing.Hashable, *args: typing.Any, **kwargs: typing.Any) -> T:
+    def get(self, key: str, *args: typing.Any, **kwargs: typing.Any) -> T:
         instance = super().get(key, *args, **kwargs)
 
         if self.attr_name:
@@ -62,13 +60,13 @@ class EntryPointClassRegistry(BaseRegistry[T]):
 
         return instance
 
-    def get_class(self, key: typing.Hashable) -> typing.Type[T]:
+    def get_class(self, key: str) -> typing.Type[T]:
         try:
             return self._get_cache()[key]
         except KeyError:
             return self.__missing__(key)
 
-    def keys(self) -> typing.Iterable[typing.Hashable]:
+    def keys(self) -> typing.Iterable[str]:
         return iter(self._get_cache().keys())
 
     def refresh(self) -> None:
@@ -80,7 +78,7 @@ class EntryPointClassRegistry(BaseRegistry[T]):
         """
         self._cache = None
 
-    def _get_cache(self) -> dict[typing.Hashable, typing.Type[T]]:
+    def _get_cache(self) -> dict[str, typing.Type[T]]:
         """
         Populates the cache (if necessary) and returns it.
         """
