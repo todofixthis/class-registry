@@ -59,7 +59,7 @@ code:
 Symbol                                  How to Import in ClassRegistry v5
 ======================================  ===================================================================
 :py:func:`AutoRegister`                 ``from class_registry.base import AutoRegister``
-:py:class:`ClassRegistry`               ``from class_registry import Classregistry`` (unchanged)
+:py:class:`ClassRegistry`               ``from class_registry import ClassRegistry`` (unchanged)
 :py:class:`ClassRegistryInstanceCache`  ``from class_registry.cache import ClassRegistryInstanceCache``
 :py:class:`EntryPointClassRegistry`     ``from class_registry.entry_points import EntryPointClassRegistry``
 :py:class:`RegistryKeyError`            ``from class_registry import RegistryKeyError`` (unchanged)

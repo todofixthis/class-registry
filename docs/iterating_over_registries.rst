@@ -1,7 +1,7 @@
 Iterating Over Registries
 =========================
 Sometimes, you want to iterate over all of the classes registered in a
-:py:class:`ClassRegistry`.  There are three methods included to help you do this:
+:py:class:`ClassRegistry`.  There are two methods included to help you do this:
 
 - :py:meth:`keys` iterates over the registry keys.
 - :py:meth:`classes` iterates over the registered classes.
@@ -33,9 +33,9 @@ Here's an example:
 
    Tired of having to add the :py:meth:`register` decorator to every class?
 
-   You can use the :py:func:`AutoRegister` metaclass to automatically register all
-   non-abstract subclasses of a particular base class.  See :doc:`advanced_topics` for
-   more information.
+   You can use :py:func:`AutoRegister` to generate a base class that automatically
+   registers all non-abstract subclasses of a particular base class.  See
+   :doc:`advanced_topics` for more information.
 
 Specifying the Key Type
 -----------------------
@@ -74,18 +74,8 @@ explicitly::
 
 .. note::
 
-   **Migrating to v6.0.0.**  Registry keys now default to :py:class:`str`.  If
-   you have existing code that uses non-:py:class:`str` keys under a bare
-   ``ClassRegistry[Foo]``, your type checker will report an error such as:
-
-   .. code-block:: text
-
-      error: Argument 1 to "get_class" of "ClassRegistry" has incompatible type "int"; expected "str"  [arg-type]
-
-   Runtime behaviour is unchanged.  To fix it, declare the key type
-   explicitly, as shown above — either the specific key type you use, or
-   :py:class:`~collections.abc.Hashable` to retain the original permissive
-   behaviour.
+   Upgrading from ClassRegistry v5?  This default is new in v6.0.0 and can
+   break existing type-checked code.  See :doc:`upgrading_to_v6`.
 
 Changing the Sort Order
 -----------------------
@@ -116,7 +106,7 @@ If you'd like to customise this ordering, use :py:class:`SortedClassRegistry`:
        weight = 15
 
    assert list(pokedex.keys()) == ['grass', 'fighting', 'rock']
-   assert list(pokedex.values()) == [Bellsprout, Machop, Geodude]
+   assert list(pokedex.classes()) == [Bellsprout, Machop, Geodude]
 
 In the above example, the code iterates over registered classes in ascending order by
 their ``weight`` attributes.
@@ -171,7 +161,7 @@ are sorted:
        weight = 5
 
    assert list(pokedex.keys()) == ['poison', 'electric', 'water']
-   assert list(pokedex.values()) == [Koffing, Voltorb, Horsea]
+   assert list(pokedex.classes()) == [Koffing, Voltorb, Horsea]
 
 This time, the :py:class:`SortedClassRegistry` used our custom sorter function, so that
 the classes were sorted descending by weight, with the registry key used as a

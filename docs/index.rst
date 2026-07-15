@@ -10,6 +10,7 @@ ClassRegistry
    entry_points
    advanced_topics
    upgrading_to_v5
+   upgrading_to_v6
    api
 
 
@@ -23,13 +24,19 @@ At the intersection of the Registry and Factory patterns lies the ``ClassRegistr
   extensible by 3rd-party libraries!
 - And more!
 
-Upgrading from ClassRegistry v4
--------------------------------
+Upgrading from an Earlier Version
+----------------------------------
 .. important::
 
    ClassRegistry v5 introduces some changes that can break code that was previously
    using ClassRegistry v4.  If you are upgrading from ClassRegistry v4 to ClassRegistry
    v5, please read :doc:`upgrading_to_v5`!
+
+.. important::
+
+   ClassRegistry v6 changes the default registry key type, which can produce type
+   checker errors in existing code (runtime behaviour is unchanged).  If you are
+   upgrading to ClassRegistry v6, please read :doc:`upgrading_to_v6`!
 
 Getting Started
 ---------------

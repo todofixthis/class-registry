@@ -88,7 +88,7 @@ because it is abstract.
    In previous versions of ClassRegistry, ``AutoRegister`` returned a metaclass instead
    of a base class.  The metaclass version of the function still exists at
    :py:func:`class_registry.auto_register.AutoRegister`, but
-   `it is deprecated and will be removed in a future version of ClassRegistry <https://github.com/todofixthis/class-registry/issues/14>`.
+   `it is deprecated and will be removed in a future version of ClassRegistry <https://github.com/todofixthis/class-registry/issues/14>`_.
 
    If your code is still using the old ``AutoRegister`` function, you can change it like
    this:
