@@ -118,17 +118,19 @@ class RegistryPatcher(typing.Generic[ValueType, KeyType]):
         default: typing.Any = None,
     ) -> typing.Any:
         try:
-            # ``key`` arrives from ``_new_values`` (a ``str`` kwarg); the
-            # target's ``get_class`` is typed against the public ``KeyType``.
-            # The cast is runtime-erased — see docs/adr/002.
+            # ``key`` is a registry key drawn from ``_new_values`` — a kwarg
+            # name, or an ``attr_name`` value off a class passed positionally;
+            # the target's ``get_class`` is typed against the public
+            # ``KeyType``. The cast is runtime-erased — see docs/adr/002.
             return self.target.get_class(typing.cast(KeyType, key))
         except RegistryKeyError:
             return default
 
     def _set_value(self, key: typing.Hashable, value: typing.Type[ValueType]) -> None:
-        # ``key`` is a ``str`` kwarg when patching, or a ``Hashable`` backup
-        # key when restoring; the target's ``register`` is typed against the
-        # public ``KeyType``. The cast is runtime-erased — see docs/adr/002.
+        # ``key`` comes from ``_new_values`` when patching, or from the
+        # ``_prev_values`` backup when restoring; the target's ``register`` is
+        # typed against the public ``KeyType``. The cast is runtime-erased —
+        # see docs/adr/002.
         self.target.register(typing.cast(KeyType, key))(value)
 
     def _del_value(self, key: typing.Hashable) -> None:

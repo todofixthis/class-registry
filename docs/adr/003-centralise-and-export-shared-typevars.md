@@ -84,9 +84,9 @@ renames and centralises, it does not revisit that bound or default.
 - Renaming `T`→`ValueType` and `K`→`KeyType` is a source-level rename only:
   TypeVars are matched positionally in subscription, so call sites like
   `ClassRegistry[Foo, int]` are unaffected. `base.T`/`base.K` are not in
-  `base.__all__` today but remain importable by name, so any downstream code
-  importing them directly (rather than subscripting) breaks on the rename;
-  this is called out here since it isn't otherwise enforced by `__all__`.
+  `base.__all__` today, but nothing stops downstream code importing them by
+  name, and any code that does breaks on the rename; this is called out here
+  since `__all__` never gated it.
 - `ValueType` and `KeyType` become public API — autodoc gives each a documented
   entry of its own that signatures can cross-reference, and they are supported
   imports from `class_registry.base` — so future changes to their bound or

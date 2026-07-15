@@ -83,11 +83,14 @@ Public keys vs. the internal lookup key
 The key type you declare (``str``, ``int``, ``Hashable``, or otherwise) is the
 **public** key: what you pass to ``get``/``register`` and get back from ``keys()``.
 
-The **lookup** key — produced by :py:meth:`~class_registry.base.BaseRegistry.gen_lookup_key`,
-which you may override to support aliases or case-folding — is always
-:py:class:`~collections.abc.Hashable`, regardless of your registry's key type.  It
-is deliberately not parametrised, because the hook is free to reshape the key
-(for example, wrapping it in a tuple) into something other than the public key
-type.  So when you override ``gen_lookup_key`` in a subclass, keep its signature
-as ``Hashable`` — don't narrow it to match your registry's key type.  See
-:doc:`advanced_topics` for an example of overriding ``gen_lookup_key``.
+The **lookup** key — what
+:py:meth:`~class_registry.base.BaseRegistry.gen_lookup_key` *returns* — is typed
+:py:class:`~collections.abc.Hashable`, not your registry's key type.  The base
+class declares it that way deliberately: the hook is free to reshape the key (for
+example, wrapping it in a tuple), so its result is not guaranteed to be a key type
+at all.  Don't assume ``gen_lookup_key`` hands you back a value of your registry's
+key type.
+
+Its ``key`` *parameter*, by contrast, is typed as your registry's key type.  If you
+override the hook to support aliases or case-folding, you may keep that signature
+or widen it — see :doc:`advanced_topics` for an example.

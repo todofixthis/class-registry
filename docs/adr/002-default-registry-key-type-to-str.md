@@ -38,7 +38,7 @@ key = next(iter(registry.keys()))   # inferred type: Hashable
 name: str = str(key)                # explicit str() coercion required
 ```
 
-With `str` as the default, that same bare subscription needs no coercion:
+With `str` as the default, bare `ClassRegistry[Pokemon]` needs no coercion:
 
 ```python
 registry: ClassRegistry[Pokemon] = ClassRegistry("element")
