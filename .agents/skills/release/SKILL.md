@@ -34,16 +34,27 @@ Based on the changes, recommend a semver bump:
 - **patch** — bug fixes only
 
 ### 5. Gate: breaking changes require a migration guide
-If this release has breaking changes, `docs/upgrading_to_v<major>.rst` **must already exist**, be listed in the `docs/index.rst` toctree, and be linked from that page's upgrade alert. **If it does not, the release stops here** — write it first, following the _Writing a Migration Guide_ section below.
+A **breaking change** is anything that makes previously-working code fail — at runtime, or under a type checker. Undocumented behaviour someone relied on still counts; "only a couple of users" measures blast radius, not compatibility. If this release has none, skip to the stop below.
 
-Release notes do not satisfy this gate. They are read once, by people who already know a release happened; the guide is what someone finds months later when their type checker starts failing and they don't yet know why.
+**First, settle the version.** Step 4 defines minor and patch as *fully backwards-compatible*, so a breaking change in anything but a major contradicts it. When that happens, stop and put it to the developer: bump to major, or keep the smaller bump and record why in an ADR. Neither pick it for them nor draft around it — the answer decides which guide the rest of this step is about, and a release drafted for one version and linked to another ships broken.
 
-Verify all three, not just the first:
+**Then the guide.** One guide per major line, `docs/upgrading_to_v<major>.rst` — never a per-minor page. `<major>` is the major being released, or, for a break shipped in a minor or patch, the major line it lands on.
+
+It must:
+- **cover *this* release's breaking change.** A guide left over from an earlier release satisfies nothing — its existence is what makes this the easy check to fake. A break shipped in 6.3.0 gets its own section in `upgrading_to_v6.rst`, headed by the version that introduced it.
+- exist, be listed in the `docs/index.rst` toctree, and be linked from that page's upgrade alert.
+- follow _Writing a Migration Guide_ below.
+
+**If any of that is missing, the release stops here** — write it first.
+
+Release notes do not satisfy this gate. They are read once, by people who already know a release happened; the guide is what someone finds months later when their code breaks and they don't yet know why.
+
 ```bash
 ls docs/upgrading_to_v<major>.rst                        # exists
 rg 'upgrading_to_v<major>' docs/index.rst                # in toctree AND upgrade alert
 uv run make -C docs clean && uv run make -C docs html    # builds, and it isn't orphaned
 ```
+Then read the guide and confirm it covers this release's break. No command checks that for you.
 
 **Stop here. Get explicit confirmation of the release notes and version number before continuing.**
 
@@ -215,6 +226,8 @@ Only include the `[!WARNING]` block if there are breaking changes — but when i
 ## Writing a Migration Guide
 
 `docs/upgrading_to_v<major>.rst`, modelled on the existing `upgrading_to_v5.rst`. Add it to the `docs/index.rst` toctree and link it from that page's upgrade alert, or readers never reach it.
+
+One page covers a whole major line: the move onto it, and any break shipped later within it. Say so in the opening paragraph — someone already on v6 has no reason to guess that "Upgrading to ClassRegistry v6" is where a 6.3.0 break is written down. Breaks after the major boundary get their own `Changes in v<version>` section; the major boundary itself is the page's main content.
 
 Write for someone who upgraded, hit an error, and does not yet know a release caused it. They arrive by searching the error text — not by reading release notes.
 
