@@ -4,10 +4,13 @@ import typing
 from collections import defaultdict
 
 from . import ClassRegistry
-from .base import ValueType
+from .base import KeyType, ValueType
 
 
-class ClassRegistryInstanceCache(typing.Mapping[typing.Hashable, ValueType]):
+class ClassRegistryInstanceCache(
+    typing.Mapping[typing.Hashable, ValueType],
+    typing.Generic[ValueType, KeyType],
+):
     """
     Wraps a ClassRegistry instance, caching instances as they are created.
 
@@ -22,7 +25,7 @@ class ClassRegistryInstanceCache(typing.Mapping[typing.Hashable, ValueType]):
 
     def __init__(
         self,
-        class_registry: ClassRegistry[ValueType, typing.Any],
+        class_registry: ClassRegistry[ValueType, KeyType],
         *args: typing.Any,
         **kwargs: typing.Any,
     ) -> None:
@@ -39,7 +42,7 @@ class ClassRegistryInstanceCache(typing.Mapping[typing.Hashable, ValueType]):
         """
         super().__init__()
 
-        self._registry: ClassRegistry[ValueType, typing.Any] = class_registry
+        self._registry: ClassRegistry[ValueType, KeyType] = class_registry
         self._cache: dict[typing.Hashable, ValueType] = {}
 
         self._key_map: dict[typing.Hashable, list[typing.Hashable]] = defaultdict(list)
@@ -60,8 +63,13 @@ class ClassRegistryInstanceCache(typing.Mapping[typing.Hashable, ValueType]):
             # correct order.
             self._key_map[class_key].append(instance_key)
 
+            # ``class_key`` is a lookup key (``Hashable``); the wrapped
+            # registry's ``get`` is typed against the public ``KeyType``. The
+            # cast is runtime-erased — see docs/adr/002.
             self._cache[instance_key] = self._registry.get(
-                class_key, *self._template_args, **self._template_kwargs
+                typing.cast(KeyType, class_key),
+                *self._template_args,
+                **self._template_kwargs,
             )
 
         return self._cache[instance_key]
@@ -86,7 +94,7 @@ class ClassRegistryInstanceCache(typing.Mapping[typing.Hashable, ValueType]):
         return len(self._cache)
 
     @property
-    def registry(self) -> ClassRegistry[ValueType, typing.Any]:
+    def registry(self) -> ClassRegistry[ValueType, KeyType]:
         """
         Accessor for the wrapped class registry.
         """
@@ -126,4 +134,6 @@ class ClassRegistryInstanceCache(typing.Mapping[typing.Hashable, ValueType]):
             key:
                 Value provided to :py:meth:`__getitem__`.
         """
-        return self._registry.gen_lookup_key(key)
+        # ``key`` arrives as ``Hashable`` (the ``Mapping`` contract); the
+        # registry's ``gen_lookup_key`` is typed against ``KeyType``.
+        return self._registry.gen_lookup_key(typing.cast(KeyType, key))

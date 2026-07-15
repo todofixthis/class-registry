@@ -58,14 +58,17 @@ def test_entry_point_registry_keys_are_str() -> None:
     typing.assert_type(registry.keys(), typing.Iterable[str])
 
 
-def test_instance_cache_accepts_non_str_key_registry() -> None:
+def test_instance_cache_infers_key_type_from_registry() -> None:
     registry: ClassRegistry[Widget, int] = ClassRegistry()
 
     @registry.register(7)
     class Seven(Widget):
         pass
 
-    cache: ClassRegistryInstanceCache[Widget] = ClassRegistryInstanceCache(registry)
+    cache = ClassRegistryInstanceCache(registry)
+
+    typing.assert_type(cache, ClassRegistryInstanceCache[Widget, int])
+    typing.assert_type(cache.registry, ClassRegistry[Widget, int])
     typing.assert_type(cache[7], Widget)
 
 
