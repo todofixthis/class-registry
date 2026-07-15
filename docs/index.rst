@@ -80,6 +80,10 @@ To create a class instance from a registry, use the subscript operator:
       # Your IDE will automatically infer that ``fighter1`` is a ``Pokemon``.
       fighter1 = pokedex['fire']
 
+   Registry keys are typed as :py:class:`str` by default; see "Specifying
+   the Key Type" in :doc:`iterating_over_registries` to use a different key
+   type.
+
 Advanced Usage
 --------------
 There's a whole lot more you can do with ClassRegistry, including:

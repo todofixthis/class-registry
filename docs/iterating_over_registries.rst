@@ -74,10 +74,26 @@ explicitly::
 
 .. note::
 
-   If you have existing code that uses non-:py:class:`str` keys under a bare
-   ``ClassRegistry[Foo]``, your type checker will now report errors (runtime
-   behaviour is unchanged).  The fix is to declare the key type explicitly, e.g.
-   ``ClassRegistry[Foo, Hashable]``.
+   **Migrating to v6.0.0.**  Registry keys now default to :py:class:`str`.  If
+   you have existing code that uses non-:py:class:`str` keys under a bare
+   ``ClassRegistry[Foo]``, your type checker will report an error such as:
+
+   .. code-block:: text
+
+      error: Argument 1 to "get_class" of "ClassRegistry" has incompatible
+      type "int"; expected "str"  [arg-type]
+
+   Runtime behaviour is unchanged.  To fix it, declare the key type
+   explicitly::
+
+      pokedex: ClassRegistry[Pokemon, int] = ClassRegistry('pokedex_id')
+
+   To keep the previous permissive behaviour (any
+   :py:class:`~collections.abc.Hashable` key), use::
+
+      from collections.abc import Hashable
+
+      pokedex: ClassRegistry[Pokemon, Hashable] = ClassRegistry('element')
 
 Changing the Sort Order
 -----------------------
