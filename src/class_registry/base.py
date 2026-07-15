@@ -51,7 +51,8 @@ class BaseRegistry(typing.Generic[ValueType, KeyType], ABC):
     - ``ValueType`` — the registered class, and the instance that
       :py:meth:`get` returns.
     - ``KeyType`` — the public key used to look a class up (passed to
-      :py:meth:`get`/:py:meth:`register` and returned by :py:meth:`keys`).
+      :py:meth:`get`/:py:meth:`~BaseMutableRegistry.register` and returned
+      by :py:meth:`keys`).
       Defaults to :py:class:`str`.  The *internal* lookup key produced by
       :py:meth:`gen_lookup_key` is always
       :py:class:`~collections.abc.Hashable` and is deliberately not
@@ -169,9 +170,10 @@ class BaseRegistry(typing.Generic[ValueType, KeyType], ABC):
 
         Note:
             The return type is :py:class:`~collections.abc.Hashable` rather
-            than ``KeyType``.  This hook may change the key's type — e.g.
-            case-folding, or wrapping the key in a tuple — so the lookup key
-            it produces can differ from the public key.  See docs/adr/002.
+            than ``KeyType``.  This hook may reshape the key — e.g.
+            case-folding it, or wrapping it in a tuple — so the lookup key
+            it produces can differ from the public key in value, type, or
+            both.  See docs/adr/002.
         """
         return key
 
