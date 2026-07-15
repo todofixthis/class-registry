@@ -4,10 +4,10 @@ import typing
 from types import TracebackType
 
 from . import RegistryKeyError
-from .base import BaseMutableRegistry, ValueType
+from .base import BaseMutableRegistry, KeyType, ValueType
 
 
-class RegistryPatcher(typing.Generic[ValueType]):
+class RegistryPatcher(typing.Generic[ValueType, KeyType]):
     """
     Creates a context in which classes are temporarily registered with a class registry,
     then removed when the context exits.
@@ -26,7 +26,7 @@ class RegistryPatcher(typing.Generic[ValueType]):
 
     def __init__(
         self,
-        registry: BaseMutableRegistry[ValueType, typing.Any],
+        registry: BaseMutableRegistry[ValueType, KeyType],
         *args: typing.Type[ValueType],
         **kwargs: typing.Type[ValueType],
     ) -> None:
@@ -57,7 +57,7 @@ class RegistryPatcher(typing.Generic[ValueType]):
         for class_ in args:
             kwargs[getattr(class_, registry.attr_name)] = class_
 
-        self.target: BaseMutableRegistry[ValueType, typing.Any] = registry
+        self.target: BaseMutableRegistry[ValueType, KeyType] = registry
 
         self._new_values: dict[str, typing.Type[ValueType]] = kwargs
         self._prev_values: dict[
@@ -118,15 +118,24 @@ class RegistryPatcher(typing.Generic[ValueType]):
         default: typing.Any = None,
     ) -> typing.Any:
         try:
-            return self.target.get_class(key)
+            # ``key`` arrives from ``_new_values`` (a ``str`` kwarg); the
+            # target's ``get_class`` is typed against the public ``KeyType``.
+            # The cast is runtime-erased — see docs/adr/002.
+            return self.target.get_class(typing.cast(KeyType, key))
         except RegistryKeyError:
             return default
 
     def _set_value(self, key: typing.Hashable, value: typing.Type[ValueType]) -> None:
-        self.target.register(key)(value)
+        # ``key`` is a ``str`` kwarg when patching, or a ``Hashable`` backup
+        # key when restoring; the target's ``register`` is typed against the
+        # public ``KeyType``. The cast is runtime-erased — see docs/adr/002.
+        self.target.register(typing.cast(KeyType, key))(value)
 
     def _del_value(self, key: typing.Hashable) -> None:
         try:
-            self.target.unregister(key)
+            # Same key provenance as ``_set_value``; the target's
+            # ``unregister`` is typed against the public ``KeyType``. The cast
+            # is runtime-erased — see docs/adr/002.
+            self.target.unregister(typing.cast(KeyType, key))
         except RegistryKeyError:
             pass

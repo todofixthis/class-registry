@@ -72,7 +72,10 @@ def test_instance_cache_infers_key_type_from_registry() -> None:
     typing.assert_type(cache[7], Widget)
 
 
-def test_patcher_accepts_non_str_key_registry() -> None:
+def test_patcher_infers_key_type_from_registry() -> None:
     registry: ClassRegistry[Widget, int] = ClassRegistry(attr_name="key")
-    patcher: RegistryPatcher[Widget] = RegistryPatcher(registry)
-    typing.assert_type(patcher.target, BaseMutableRegistry[Widget, typing.Any])
+
+    patcher = RegistryPatcher(registry)
+
+    typing.assert_type(patcher, RegistryPatcher[Widget, int])
+    typing.assert_type(patcher.target, BaseMutableRegistry[Widget, int])
