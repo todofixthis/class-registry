@@ -29,15 +29,16 @@ callers who want `str` back must cast (passing a `str` *in* already type-checks,
 since `str` is `Hashable`). The default chosen here also sets a precedent for how
 this library weighs ergonomics against maximal permissiveness in its typing.
 
-Concretely, the friction is on output. Under the historical `Hashable` typing:
+Historically, bare `ClassRegistry[Pokemon]` resolved its keys to `Hashable` —
+behaviour reproducible today only by naming the key type explicitly:
 
 ```python
 registry: ClassRegistry[Pokemon, Hashable] = ClassRegistry("element")
 key = next(iter(registry.keys()))   # inferred type: Hashable
-name: str = str(key)                # explicit cast required
+name: str = str(key)                # explicit str() coercion required
 ```
 
-With `str` as the default key type, the common case needs no cast:
+With `str` as the default, that same bare subscription needs no coercion:
 
 ```python
 registry: ClassRegistry[Pokemon] = ClassRegistry("element")
@@ -103,8 +104,7 @@ as the guiding precedent for typing decisions in this library.
 - Only code that *both* subscripts a registry *and* uses non-str keys is affected.
   Callers that never subscript (`ClassRegistry()` — the common runtime style) see
   no change, and runtime behaviour is unchanged everywhere (the sole runtime touch
-  is the `typing_extensions` import on 3.12, covered by ADR 001). Flag the
-  type-only break in the release notes.
+  is the `typing_extensions` import on 3.12, covered by ADR 001).
 - The type-checker-visible narrowing (shared by Options 2 and 3) is mitigated
   by shipping this change in a new **major version** (targeted 6.0.0): the
   narrowing and its one-line fix are called out in the release notes and in the
