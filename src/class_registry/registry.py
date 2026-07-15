@@ -3,14 +3,14 @@ __all__ = ["ClassRegistry", "SortedClassRegistry"]
 import typing
 from functools import cmp_to_key
 
-from .base import BaseMutableRegistry, K, RegistryKeyError, T
+from .base import BaseMutableRegistry, KeyType, RegistryKeyError, ValueType
 
 # :see: https://github.com/python/typeshed/blob/main/stdlib/_typeshed/README.md
 if typing.TYPE_CHECKING:
     from _typeshed import SupportsAllComparisons
 
 
-class ClassRegistry(BaseMutableRegistry[T, K]):
+class ClassRegistry(BaseMutableRegistry[ValueType, KeyType]):
     """
     Maintains a registry of classes and provides a generic factory for instantiating
     them.
@@ -38,7 +38,7 @@ class ClassRegistry(BaseMutableRegistry[T, K]):
 
         self.unique = unique
 
-        self._registry: dict[typing.Hashable, typing.Type[T]] = {}
+        self._registry: dict[typing.Hashable, typing.Type[ValueType]] = {}
 
     def __len__(self) -> int:
         return len(self._registry)
@@ -46,7 +46,7 @@ class ClassRegistry(BaseMutableRegistry[T, K]):
     def __repr__(self) -> str:
         return f"{type(self).__name__}(attr_name={self.attr_name!r}, unique={self.unique!r})"
 
-    def get_class(self, key: K) -> typing.Type[T]:
+    def get_class(self, key: KeyType) -> typing.Type[ValueType]:
         """
         Returns the class associated with the specified key.
         """
@@ -57,7 +57,7 @@ class ClassRegistry(BaseMutableRegistry[T, K]):
         except KeyError:
             return self.__missing__(lookup_key)
 
-    def _register(self, key: typing.Hashable, class_: typing.Type[T]) -> None:
+    def _register(self, key: typing.Hashable, class_: typing.Type[ValueType]) -> None:
         """
         Registers a class with the registry.
 
@@ -78,7 +78,7 @@ class ClassRegistry(BaseMutableRegistry[T, K]):
 
         self._registry[key] = class_
 
-    def _unregister(self, key: typing.Hashable) -> typing.Type[T]:
+    def _unregister(self, key: typing.Hashable) -> typing.Type[ValueType]:
         """
         Unregisters the class at the specified key.
 
@@ -91,7 +91,7 @@ class ClassRegistry(BaseMutableRegistry[T, K]):
         )
 
 
-class SortedClassRegistry(ClassRegistry[T, K]):
+class SortedClassRegistry(ClassRegistry[ValueType, KeyType]):
     """
     A ClassRegistry that uses a function to determine sort order when iterating.
     """
@@ -131,7 +131,7 @@ class SortedClassRegistry(ClassRegistry[T, K]):
 
         self.reverse = reverse
 
-    def keys(self) -> typing.Iterable[K]:
+    def keys(self) -> typing.Iterable[KeyType]:
         """
         Returns the collection of registry keys, in the order that they were registered.
         """
@@ -156,8 +156,8 @@ class SortedClassRegistry(ClassRegistry[T, K]):
         """
 
         def sorter(
-            a: typing.Tuple[K, typing.Type[T], typing.Hashable],
-            b: typing.Tuple[K, typing.Type[T], typing.Hashable],
+            a: typing.Tuple[KeyType, typing.Type[ValueType], typing.Hashable],
+            b: typing.Tuple[KeyType, typing.Type[ValueType], typing.Hashable],
         ) -> int:
             a_attr = getattr(a[1], sort_key)
             b_attr = getattr(b[1], sort_key)

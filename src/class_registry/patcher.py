@@ -4,12 +4,10 @@ import typing
 from types import TracebackType
 
 from . import RegistryKeyError
-from .base import BaseMutableRegistry
-
-T = typing.TypeVar("T")
+from .base import BaseMutableRegistry, ValueType
 
 
-class RegistryPatcher(typing.Generic[T]):
+class RegistryPatcher(typing.Generic[ValueType]):
     """
     Creates a context in which classes are temporarily registered with a class registry,
     then removed when the context exits.
@@ -28,9 +26,9 @@ class RegistryPatcher(typing.Generic[T]):
 
     def __init__(
         self,
-        registry: BaseMutableRegistry[T, typing.Any],
-        *args: typing.Type[T],
-        **kwargs: typing.Type[T],
+        registry: BaseMutableRegistry[ValueType, typing.Any],
+        *args: typing.Type[ValueType],
+        **kwargs: typing.Type[ValueType],
     ) -> None:
         """
         Args:
@@ -59,12 +57,14 @@ class RegistryPatcher(typing.Generic[T]):
         for class_ in args:
             kwargs[getattr(class_, registry.attr_name)] = class_
 
-        self.target: BaseMutableRegistry[T, typing.Any] = registry
+        self.target: BaseMutableRegistry[ValueType, typing.Any] = registry
 
-        self._new_values: dict[str, typing.Type[T]] = kwargs
+        self._new_values: dict[str, typing.Type[ValueType]] = kwargs
         self._prev_values: dict[
             typing.Hashable,
-            typing.Union[typing.Type[T], typing.Type[RegistryPatcher.DoesNotExist]],
+            typing.Union[
+                typing.Type[ValueType], typing.Type[RegistryPatcher.DoesNotExist]
+            ],
         ] = {}
 
     def __enter__(self) -> None:
@@ -108,7 +108,7 @@ class RegistryPatcher(typing.Generic[T]):
             if value is not self.DoesNotExist:
                 if typing.TYPE_CHECKING:
                     # Convince mypy that ``value`` cannot be ``self.DoesNotExist``.
-                    value = typing.cast(typing.Type[T], value)
+                    value = typing.cast(typing.Type[ValueType], value)
 
                 self._set_value(key, value)
 
@@ -122,7 +122,7 @@ class RegistryPatcher(typing.Generic[T]):
         except RegistryKeyError:
             return default
 
-    def _set_value(self, key: typing.Hashable, value: typing.Type[T]) -> None:
+    def _set_value(self, key: typing.Hashable, value: typing.Type[ValueType]) -> None:
         self.target.register(key)(value)
 
     def _del_value(self, key: typing.Hashable) -> None:

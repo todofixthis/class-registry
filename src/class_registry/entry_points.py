@@ -3,10 +3,10 @@ __all__ = ["EntryPointClassRegistry"]
 import typing
 from importlib.metadata import entry_points
 
-from .base import BaseRegistry, T
+from .base import BaseRegistry, ValueType
 
 
-class EntryPointClassRegistry(BaseRegistry[T, str]):
+class EntryPointClassRegistry(BaseRegistry[ValueType, str]):
     """
     A class registry that loads classes using setuptools entry points.
     """
@@ -33,7 +33,7 @@ class EntryPointClassRegistry(BaseRegistry[T, str]):
         self.attr_name = attr_name
         self.group = group
 
-        self._cache: typing.Optional[dict[str, typing.Type[T]]] = None
+        self._cache: typing.Optional[dict[str, typing.Type[ValueType]]] = None
         """
         Caches registered classes locally, so that we don't have to keep iterating over
         entry points.
@@ -49,7 +49,7 @@ class EntryPointClassRegistry(BaseRegistry[T, str]):
     def __repr__(self) -> str:
         return f"{type(self).__name__}(group={self.group!r})"
 
-    def get(self, key: str, *args: typing.Any, **kwargs: typing.Any) -> T:
+    def get(self, key: str, *args: typing.Any, **kwargs: typing.Any) -> ValueType:
         instance = super().get(key, *args, **kwargs)
 
         if self.attr_name:
@@ -60,7 +60,7 @@ class EntryPointClassRegistry(BaseRegistry[T, str]):
 
         return instance
 
-    def get_class(self, key: str) -> typing.Type[T]:
+    def get_class(self, key: str) -> typing.Type[ValueType]:
         try:
             return self._get_cache()[key]
         except KeyError:
@@ -78,7 +78,7 @@ class EntryPointClassRegistry(BaseRegistry[T, str]):
         """
         self._cache = None
 
-    def _get_cache(self) -> dict[str, typing.Type[T]]:
+    def _get_cache(self) -> dict[str, typing.Type[ValueType]]:
         """
         Populates the cache (if necessary) and returns it.
         """

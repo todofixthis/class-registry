@@ -4,11 +4,10 @@ import typing
 from collections import defaultdict
 
 from . import ClassRegistry
+from .base import ValueType
 
-T = typing.TypeVar("T")
 
-
-class ClassRegistryInstanceCache(typing.Mapping[typing.Hashable, T]):
+class ClassRegistryInstanceCache(typing.Mapping[typing.Hashable, ValueType]):
     """
     Wraps a ClassRegistry instance, caching instances as they are created.
 
@@ -23,7 +22,7 @@ class ClassRegistryInstanceCache(typing.Mapping[typing.Hashable, T]):
 
     def __init__(
         self,
-        class_registry: ClassRegistry[T, typing.Any],
+        class_registry: ClassRegistry[ValueType, typing.Any],
         *args: typing.Any,
         **kwargs: typing.Any,
     ) -> None:
@@ -40,15 +39,15 @@ class ClassRegistryInstanceCache(typing.Mapping[typing.Hashable, T]):
         """
         super().__init__()
 
-        self._registry: ClassRegistry[T, typing.Any] = class_registry
-        self._cache: dict[typing.Hashable, T] = {}
+        self._registry: ClassRegistry[ValueType, typing.Any] = class_registry
+        self._cache: dict[typing.Hashable, ValueType] = {}
 
         self._key_map: dict[typing.Hashable, list[typing.Hashable]] = defaultdict(list)
 
         self._template_args = args
         self._template_kwargs = kwargs
 
-    def __getitem__(self, key: typing.Hashable) -> T:
+    def __getitem__(self, key: typing.Hashable) -> ValueType:
         """
         Returns the cached instance associated with the specified key.
         """
@@ -67,7 +66,7 @@ class ClassRegistryInstanceCache(typing.Mapping[typing.Hashable, T]):
 
         return self._cache[instance_key]
 
-    def __iter__(self) -> typing.Generator[T, None, None]:
+    def __iter__(self) -> typing.Generator[ValueType, None, None]:
         """
         Returns a generator for iterating over cached instances, using the wrapped
         registry to determine sort order.
@@ -87,7 +86,7 @@ class ClassRegistryInstanceCache(typing.Mapping[typing.Hashable, T]):
         return len(self._cache)
 
     @property
-    def registry(self) -> ClassRegistry[T, typing.Any]:
+    def registry(self) -> ClassRegistry[ValueType, typing.Any]:
         """
         Accessor for the wrapped class registry.
         """
