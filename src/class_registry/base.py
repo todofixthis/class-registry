@@ -45,6 +45,17 @@ D = TypeVar("D", bound=typing.Callable[..., typing.Any])
 class BaseRegistry(typing.Generic[ValueType, KeyType], ABC):
     """
     Base functionality for registries.
+
+    The two type parameters are:
+
+    - ``ValueType`` — the registered class, and the instance that
+      :py:meth:`get` returns.
+    - ``KeyType`` — the public key used to look a class up (passed to
+      :py:meth:`get`/:py:meth:`register` and returned by :py:meth:`keys`).
+      Defaults to :py:class:`str`.  The *internal* lookup key produced by
+      :py:meth:`gen_lookup_key` is always
+      :py:class:`~collections.abc.Hashable` and is deliberately not
+      parametrised (see docs/adr/002).
     """
 
     def __contains__(self, key: KeyType) -> bool:
@@ -155,6 +166,12 @@ class BaseRegistry(typing.Generic[ValueType, KeyType], ABC):
 
         Returns:
             The registry key, used to look up the corresponding class.
+
+        Note:
+            The return type is :py:class:`~collections.abc.Hashable` rather
+            than ``KeyType``.  This hook may change the key's type — e.g.
+            case-folding, or wrapping the key in a tuple — so the lookup key
+            it produces can differ from the public key.  See docs/adr/002.
         """
         return key
 
