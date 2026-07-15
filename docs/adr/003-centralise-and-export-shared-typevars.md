@@ -10,13 +10,14 @@ summary: Define the shared value and key TypeVars once in base.py as exported Va
 ## Context
 
 Issue #100 introduced generic `T` (value type) and `K` (key type) TypeVars.
-Rather than a single shared definition, `base.py` defines its own `T` and `K`,
-while `cache.py` and `patcher.py` each redefine `T = typing.TypeVar("T")`
-independently; `registry.py` previously did the same before switching to an
-import. Review of PR #101 flagged the drift this invites: nothing stops two
-modules' `T`s from diverging in bound or default, and a bare `K` gives callers
-reading a signature like `ClassRegistry[Foo, K]` no clue what the parameter
-means without opening `base.py`.
+`base.py` is already their de-facto home, and `registry.py` and
+`entry_points.py` import both from it rather than redefining them; `cache.py`
+and `patcher.py` are the holdouts, each still redefining their own
+`T = typing.TypeVar("T")`. Review of PR #101 flagged the drift this invites:
+nothing stops a redefined `T` from diverging in bound or default from
+`base.py`'s, and a bare `K` gives callers reading a signature like
+`ClassRegistry[Foo, K]` no clue what the parameter means without opening
+`base.py`.
 
 `K`'s role — the public key type, distinct from the internal lookup key
 produced by `gen_lookup_key` — is established in ADR 002. That distinction is
@@ -31,8 +32,10 @@ Keep redefining `T` in each module that needs it, and leave `K` as-is.
 
 **Pros:** No change required.
 **Cons:** Redefinitions can drift (different bound or default per module);
-`K` is not importable, so downstream code that wants to name the key type in
-its own signatures must define its own equivalent TypeVar.
+`K` is not in `base.__all__`, so it is undocumented, absent from rendered
+signatures, and unsupported to depend on — downstream code that wants to name
+the key type in its own signatures has no supported way to do so short of
+defining its own equivalent TypeVar.
 **Risks:** A future edit updates `base.T`'s bound or default and misses the
 copies in `cache.py`/`patcher.py`, silently reintroducing inconsistent
 generics.
@@ -44,11 +47,14 @@ Move both TypeVars to `base.py`, rename to self-documenting names, add them to
 
 **Pros:** Single source of truth for bound/default; descriptive names read as
 documentation in signatures such as `ClassRegistry[ValueType, KeyType]`;
-importable by downstream code that wants to reuse the same TypeVars.
+becomes public, named, and supported for downstream code that wants to reuse
+the same TypeVars, rather than merely importable as an unsupported
+implementation detail.
 **Cons:** Touches every module that currently defines its own `T`.
-**Risks:** None beyond the mechanical rename; TypeVars are matched
-positionally in subscription, not by name, so the rename has no runtime or
-subscription-site effect.
+**Risks:** TypeVars are matched positionally in subscription, not by name, so
+the rename has no runtime or subscription-site effect; the one exposure is
+that anyone already importing `base.T`/`base.K` by name (rather than
+subscripting) breaks on the rename, since neither is in `base.__all__` today.
 
 ### Option 3: Extract a dedicated `_typevars.py` module
 
@@ -57,8 +63,10 @@ and siblings alike.
 
 **Pros:** Decouples the TypeVar definitions from `base.py`'s other contents.
 **Cons:** Two symbols do not justify a new module; `base.py` already owns the
-base abstractions these TypeVars parametrise, so it is their natural home.
-**Risks:** An extra import hop for no discoverability gain over Option 2.
+base abstractions these TypeVars parametrise, so it is their natural home; an
+extra import hop buys no discoverability gain over Option 2.
+**Risks:** Same by-name import break as Option 2, since this option renames
+`T`/`K` too.
 
 ## Decision
 
@@ -86,6 +94,7 @@ renames and centralises, it does not revisit that bound or default.
 - Establishes the precedent: a TypeVar shared across modules is defined once,
   in the module that owns the base abstraction it parametrises, and imported
   everywhere else — not redefined per module. `base.py`'s `D` (the decorator
-  TypeVar for `AutoRegister`) is unrelated in purpose and out of scope here.
+  TypeVar for `BaseMutableRegistry.register`) is unrelated in purpose and out
+  of scope here.
 - The rename itself (updating `cache.py`, `patcher.py`, `registry.py`, and any
   other importers) is implementation work for a follow-up task, not this ADR.
