@@ -10,12 +10,12 @@ summary: Define the shared value and key TypeVars once in base.py as exported Va
 ## Context
 
 Issue #100 introduced generic `T` (value type) and `K` (key type) TypeVars.
-`base.py` is already their de-facto home, and `registry.py` and
-`entry_points.py` import both from it rather than redefining them; `cache.py`
-and `patcher.py` are the holdouts, each still redefining their own
-`T = typing.TypeVar("T")`. Review of PR #101 flagged the drift this invites:
-nothing stops a redefined `T` from diverging in bound or default from
-`base.py`'s, and a bare `K` gives callers reading a signature like
+`base.py` is already their de-facto home: `registry.py` imports both from it,
+and `entry_points.py` imports `T` while pinning its key type positionally as
+ADR 002 prescribes. `cache.py` and `patcher.py` are the holdouts, each still
+redefining their own `T = typing.TypeVar("T")`. Review of PR #101 flagged the
+drift this invites: nothing stops a redefined `T` from diverging in bound or
+default from `base.py`'s, and a bare `K` gives callers reading a signature like
 `ClassRegistry[Foo, K]` no clue what the parameter means without opening
 `base.py`.
 
@@ -32,10 +32,11 @@ Keep redefining `T` in each module that needs it, and leave `K` as-is.
 
 **Pros:** No change required.
 **Cons:** Redefinitions can drift (different bound or default per module);
-`K` is not in `base.__all__`, so it is undocumented, absent from rendered
-signatures, and unsupported to depend on — downstream code that wants to name
-the key type in its own signatures has no supported way to do so short of
-defining its own equivalent TypeVar.
+`K` is not in `base.__all__`, so autodoc gives it no documented entry of its
+own and no resolvable cross-reference target — it renders in signatures as a
+bare letter pointing nowhere — and depending on it is unsupported, leaving
+downstream code that wants to name the key type in its own signatures no
+supported way to do so short of defining its own equivalent TypeVar.
 **Risks:** A future edit updates `base.T`'s bound or default and misses the
 copies in `cache.py`/`patcher.py`, silently reintroducing inconsistent
 generics.
@@ -50,11 +51,10 @@ documentation in signatures such as `ClassRegistry[ValueType, KeyType]`;
 becomes public, named, and supported for downstream code that wants to reuse
 the same TypeVars, rather than merely importable as an unsupported
 implementation detail.
-**Cons:** Touches every module that currently defines its own `T`.
-**Risks:** TypeVars are matched positionally in subscription, not by name, so
-the rename has no runtime or subscription-site effect; the one exposure is
-that anyone already importing `base.T`/`base.K` by name (rather than
-subscripting) breaks on the rename, since neither is in `base.__all__` today.
+**Cons:** Touches every module that defines or imports `T`/`K`.
+**Risks:** Anyone already importing `base.T`/`base.K` by name, rather than
+subscripting, breaks on the rename — and we treat that as unsupported, since
+neither is in `base.__all__` today.
 
 ### Option 3: Extract a dedicated `_typevars.py` module
 
@@ -87,10 +87,10 @@ renames and centralises, it does not revisit that bound or default.
   `base.__all__` today but remain importable by name, so any downstream code
   importing them directly (rather than subscripting) breaks on the rename;
   this is called out here since it isn't otherwise enforced by `__all__`.
-- `ValueType` and `KeyType` become public API — they appear in rendered
-  signatures and are importable from `class_registry.base` — so future changes
-  to their bound or default are a compatibility-sensitive edit, not a private
-  refactor.
+- `ValueType` and `KeyType` become public API — autodoc gives each a documented
+  entry of its own that signatures can cross-reference, and they are supported
+  imports from `class_registry.base` — so future changes to their bound or
+  default are a compatibility-sensitive edit, not a private refactor.
 - Establishes the precedent: a TypeVar shared across modules is defined once,
   in the module that owns the base abstraction it parametrises, and imported
   everywhere else — not redefined per module. `base.py`'s `D` (the decorator
