@@ -39,8 +39,8 @@ objects.  To fix it, declare the key type explicitly:
 
    pokedex: ClassRegistry[Pokemon, int] = ClassRegistry('pokedex_id')
 
-The `Hashable` escape hatch
-----------------------------
+The ``Hashable`` escape hatch
+-----------------------------
 If your keys vary in type, or you'd rather not name a specific key type, declare
 :py:class:`~collections.abc.Hashable` to restore the original permissive behaviour:
 
@@ -50,8 +50,8 @@ If your keys vary in type, or you'd rather not name a specific key type, declare
 
    pokedex: ClassRegistry[Pokemon, Hashable] = ClassRegistry('pokedex_id')
 
-A trap to avoid: `KeyType` is invariant
-------------------------------------------
+A trap to avoid: ``KeyType`` is invariant
+-----------------------------------------
 Having switched to ``Hashable``, you might write a helper that accepts it:
 
 .. code-block:: python
