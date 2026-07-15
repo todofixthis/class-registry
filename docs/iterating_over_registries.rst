@@ -80,20 +80,12 @@ explicitly::
 
    .. code-block:: text
 
-      error: Argument 1 to "get_class" of "ClassRegistry" has incompatible
-      type "int"; expected "str"  [arg-type]
+      error: Argument 1 to "get_class" of "ClassRegistry" has incompatible type "int"; expected "str"  [arg-type]
 
    Runtime behaviour is unchanged.  To fix it, declare the key type
-   explicitly::
-
-      pokedex: ClassRegistry[Pokemon, int] = ClassRegistry('pokedex_id')
-
-   To keep the previous permissive behaviour (any
-   :py:class:`~collections.abc.Hashable` key), use::
-
-      from collections.abc import Hashable
-
-      pokedex: ClassRegistry[Pokemon, Hashable] = ClassRegistry('element')
+   explicitly, as shown above — either the specific key type you use, or
+   :py:class:`~collections.abc.Hashable` to retain the original permissive
+   behaviour.
 
 Changing the Sort Order
 -----------------------

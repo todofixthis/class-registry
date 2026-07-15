@@ -1,9 +1,11 @@
 API Documentation
 =================
-The signatures below are generic over ``ValueType`` (the registered class)
-and ``KeyType`` (the public registry key, defaulting to :py:class:`str`).
-See :py:class:`~class_registry.base.BaseRegistry` for what each type
-parameter means.
+Most classes below are generic over ``ValueType`` (the registered class) and
+``KeyType`` (the public registry key, defaulting to :py:class:`str`).  See
+:py:class:`~class_registry.base.BaseRegistry` for what each type parameter
+means.  :py:class:`~class_registry.entry_points.EntryPointClassRegistry` is
+the exception: its keys are entry point names, so it pins ``KeyType`` to
+:py:class:`str`.
 
 .. automodule:: class_registry.base
 .. automodule:: class_registry.cache

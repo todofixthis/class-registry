@@ -115,8 +115,7 @@ might need to patch a global class registry in a unit test, ensuring that the ex
 classes are removed when the test finishes.
 
 ClassRegistry provides a :py:class:`RegistryPatcher` that you can use for just such a
-purpose.  Like the instance cache described in :doc:`service_registries`, it inherits
-the type parameters from the registry that it wraps:
+purpose:
 
 .. code-block:: python
 
