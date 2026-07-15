@@ -20,6 +20,7 @@ class Widget:
 
 
 def test_class_registry_defaults_keys_to_str() -> None:
+    """Bare ``ClassRegistry[Widget]`` types its keys as ``str``."""
     registry: ClassRegistry[Widget] = ClassRegistry()
 
     @registry.register("custom")
@@ -33,6 +34,7 @@ def test_class_registry_defaults_keys_to_str() -> None:
 
 
 def test_class_registry_accepts_explicit_key_type() -> None:
+    """``ClassRegistry[Widget, int]`` types its keys as ``int``."""
     registry: ClassRegistry[Widget, int] = ClassRegistry()
 
     @registry.register(42)
@@ -44,6 +46,7 @@ def test_class_registry_accepts_explicit_key_type() -> None:
 
 
 def test_sorted_class_registry_defaults_keys_to_str() -> None:
+    """``SortedClassRegistry`` inherits the default ``str`` key type."""
     registry: SortedClassRegistry[Widget] = SortedClassRegistry(sort_key="weight")
 
     @registry.register("a")
@@ -54,11 +57,13 @@ def test_sorted_class_registry_defaults_keys_to_str() -> None:
 
 
 def test_entry_point_registry_keys_are_str() -> None:
+    """``EntryPointClassRegistry`` keys are always ``str``."""
     registry: EntryPointClassRegistry[Widget] = EntryPointClassRegistry("dummy.group")
     typing.assert_type(registry.keys(), typing.Iterable[str])
 
 
 def test_instance_cache_infers_key_type_from_registry() -> None:
+    """The instance cache infers its key type from the wrapped registry."""
     registry: ClassRegistry[Widget, int] = ClassRegistry()
 
     @registry.register(7)
@@ -73,6 +78,7 @@ def test_instance_cache_infers_key_type_from_registry() -> None:
 
 
 def test_patcher_infers_key_type_from_registry() -> None:
+    """The patcher infers its key type from the registry it patches."""
     registry: ClassRegistry[Widget, int] = ClassRegistry(attr_name="key")
 
     patcher = RegistryPatcher(registry)

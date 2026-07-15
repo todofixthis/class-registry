@@ -36,13 +36,13 @@ The package is in `src/class_registry/`. The public API (`__init__.py`) exports 
 
 **Class hierarchy:**
 
-- `base.BaseRegistry[T]` — read-only abstract base; defines `__getitem__`/`get`/`get_class`/`keys`/`classes`, plus extension points `gen_lookup_key` and `create_instance`.
-- `base.BaseMutableRegistry[T]` — extends `BaseRegistry` with `register`/`unregister` (and deprecated `items`/`values`).
-- `registry.ClassRegistry[T]` — the main concrete implementation; stores classes in a dict, supports `unique` mode to prevent key collisions.
-- `registry.SortedClassRegistry[T]` — extends `ClassRegistry`; overrides `keys()` to sort by a `sort_key` attribute or callable.
-- `entry_points.EntryPointClassRegistry[T]` — extends `BaseRegistry` (read-only); discovers classes via setuptools entry points, lazily cached.
-- `cache.ClassRegistryInstanceCache[T]` — wraps a `ClassRegistry`, caching instantiated objects rather than classes (for service-registry use cases).
-- `patcher.RegistryPatcher[T]` — context manager that temporarily patches a `BaseMutableRegistry`, then restores the original state on exit.
+- `base.BaseRegistry[ValueType, KeyType]` — read-only abstract base; defines `__getitem__`/`get`/`get_class`/`keys`/`classes`, plus extension points `gen_lookup_key` and `create_instance`.
+- `base.BaseMutableRegistry[ValueType, KeyType]` — extends `BaseRegistry` with `register`/`unregister` (and deprecated `items`/`values`).
+- `registry.ClassRegistry[ValueType, KeyType]` — the main concrete implementation; stores classes in a dict, supports `unique` mode to prevent key collisions.
+- `registry.SortedClassRegistry[ValueType, KeyType]` — extends `ClassRegistry`; overrides `keys()` to sort by a `sort_key` attribute or callable.
+- `entry_points.EntryPointClassRegistry[ValueType]` — extends `BaseRegistry`, pinning its key type to `str` (read-only); discovers classes via setuptools entry points, lazily cached.
+- `cache.ClassRegistryInstanceCache[ValueType, KeyType]` — wraps a `ClassRegistry`, caching instantiated objects rather than classes (for service-registry use cases).
+- `patcher.RegistryPatcher[ValueType, KeyType]` — context manager that temporarily patches a `BaseMutableRegistry`, then restores the original state on exit.
 
 **`AutoRegister`:**
 - `base.AutoRegister(registry)` — current API; returns a **base class** whose non-abstract subclasses auto-register. Requires `registry.attr_name` to be set.
@@ -56,6 +56,10 @@ The package is in `src/class_registry/`. The public API (`__init__.py`) exports 
 ## Docstrings
 
 Google/Napoleon format (`Args:`, `Returns:`, `Note:`) — not Sphinx `:param:` style. Max 80 chars per line. Escape backslashes (e.g. `'\\n'` not `'\n'`). Blank line before lists inside `Args:` sections to avoid Sphinx indentation warnings. ReadTheDocs treats all Sphinx warnings as errors — resolve them before pushing.
+
+## Tests
+
+Every test function has a one-line docstring stating the behaviour it verifies.
 
 ## Code Comments
 
