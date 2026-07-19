@@ -71,21 +71,12 @@ For example, to use integer keys:
 
    assert list(pokedex.keys()) == [74]
 
-To retain the original permissive behaviour (any
-:py:class:`~collections.abc.Hashable` as a key), declare the key type
-explicitly:
+Upgrading from ClassRegistry v5 or earlier?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. code-block:: python
-
-   from collections.abc import Hashable
-   from class_registry import ClassRegistry
-
-   pokedex: ClassRegistry[Pokemon, Hashable] = ClassRegistry('element')
-
-.. note::
-
-   Upgrading from ClassRegistry v5?  This default is new in v6.0.0 and can
-   break existing type-checked code.  See :doc:`upgrading_to_v6`.
+In ClassRegistry v6 the default key type was changed from :py:class:`~typing.Hashable`
+to :py:class:`str`. This change may cause type checker failures in your project — see
+:doc:`upgrading_to_v6` for migration instructions.
 
 Changing the Sort Order
 -----------------------
