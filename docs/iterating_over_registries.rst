@@ -44,17 +44,25 @@ By default, registry keys are typed as :py:class:`str`.  This means that
 values — no explicit ``str()`` coercion needed.
 
 :py:class:`ClassRegistry` accepts an optional second type argument for the key
-type.  The first argument is always the value type::
+type.  The first argument is always the value type:
+
+.. code-block:: python
 
    ClassRegistry[ValueType, KeyType]
 
-For example, to use integer keys::
+For example, to use integer keys:
 
+.. code-block:: python
+
+   from abc import ABC
    from class_registry import ClassRegistry
 
-   class Pokemon:
-       pass
+   class Pokemon(ABC):
+       pokedex_id: int
+       # ...
 
+   # Register ``Pokemon`` by their numeric IDs instead of elements.
+   # Note that we pass ``int`` as the *second* type argument.
    pokedex: ClassRegistry[Pokemon, int] = ClassRegistry('pokedex_id')
 
    @pokedex.register
@@ -65,7 +73,9 @@ For example, to use integer keys::
 
 To retain the original permissive behaviour (any
 :py:class:`~collections.abc.Hashable` as a key), declare the key type
-explicitly::
+explicitly:
+
+.. code-block:: python
 
    from collections.abc import Hashable
    from class_registry import ClassRegistry
