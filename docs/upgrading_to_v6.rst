@@ -2,14 +2,14 @@ Upgrading to ClassRegistry v6
 ==============================
 
 `ClassRegistry v6 <https://github.com/todofixthis/class-registry/releases/tag/6.0.0>`_
-changes the default registry key type.  This is a **type-checker-visible only** change:
-runtime behaviour is unchanged.  If your type checker flags an error after upgrading,
+changes the default registry key type. This is a **type-checker-visible only** change:
+runtime behaviour is unchanged. If your type checker flags an error after upgrading,
 read on.
 
 Registry keys now default to :py:class:`str`
 ----------------------------------------------
 Previously, a bare ``ClassRegistry[Foo]`` resolved its key type to
-:py:class:`~collections.abc.Hashable`.  In ClassRegistry v6, it resolves to
+:py:class:`~typing.Hashable`. In ClassRegistry v6, it resolves to
 :py:class:`str` instead.
 
 .. note::
@@ -55,16 +55,48 @@ If your keys vary in type, or you'd rather not name a specific key type, declare
 
 Public keys vs. internal lookup keys
 ------------------------------------
+.. note::
+
+   This section only applies if you have written a derived class that overrides
+   :py:meth:`~class_registry.base.BaseRegistry.gen_lookup_key`. See
+   :ref:`overriding-lookup-keys` for more information.
+
 The key type you declare (``str``, ``int``, ``Hashable``, or otherwise) is the
 **public** key: what you pass to ``get``/``register`` and get back from ``keys()``.
 
 The **lookup** key — what
-:py:meth:`~class_registry.base.BaseRegistry.gen_lookup_key` *returns* — is typed
-:py:class:`~typing.Hashable`, *not* your registry's key type.  The base class declares
-it that way deliberately: the hook is free to reshape the key (for example, wrapping it
-in a tuple), so its result is not guaranteed to be a key type at all.  Don't assume
-``gen_lookup_key`` hands you back a value of your registry's key type.
+:py:meth:`~class_registry.base.BaseRegistry.gen_lookup_key` *returns* — is a separate
+type, chosen independently of the public key. The base class types it
+:py:class:`~typing.Hashable` rather than your key type on purpose: the hook is
+free to reshape the key — narrowing it, wrapping it in a tuple, etc. — so its return
+value may be a completely different type.
 
-Its ``key`` *parameter*, by contrast, is typed as your registry's key type.  If you
-override the hook to support aliases or case-folding, you may keep that signature
-or widen it — see :doc:`advanced_topics` for an example.
+The public key is often the *wider* of the two. Consider a ``Pokedex`` migrating from
+lookup by pokédex ID to lookup by name. While the migration is under way, callers pass
+either an ``int`` ID or a ``str`` name, so the public key is widened to
+:py:class:`~typing.Hashable` — yet every pokémon is still identified internally by
+exactly one ``int``:
+
+.. code-block:: python
+
+   from typing import Hashable
+
+   from class_registry import ClassRegistry
+
+   # ClassRegistry v6+: default key type is ``str`` so we have to explicitly declare
+   # the key type as ``Hashable`` here.
+   class Pokedex(ClassRegistry[Pokemon, Hashable]):
+       @staticmethod
+       def gen_lookup_key(key: Hashable) -> int:
+           # A name (``str``) is translated to its pokédex ID; an ID is already a
+           # lookup key, so it passes straight through.
+           if isinstance(key, str):
+               return pokedex_id_from_name(key)
+
+           return key
+
+   # ``Pokedex`` public key type is ``typing.Hashable`` — callers don't need to
+   # care how the key is translated internally.
+   red_pokedex = Pokedex('element')
+   charmander = red_pokedex['fire']
+   squirtle = red_pokedex[7]

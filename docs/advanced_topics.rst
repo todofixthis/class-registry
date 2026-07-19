@@ -178,6 +178,8 @@ already registered.
    using :py:class:`RegistryPatcher`.
 
 
+.. _overriding-lookup-keys:
+
 Overriding Lookup Keys
 ----------------------
 In some cases, you may want to customise the way a ``ClassRegistry`` looks up which
