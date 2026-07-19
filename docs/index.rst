@@ -26,17 +26,17 @@ At the intersection of the Registry and Factory patterns lies the ``ClassRegistr
 
 Upgrading from an Earlier Version
 ----------------------------------
-.. important::
+.. warning::
 
-   ClassRegistry v5 introduces some changes that can break code that was previously
-   using ClassRegistry v4.  If you are upgrading from ClassRegistry v4 to ClassRegistry
-   v5, please read :doc:`upgrading_to_v5`!
+   Major releases of ClassRegistry introduce breaking changes. If you are upgrading to a
+   new major version of ClassRegistry, please consult the migration docs.
 
-.. important::
+   If you are upgrading through more than one major version (e.g. v4 -> v6), it's
+   usually easier to upgrade through each major release incrementally (e.g. v4 -> v5 ->
+   v6) rather than make all the changes for each major release all at once.
 
-   ClassRegistry v6 changes the default registry key type, which can produce type
-   checker errors in existing code (runtime behaviour is unchanged).  If you are
-   upgrading to ClassRegistry v6, please read :doc:`upgrading_to_v6`!
+   - v5 -> v6: :doc:`upgrading_to_v6`
+   - v4 -> v5: :doc:`upgrading_to_v5`
 
 Getting Started
 ---------------
