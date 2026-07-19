@@ -19,7 +19,7 @@ Previously, a bare ``ClassRegistry[Foo]`` resolved its key type to
 If your code registers non-:py:class:`str` keys under a bare ``ClassRegistry[Foo]``,
 your type checker will report an error such as::
 
-   error: Argument 1 to "get_class" of "ClassRegistry" has incompatible type "int"; expected "str"  [arg-type]
+   error: Invalid index type ... for "ClassRegistry[..., str]"; expected type "str"
 
 For example:
 
@@ -33,13 +33,16 @@ For example:
    class Geodude(Pokemon):
        pokedex_id = 74
 
-   pokedex.get_class(74)  # error: incompatible type "int"; expected "str"
+   # The following code will **run** correctly, but mypy reports error:
+   # error: Invalid index type "int" for "ClassRegistry[Pokemon, str]"; expected type "str"
+   fighter1 = pokedex[74]
 
 **Runtime behaviour is unchanged.** Your code still works; only the type checker
 objects. To fix it, declare the key type explicitly:
 
 .. code-block:: python
 
+   # Pass a second type argument to specify the key type (``int`` in this case).
    pokedex: ClassRegistry[Pokemon, int] = ClassRegistry('pokedex_id')
 
 Restoring pre-v6 behaviour
@@ -71,7 +74,7 @@ type, chosen independently of the public key. The base class types it
 free to reshape the key — narrowing it, wrapping it in a tuple, etc. — so its return
 value may be a completely different type.
 
-The public key is often the *wider* of the two. Consider a ``Pokedex`` migrating from
+The public key is usually the *wider* of the two. Consider a ``Pokedex`` migrating from
 lookup by pokédex ID to lookup by name. While the migration is under way, callers pass
 either an ``int`` ID or a ``str`` name, so the public key is widened to
 :py:class:`~typing.Hashable` — yet every pokémon is still identified internally by
@@ -84,7 +87,7 @@ exactly one ``int``:
    from class_registry import ClassRegistry
 
    # ClassRegistry v6+: default key type is ``str`` so we have to explicitly declare
-   # the key type as ``Hashable`` here.
+   # the public key type as ``Hashable`` here.
    class Pokedex(ClassRegistry[Pokemon, Hashable]):
        @staticmethod
        def gen_lookup_key(key: Hashable) -> int:
@@ -100,3 +103,17 @@ exactly one ``int``:
    red_pokedex = Pokedex('element')
    charmander = red_pokedex['fire']
    squirtle = red_pokedex[7]
+
+.. tip::
+
+   :py:class:`~typing.Hashable` may actually be too wide for your use case. Take the
+   opportunity to see if you can use a more specific key type.
+
+   For example:
+
+   .. code-block:: python
+
+      # Callers can use ``int`` or ``str`` keys to look up pokemon, not any arbitrary
+      # hashable value.
+      class Pokedex(ClassRegistry[Pokemon, int | str]):
+          # ...
