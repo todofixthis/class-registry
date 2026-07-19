@@ -303,28 +303,28 @@ class BaseMutableRegistry(BaseRegistry[ValueType, KeyType], ABC):
                 The registry key to use for the registered class.
                 Optional if the registry's :py:attr:`attr_name` is set.
         """
-        # ``@register`` usage:
         if is_class(key):
-            if typing.TYPE_CHECKING:
-                key = typing.cast(D, key)
-
+            # ``@register`` usage: ``key`` is the class
             if self.attr_name:
-                attr_key = getattr(key, self.attr_name)
+                cls_ = typing.cast(D, key)
+
+                attr_key = getattr(cls_, self.attr_name)
                 lookup_key = self.gen_lookup_key(attr_key)
 
-                self._register(lookup_key, typing.cast(typing.Type[ValueType], key))
+                self._register(lookup_key, typing.cast(typing.Type[ValueType], cls_))
                 self._lookup_keys[attr_key] = lookup_key
 
-                return key
+                return cls_
             else:
                 raise ValueError(
                     f"Attempting to register {key.__name__} to {type(self).__name__}"
                     f"via decorator, but `{type(self).__name__}.attr_key` is not set."
                 )
         else:
-            # ``@register('some_attr')`` usage:
+            # ``@register('some_value')`` usage: ``key`` is the registry key
             def _decorator(cls: D) -> D:
                 key_ = typing.cast(KeyType, key)
+
                 lookup_key_ = self.gen_lookup_key(key_)
 
                 self._register(lookup_key_, typing.cast(typing.Type[ValueType], cls))
