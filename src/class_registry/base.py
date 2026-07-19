@@ -158,8 +158,9 @@ class BaseRegistry(typing.Generic[ValueType, KeyType], ABC):
         """
         Used by :py:meth:`get` to generate a lookup key.
 
-        You may override this method in a subclass, for example if you need to support
-        legacy aliases, etc.
+        You may override this method in a subclass, for example if you need to
+        support legacy aliases, etc. Refer to ``test/test_gen_lookup_key.py``
+        for inspiration.
 
         Args:
             key:
@@ -169,11 +170,10 @@ class BaseRegistry(typing.Generic[ValueType, KeyType], ABC):
             The registry key, used to look up the corresponding class.
 
         Note:
-            The return type is :py:class:`~collections.abc.Hashable` rather
-            than ``KeyType``.  This hook may reshape the key — e.g.
-            case-folding it, or wrapping it in a tuple — so the lookup key
-            it produces can differ from the public key in value, type, or
-            both.  See docs/adr/002.
+            The return type is bound by :py:class:`collections.abc.Hashable`
+            rather than ``KeyType``. Lookup keys are only used internally and
+            thus can have completely different values/types from the public key
+            type. See docs/adr/002 for details.
         """
         return key
 
