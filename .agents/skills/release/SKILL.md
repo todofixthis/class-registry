@@ -42,7 +42,7 @@ A **breaking change** is anything that makes previously-working code fail — at
 
 It must:
 - **cover *this* release's breaking change.** A guide left over from an earlier release satisfies nothing — its existence is what makes this the easy check to fake. A break shipped in 6.3.0 gets its own section in `upgrading_to_v6.rst`, headed by the version that introduced it.
-- exist, be listed in the `docs/index.rst` toctree, and be linked from the upgrade-alert listing in **both** `docs/index.rst` and `README.rst` — the two carry the same listing and drift apart easily.
+- exist, be listed in the `docs/index.rst` toctree, and be linked from the upgrade-alert listing in **both** `docs/index.rst` and `README.rst` — the two carry the same listing and drift apart easily. The link syntax differs by file: `docs/index.rst` uses a Sphinx `:doc:` role targeting `upgrading_to_v<major>`; `README.rst` uses a relative link to the source, `` `Upgrading to ClassRegistry v<major> <docs/upgrading_to_v<major>.rst>`_ `` — the `:doc:` role renders as raw text on GitHub, where the README is read.
 - follow _Writing a Migration Guide_ below.
 
 **If any of that is missing, the release stops here** — write it first.
@@ -225,7 +225,7 @@ Only include the `[!WARNING]` block if there are breaking changes — but when i
 
 ## Writing a Migration Guide
 
-`docs/upgrading_to_v<major>.rst`, modelled on the existing `upgrading_to_v6.rst`. It stays unreachable until wired into three slots: the `docs/index.rst` toctree, and the upgrade-alert listing in **both** `docs/index.rst` and `README.rst`. Those listings (one bullet per major upgrade) are duplicates that drift apart easily — add the new bullet to each, or the README goes stale.
+`docs/upgrading_to_v<major>.rst`, modelled on the existing `upgrading_to_v6.rst`. It stays unreachable until wired into three slots: the `docs/index.rst` toctree, and the upgrade-alert listing in **both** `docs/index.rst` and `README.rst`. The two listings (one bullet per major upgrade) drift apart easily — add the bullet to each, or the README goes stale. Their link syntax differs: `docs/index.rst` uses a Sphinx `:doc:` role targeting `upgrading_to_v<major>`; `README.rst` uses a relative link to the source, `` `Upgrading to ClassRegistry v<major> <docs/upgrading_to_v<major>.rst>`_ `` — `:doc:` renders as raw text on GitHub, where the README is read.
 
 One page covers a whole major line: the move onto it, and any break shipped later within it. Say so in the opening paragraph — someone already on v6 has no reason to guess that "Upgrading to ClassRegistry v6" is where a 6.3.0 break is written down. Breaks after the major boundary get their own `Changes in v<version>` section; the major boundary itself is the page's main content.
 
@@ -240,7 +240,17 @@ Each breaking change needs four things:
 
 Then add what the fix leads them into next:
 
-- **Second-order traps.** A fix that lands people in a subtler failure needs that failure documented beside it, with its error text. The v6 guide's invariance trap is the model: the guide recommends `Hashable` as the escape hatch, so it also documents that `ClassRegistry[Foo]` won't pass to a `ClassRegistry[Foo, Hashable]` parameter.
+- **Second-order traps.** A fix that lands people in a subtler failure needs that failure documented beside it, with its error text.
 - **Facts stranded in ADRs.** ADRs are not in the toctree and readers never see them. If an ADR holds the only explanation of something a migrating developer needs, the guide is where it goes.
 
 Verify every code sample and every error message by running it. Prose that merely sounds right is the recurring failure in this repo's documentation, and a migration guide is the worst place for it — its readers are already stuck.
+
+Before wiring the guide in, run two passes over the draft, modelled on the audience-surrogate review and quality pass in `phx:writing-release-notes`:
+
+### Audience-surrogate review
+
+Dispatch one subagent on the main model (a reasoning task, not a cheap one), given only the draft and cast as the reader above. It must resolve its problem from the guide alone and flag every place it stays stuck: an error string it can't match verbatim against what a tool emits, a fix it can't apply without knowledge the guide assumes, unexplained jargon, a missing second-order trap or stranded-ADR fact. Address the feedback before continuing.
+
+### Conciseness pass
+
+Tighten the reviewed draft: cut repetition, merge overlapping fixes, drop hedging and prose that restates a code sample. The surrogate review optimises for completeness and leaves the draft longer than it needs to be, so weigh each addition and keep only what earns its place. Never trim two things for length: **verbatim error text and code fixes** — readers match on them — and any **migration step**. Then, since this repo uses NZ English, run `phx:nz-english` over the result.

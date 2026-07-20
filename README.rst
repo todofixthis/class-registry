@@ -24,8 +24,8 @@ Upgrading from an Earlier Version
    usually easier to upgrade through each major release incrementally (e.g. v4 -> v5 ->
    v6) rather than make all the changes for each major release all at once.
 
-   - v5 -> v6: :doc:`upgrading_to_v6`
-   - v4 -> v5: :doc:`upgrading_to_v5`
+   - v5 -> v6: `Upgrading to ClassRegistry v6 <docs/upgrading_to_v6.rst>`_
+   - v4 -> v5: `Upgrading to ClassRegistry v5 <docs/upgrading_to_v5.rst>`_
 
 Getting Started
 ---------------
