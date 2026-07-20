@@ -1,9 +1,24 @@
-__all__ = ["AutoRegister", "BaseMutableRegistry", "BaseRegistry", "RegistryKeyError"]
+__all__ = [
+    "AutoRegister",
+    "BaseMutableRegistry",
+    "BaseRegistry",
+    "KeyType",
+    "RegistryKeyError",
+    "ValueType",
+]
 
+import sys
 import typing
 from abc import ABC, abstractmethod as abstract_method
 from inspect import isabstract as is_abstract, isclass as is_class
 from warnings import warn
+
+# PEP 696 ``TypeVar`` defaults are native to ``typing`` in 3.13+; on 3.12 they
+# come from ``typing_extensions`` (see docs/adr/001).
+if sys.version_info >= (3, 13):
+    from typing import TypeVar
+else:
+    from typing_extensions import TypeVar
 
 
 class RegistryKeyError(KeyError):
@@ -17,18 +32,34 @@ class RegistryKeyError(KeyError):
     pass
 
 
-T = typing.TypeVar("T")
+ValueType = TypeVar("ValueType")
+
+# ``KeyType`` parametrises the public/human-readable key. Lookup keys (produced
+# by ``gen_lookup_key``) stay ``Hashable`` — see docs/adr/002.
+KeyType = TypeVar("KeyType", bound=typing.Hashable, default=str)
 
 # [#53] Fix incorrect return type from ``register``
-D = typing.TypeVar("D", bound=typing.Callable[..., typing.Any])
+D = TypeVar("D", bound=typing.Callable[..., typing.Any])
 
 
-class BaseRegistry(typing.Generic[T], ABC):
+class BaseRegistry(typing.Generic[ValueType, KeyType], ABC):
     """
     Base functionality for registries.
+
+    The two type parameters are:
+
+    - ``ValueType`` — the registered class, and the instance that
+      :py:meth:`get` returns.
+    - ``KeyType`` — the public key used to look a class up (passed to
+      :py:meth:`get`/:py:meth:`~BaseMutableRegistry.register` and returned
+      by :py:meth:`keys`).
+      Defaults to :py:class:`str`.  The *internal* lookup key produced by
+      :py:meth:`gen_lookup_key` is always
+      :py:class:`~collections.abc.Hashable` and is deliberately not
+      parametrised (see docs/adr/002).
     """
 
-    def __contains__(self, key: typing.Hashable) -> bool:
+    def __contains__(self, key: KeyType) -> bool:
         """
         Returns whether the specified key is registered.
         """
@@ -51,13 +82,13 @@ class BaseRegistry(typing.Generic[T], ABC):
         """
         return list(map(str, self.keys()))
 
-    def __getitem__(self, key: typing.Hashable) -> T:
+    def __getitem__(self, key: KeyType) -> ValueType:
         """
         Shortcut for calling :py:meth:`get` with empty args/kwargs.
         """
         return self.get(key)
 
-    def __iter__(self) -> typing.Iterator[typing.Hashable]:
+    def __iter__(self) -> typing.Iterator[KeyType]:
         """
         Iterates over registry keys.
         """
@@ -69,7 +100,7 @@ class BaseRegistry(typing.Generic[T], ABC):
         """
         return sum(1 for _ in self.keys())
 
-    def __missing__(self, key: typing.Hashable) -> typing.Type[T]:
+    def __missing__(self, key: typing.Hashable) -> typing.Type[ValueType]:
         """
         Defines what to do when trying to access an unregistered key.
 
@@ -83,13 +114,13 @@ class BaseRegistry(typing.Generic[T], ABC):
         raise RegistryKeyError(key)
 
     @abstract_method
-    def get_class(self, key: typing.Hashable) -> typing.Type[T]:
+    def get_class(self, key: KeyType) -> typing.Type[ValueType]:
         """
         Returns the class associated with the specified key.
         """
         raise NotImplementedError()
 
-    def get(self, key: typing.Hashable, *args: typing.Any, **kwargs: typing.Any) -> T:
+    def get(self, key: KeyType, *args: typing.Any, **kwargs: typing.Any) -> ValueType:
         """
         Creates a new instance of the class matching the specified key.
 
@@ -111,25 +142,25 @@ class BaseRegistry(typing.Generic[T], ABC):
         return self.create_instance(self.get_class(key), *args, **kwargs)
 
     @abstract_method
-    def keys(self) -> typing.Iterable[typing.Hashable]:
+    def keys(self) -> typing.Iterable[KeyType]:
         """
         Returns the collection of registered keys.
         """
         raise NotImplementedError()
 
-    def classes(self) -> typing.Iterable[typing.Type[T]]:
+    def classes(self) -> typing.Iterable[typing.Type[ValueType]]:
         """
         Returns the collection of registered classes.
         """
         return iter(self.get_class(key) for key in self.keys())
 
-    @staticmethod
-    def gen_lookup_key(key: typing.Hashable) -> typing.Hashable:
+    def gen_lookup_key(self, key: KeyType) -> typing.Hashable:
         """
         Used by :py:meth:`get` to generate a lookup key.
 
-        You may override this method in a subclass, for example if you need to support
-        legacy aliases, etc.
+        You may override this method in a subclass, for example if you need to
+        support legacy aliases, etc. Refer to ``test/test_gen_lookup_key.py``
+        for inspiration.
 
         Args:
             key:
@@ -137,13 +168,19 @@ class BaseRegistry(typing.Generic[T], ABC):
 
         Returns:
             The registry key, used to look up the corresponding class.
+
+        Note:
+            The return type is bound by :py:class:`collections.abc.Hashable`
+            rather than ``KeyType``. Lookup keys are only used internally and
+            thus can have completely different values/types from the public key
+            type. See docs/adr/002 for details.
         """
         return key
 
     @staticmethod
     def create_instance(
-        class_: typing.Type[T], *args: typing.Any, **kwargs: typing.Any
-    ) -> T:
+        class_: typing.Type[ValueType], *args: typing.Any, **kwargs: typing.Any
+    ) -> ValueType:
         """
         Prepares the return value for :py:meth:`get`.
 
@@ -161,7 +198,7 @@ class BaseRegistry(typing.Generic[T], ABC):
         return class_(*args, **kwargs)
 
 
-class BaseMutableRegistry(BaseRegistry[T], ABC):
+class BaseMutableRegistry(BaseRegistry[ValueType, KeyType], ABC):
     """
     Extends :py:class:`BaseRegistry` with methods that can be used to modify the
     registered classes.
@@ -181,18 +218,18 @@ class BaseMutableRegistry(BaseRegistry[T], ABC):
         # Map lookup keys to readable keys.
         # Only needed when :py:meth:`gen_lookup_key` is overridden, but I'm not good
         # enough at reflection black magic to figure out how to do that (:
-        self._lookup_keys: dict[typing.Hashable, typing.Hashable] = {}
+        self._lookup_keys: dict[KeyType, typing.Hashable] = {}
 
     def __repr__(self) -> str:
         return f"{type(self).__name__}({self.attr_name!r})"
 
-    def keys(self) -> typing.Iterable[typing.Hashable]:
+    def keys(self) -> typing.Iterable[KeyType]:
         """
         Returns the collection of registry keys, in the order that they were registered.
         """
         return iter(self._lookup_keys.keys())
 
-    def items(self) -> typing.Iterable[tuple[typing.Hashable, typing.Type[T]]]:
+    def items(self) -> typing.Iterable[tuple[KeyType, typing.Type[ValueType]]]:
         """
         .. warning::
 
@@ -209,7 +246,7 @@ class BaseMutableRegistry(BaseRegistry[T], ABC):
         )
         return iter(zip(self.keys(), self.classes()))
 
-    def values(self) -> typing.Iterable[typing.Type[T]]:
+    def values(self) -> typing.Iterable[typing.Type[ValueType]]:
         """
         .. warning::
 
@@ -226,8 +263,8 @@ class BaseMutableRegistry(BaseRegistry[T], ABC):
         )
         return self.classes()
 
-    # [#53] Using ``D`` instead of ``T`` to prevent scrubbing type info when decorating
-    # a class.
+    # [#53] Using ``D`` instead of ``ValueType`` to prevent scrubbing type info when
+    # decorating a class.
     # :see: https://mypy.readthedocs.io/en/stable/generics.html#decorator-factories
     # :see: https://docs.python.org/3/library/typing.html#typing.overload
     @typing.overload
@@ -236,11 +273,11 @@ class BaseMutableRegistry(BaseRegistry[T], ABC):
         ...
 
     @typing.overload
-    def register(self, key: typing.Hashable) -> typing.Callable[[D], D]:
+    def register(self, key: KeyType) -> typing.Callable[[D], D]:
         """Decorator factory variant"""
         ...
 
-    def register(self, key: typing.Union[D, typing.Hashable]) -> typing.Union[
+    def register(self, key: typing.Union[D, KeyType]) -> typing.Union[
         D,
         typing.Callable[[D], D],
     ]:
@@ -266,37 +303,38 @@ class BaseMutableRegistry(BaseRegistry[T], ABC):
                 The registry key to use for the registered class.
                 Optional if the registry's :py:attr:`attr_name` is set.
         """
-        # ``@register`` usage:
         if is_class(key):
-            if typing.TYPE_CHECKING:
-                key = typing.cast(D, key)
-
+            # ``@register`` usage: ``key`` is the class
             if self.attr_name:
-                attr_key = getattr(key, self.attr_name)
+                cls_ = typing.cast(D, key)
+
+                attr_key = getattr(cls_, self.attr_name)
                 lookup_key = self.gen_lookup_key(attr_key)
 
-                self._register(lookup_key, typing.cast(typing.Type[T], key))
+                self._register(lookup_key, typing.cast(typing.Type[ValueType], cls_))
                 self._lookup_keys[attr_key] = lookup_key
 
-                return key
+                return cls_
             else:
                 raise ValueError(
                     f"Attempting to register {key.__name__} to {type(self).__name__}"
                     f"via decorator, but `{type(self).__name__}.attr_key` is not set."
                 )
         else:
-            # ``@register('some_attr')`` usage:
+            # ``@register('some_value')`` usage: ``key`` is the registry key
             def _decorator(cls: D) -> D:
-                lookup_key_ = self.gen_lookup_key(key)
+                key_ = typing.cast(KeyType, key)
 
-                self._register(lookup_key_, typing.cast(typing.Type[T], cls))
-                self._lookup_keys[key] = lookup_key_
+                lookup_key_ = self.gen_lookup_key(key_)
+
+                self._register(lookup_key_, typing.cast(typing.Type[ValueType], cls))
+                self._lookup_keys[key_] = lookup_key_
 
                 return cls
 
             return _decorator
 
-    def unregister(self, key: typing.Hashable) -> typing.Type[T]:
+    def unregister(self, key: KeyType) -> typing.Type[ValueType]:
         """
         Unregisters the class with the specified key.
 
@@ -316,7 +354,7 @@ class BaseMutableRegistry(BaseRegistry[T], ABC):
         return result
 
     @abstract_method
-    def _register(self, key: typing.Hashable, class_: typing.Type[T]) -> None:
+    def _register(self, key: typing.Hashable, class_: typing.Type[ValueType]) -> None:
         """
         Registers a class with the registry.
 
@@ -327,7 +365,7 @@ class BaseMutableRegistry(BaseRegistry[T], ABC):
         raise NotImplementedError()
 
     @abstract_method
-    def _unregister(self, key: typing.Hashable) -> typing.Type[T]:
+    def _unregister(self, key: typing.Hashable) -> typing.Type[ValueType]:
         """
         Unregisters the class at the specified key.
 
@@ -338,7 +376,7 @@ class BaseMutableRegistry(BaseRegistry[T], ABC):
         raise NotImplementedError()
 
 
-def AutoRegister(registry: BaseMutableRegistry[T]) -> type:
+def AutoRegister(registry: BaseMutableRegistry[ValueType, typing.Any]) -> type:
     """
     Creates a base class that automatically registers all non-abstract subclasses in the
     specified registry.

@@ -9,7 +9,7 @@ a class registry?  Surely there's a better way!
 
 The answer is :py:func:`class_registry.base.AutoRegister`!
 
-Call ``AutoRegister()`` and pass in a registry, and it returns a base class.  Any
+Call ``AutoRegister()`` and pass in a registry, and it returns a base class. Any
 non-abstract class that extends from that base class automatically gets added to the
 registry.
 
@@ -48,13 +48,13 @@ Here's an example:
    assert list(pokedex.classes()) == [Butterfree, Spearow]
 
 In the above example, note that ``Butterfree`` and ``Spearow`` were added to
-``pokedex`` automatically.  However, the ``Pokemon`` base class was not added,
+``pokedex`` automatically. However, the ``Pokemon`` base class was not added,
 because it is abstract.
 
 .. important::
 
    Python defines an abstract class as a class with at least one unimplemented abstract
-   method.  You can't just add ``ABC``!
+   method. You can't just add ``ABC``!
 
    .. code-block:: python
 
@@ -86,9 +86,9 @@ because it is abstract.
 .. note::
 
    In previous versions of ClassRegistry, ``AutoRegister`` returned a metaclass instead
-   of a base class.  The metaclass version of the function still exists at
+   of a base class. The metaclass version of the function still exists at
    :py:func:`class_registry.auto_register.AutoRegister`, but
-   `it is deprecated and will be removed in a future version of ClassRegistry <https://github.com/todofixthis/class-registry/issues/14>`.
+   `it is deprecated and will be removed in a future version of ClassRegistry <https://github.com/todofixthis/class-registry/issues/14>`_.
 
    If your code is still using the old ``AutoRegister`` function, you can change it like
    this:
@@ -110,7 +110,7 @@ because it is abstract.
 
 Patching
 --------
-From time to time, you might need to register classes temporarily.  For example, you
+From time to time, you might need to register classes temporarily. For example, you
 might need to patch a global class registry in a unit test, ensuring that the extra
 classes are removed when the test finishes.
 
@@ -178,22 +178,27 @@ already registered.
    using :py:class:`RegistryPatcher`.
 
 
+.. _overriding-lookup-keys:
+
 Overriding Lookup Keys
 ----------------------
 In some cases, you may want to customise the way a ``ClassRegistry`` looks up which
-class to use.  For example, you may need to change the registry key for a particular
-class, but you want to maintain backwards-compatibility for existing code that
-references the old key.
+class to use internally. For example, you may want to introduce aliases, translations,
+or even different types of keys.
 
 To customise this, create a subclass of ``ClassRegistry`` and override its
-``gen_lookup_key`` method:
+``gen_lookup_key`` method.
+
+For example, to support aliases or translations:
 
 .. code-block:: python
 
-   import typing
    from class_registry import ClassRegistry
 
-   class FacadeRegistry(ClassRegistry):
+   class Pokemon:
+       element: str
+
+   class AliasRegistry(ClassRegistry[Pokemon]):
        @staticmethod
        def gen_lookup_key(key: typing.Hashable) -> typing.Hashable:
            """
@@ -205,14 +210,14 @@ To customise this, create a subclass of ``ClassRegistry`` and override its
 
            return key
 
-   pokedex = FacadeRegistry('element')
+   pokedex = AliasRegistry('element')
 
    @pokedex.register
-   class MissingNo:
+   class MissingNo(Pokemon):
        element = 'flying'
 
    @pokedex.register
-   class Meowth:
+   class Meowth(Pokemon):
        element = 'normal'
 
    # MissingNo can be accessed by either key.
@@ -221,3 +226,44 @@ To customise this, create a subclass of ``ClassRegistry`` and override its
 
    # Other pokémon work as you'd expect.
    assert isinstance(pokedex['normal'], Meowth)
+
+You can also change the lookup key to a different type (so long as it implements
+:py:class:`~typing.Hashable`):
+
+.. code-block:: python
+
+    class PokemonWithID(Pokemon):
+        pokedex_id: int
+
+    class MigrationRegistry(ClassRegistry[PokemonWithID, str | int]):
+        """
+        Historically pokémon were referenced by numeric ID. We are in the
+        process of refactoring the code to reference the element instead, but
+        until the migration is complete we still have to support looking up by
+        ID.
+        """
+        element_from_id: dict[int, str] = {}
+
+        def _register(self, key: typing.Hashable, class_: typing.Type[PokemonWithID]) -> None:
+            super()._register(key, class_)
+            self.element_from_id[class_.pokedex_id] = typing.cast(str, key)
+
+        def gen_lookup_key(self, key: int | str) -> str:
+            """
+            If the caller is providing a pokedex ID (int), look up the
+            corresponding element (str) for the lookup.
+            """
+            if isinstance(key, int):
+                return self.element_from_id[key]
+            return key
+
+    pokedex = MigrationRegistry('element')
+
+    @pokedex.register
+    class Charizard(PokemonWithID):
+        element = 'fire'
+        pokedex_id = 6
+
+    # Callers can provide either the element or the legacy ID to the registry.
+    assert isinstance(pokedex['fire'], Charizard)
+    assert isinstance(pokedex[6], Charizard)

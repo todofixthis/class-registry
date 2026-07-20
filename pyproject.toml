@@ -21,6 +21,9 @@ classifiers = [
     "Intended Audience :: Developers",
     "Topic :: Software Development :: Libraries :: Python Modules",
 ]
+dependencies = [
+    "typing-extensions>=4.6,<5 ; python_version < '3.13'",
+]
 
 [project.urls]
 Repository = "https://github.com/todofixthis/class-registry"
@@ -39,10 +42,12 @@ dev = [
     "filelock>=3.29",
     "mypy>=2,<3",
     "pytest>=9,<10",
+    "pyyaml>=6.0.3,<7.0.0",
     "sphinx>=9,<10",
     "sphinx_rtd_theme>=3.1,<4",
     "tox>=4,<5",
     "tox-uv>=1,<2",
+    "types-pyyaml>=6.0.12.20260518,<7.0.0.0",
 ]
 ci = [
     "mypy>=2,<3",
@@ -55,6 +60,7 @@ ci = [
 [tool.autohooks]
 mode = "pythonpath"
 pre-commit = [
+    "adr_index",
     "autohooks.plugins.black",
     "autohooks.plugins.mypy",
     "autohooks.plugins.pytest",

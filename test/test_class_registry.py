@@ -124,7 +124,7 @@ def test_unregister() -> None:
 
     # Note that you must unregister the KEY, not the CLASS.
     with pytest.raises(KeyError):
-        registry.unregister(Squirtle)
+        registry.unregister(Squirtle)  # type: ignore[arg-type]
 
     # If you try to unregister a key that isn't registered, you'll
     # get an error.

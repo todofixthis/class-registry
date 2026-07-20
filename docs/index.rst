@@ -10,6 +10,7 @@ ClassRegistry
    entry_points
    advanced_topics
    upgrading_to_v5
+   upgrading_to_v6
    api
 
 
@@ -23,13 +24,19 @@ At the intersection of the Registry and Factory patterns lies the ``ClassRegistr
   extensible by 3rd-party libraries!
 - And more!
 
-Upgrading from ClassRegistry v4
--------------------------------
-.. important::
+Upgrading from an Earlier Version
+----------------------------------
+.. warning::
 
-   ClassRegistry v5 introduces some changes that can break code that was previously
-   using ClassRegistry v4.  If you are upgrading from ClassRegistry v4 to ClassRegistry
-   v5, please read :doc:`upgrading_to_v5`!
+   Major releases of ClassRegistry introduce breaking changes. If you are upgrading to a
+   new major version of ClassRegistry, please consult the migration docs.
+
+   If you are upgrading through more than one major version (e.g. v4 -> v6), it's
+   usually easier to upgrade through each major release incrementally (e.g. v4 -> v5 ->
+   v6) rather than make all the changes for each major release all at once.
+
+   - v5 -> v6: :doc:`upgrading_to_v6`
+   - v4 -> v5: :doc:`upgrading_to_v5`
 
 Getting Started
 ---------------
@@ -79,6 +86,10 @@ To create a class instance from a registry, use the subscript operator:
 
       # Your IDE will automatically infer that ``fighter1`` is a ``Pokemon``.
       fighter1 = pokedex['fire']
+
+   Registry keys are typed as :py:class:`str` by default; see "Specifying
+   the Key Type" in :doc:`iterating_over_registries` to use a different key
+   type.
 
 Advanced Usage
 --------------

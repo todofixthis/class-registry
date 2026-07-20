@@ -4,12 +4,10 @@ import typing
 from types import TracebackType
 
 from . import RegistryKeyError
-from .base import BaseMutableRegistry
-
-T = typing.TypeVar("T")
+from .base import BaseMutableRegistry, KeyType, ValueType
 
 
-class RegistryPatcher(typing.Generic[T]):
+class RegistryPatcher(typing.Generic[ValueType, KeyType]):
     """
     Creates a context in which classes are temporarily registered with a class registry,
     then removed when the context exits.
@@ -28,9 +26,9 @@ class RegistryPatcher(typing.Generic[T]):
 
     def __init__(
         self,
-        registry: BaseMutableRegistry[T],
-        *args: typing.Type[T],
-        **kwargs: typing.Type[T]
+        registry: BaseMutableRegistry[ValueType, KeyType],
+        *args: typing.Type[ValueType],
+        **kwargs: typing.Type[ValueType],
     ) -> None:
         """
         Args:
@@ -59,12 +57,14 @@ class RegistryPatcher(typing.Generic[T]):
         for class_ in args:
             kwargs[getattr(class_, registry.attr_name)] = class_
 
-        self.target: BaseMutableRegistry[T] = registry
+        self.target: BaseMutableRegistry[ValueType, KeyType] = registry
 
-        self._new_values: dict[str, typing.Type[T]] = kwargs
+        self._new_values: dict[str, typing.Type[ValueType]] = kwargs
         self._prev_values: dict[
             typing.Hashable,
-            typing.Union[typing.Type[T], typing.Type[RegistryPatcher.DoesNotExist]],
+            typing.Union[
+                typing.Type[ValueType], typing.Type[RegistryPatcher.DoesNotExist]
+            ],
         ] = {}
 
     def __enter__(self) -> None:
@@ -108,7 +108,7 @@ class RegistryPatcher(typing.Generic[T]):
             if value is not self.DoesNotExist:
                 if typing.TYPE_CHECKING:
                     # Convince mypy that ``value`` cannot be ``self.DoesNotExist``.
-                    value = typing.cast(typing.Type[T], value)
+                    value = typing.cast(typing.Type[ValueType], value)
 
                 self._set_value(key, value)
 
@@ -118,15 +118,26 @@ class RegistryPatcher(typing.Generic[T]):
         default: typing.Any = None,
     ) -> typing.Any:
         try:
-            return self.target.get_class(key)
+            # ``key`` is a registry key drawn from ``_new_values`` — a kwarg
+            # name, or an ``attr_name`` value off a class passed positionally;
+            # the target's ``get_class`` is typed against the public
+            # ``KeyType``. The cast is runtime-erased — see docs/adr/002.
+            return self.target.get_class(typing.cast(KeyType, key))
         except RegistryKeyError:
             return default
 
-    def _set_value(self, key: typing.Hashable, value: typing.Type[T]) -> None:
-        self.target.register(key)(value)
+    def _set_value(self, key: typing.Hashable, value: typing.Type[ValueType]) -> None:
+        # ``key`` comes from ``_new_values`` when patching, or from the
+        # ``_prev_values`` backup when restoring; the target's ``register`` is
+        # typed against the public ``KeyType``. The cast is runtime-erased —
+        # see docs/adr/002.
+        self.target.register(typing.cast(KeyType, key))(value)
 
     def _del_value(self, key: typing.Hashable) -> None:
         try:
-            self.target.unregister(key)
+            # Same key provenance as ``_set_value``; the target's
+            # ``unregister`` is typed against the public ``KeyType``. The cast
+            # is runtime-erased — see docs/adr/002.
+            self.target.unregister(typing.cast(KeyType, key))
         except RegistryKeyError:
             pass

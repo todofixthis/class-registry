@@ -1,7 +1,7 @@
 Iterating Over Registries
 =========================
 Sometimes, you want to iterate over all of the classes registered in a
-:py:class:`ClassRegistry`.  There are three methods included to help you do this:
+:py:class:`ClassRegistry`.  There are two methods included to help you do this:
 
 - :py:meth:`keys` iterates over the registry keys.
 - :py:meth:`classes` iterates over the registered classes.
@@ -33,9 +33,50 @@ Here's an example:
 
    Tired of having to add the :py:meth:`register` decorator to every class?
 
-   You can use the :py:func:`AutoRegister` metaclass to automatically register all
-   non-abstract subclasses of a particular base class.  See :doc:`advanced_topics` for
-   more information.
+   You can use :py:func:`AutoRegister` to generate a base class that automatically
+   registers all non-abstract subclasses of a particular base class.  See
+   :doc:`advanced_topics` for more information.
+
+Specifying the Key Type
+-----------------------
+By default, registry keys are typed as :py:class:`str`.  This means that
+``registry.keys()`` and ``for key in registry`` both yield :py:class:`str`
+values — no explicit ``str()`` coercion needed.
+
+:py:class:`ClassRegistry` accepts an optional second type argument for the key
+type.  The first argument is always the value type:
+
+.. code-block:: python
+
+   ClassRegistry[ValueType, KeyType]
+
+For example, to use integer keys:
+
+.. code-block:: python
+
+   from abc import ABC
+   from class_registry import ClassRegistry
+
+   class Pokemon(ABC):
+       pokedex_id: int
+       # ...
+
+   # Register ``Pokemon`` by their numeric IDs instead of elements.
+   # Note that we pass ``int`` as the *second* type argument.
+   pokedex: ClassRegistry[Pokemon, int] = ClassRegistry('pokedex_id')
+
+   @pokedex.register
+   class Geodude(Pokemon):
+       pokedex_id = 74
+
+   assert list(pokedex.keys()) == [74]
+
+Upgrading from ClassRegistry v5 or earlier?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In ClassRegistry v6 the default key type was changed from :py:class:`~typing.Hashable`
+to :py:class:`str`. This change may cause type checker failures in your project — see
+:doc:`upgrading_to_v6` for migration instructions.
 
 Changing the Sort Order
 -----------------------
@@ -66,7 +107,7 @@ If you'd like to customise this ordering, use :py:class:`SortedClassRegistry`:
        weight = 15
 
    assert list(pokedex.keys()) == ['grass', 'fighting', 'rock']
-   assert list(pokedex.values()) == [Bellsprout, Machop, Geodude]
+   assert list(pokedex.classes()) == [Bellsprout, Machop, Geodude]
 
 In the above example, the code iterates over registered classes in ascending order by
 their ``weight`` attributes.
@@ -121,7 +162,7 @@ are sorted:
        weight = 5
 
    assert list(pokedex.keys()) == ['poison', 'electric', 'water']
-   assert list(pokedex.values()) == [Koffing, Voltorb, Horsea]
+   assert list(pokedex.classes()) == [Koffing, Voltorb, Horsea]
 
 This time, the :py:class:`SortedClassRegistry` used our custom sorter function, so that
 the classes were sorted descending by weight, with the registry key used as a

@@ -53,6 +53,12 @@ to help with type checking, autocomplete, etc.:
    # Your IDE will automatically infer that ``fighter1`` is a ``Pokemon``.
    fighter1 = pokedex['fire']
 
+.. note::
+
+   By default, registry keys are typed as :py:class:`str`.  See "Specifying
+   the Key Type" in :doc:`iterating_over_registries` if your registry uses a
+   different key type.
+
 Auto-Detecting Registry Keys
 ----------------------------
 By default, you have to provide the registry key whenever you register a new class.
