@@ -84,7 +84,7 @@ Place comments on the line preceding the code they document, not as trailing com
 
 ## Git Worktrees
 
-Use the `using-git-worktrees` skill; it creates worktrees via the native `EnterWorktree` tool under `.agents/worktrees/` (gitignored). Don't hand-roll `git worktree add` when the native tool is available.
+Use the `using-git-worktrees` skill; it creates worktrees via the native `EnterWorktree` tool under `.claude/worktrees/` (gitignored). Don't hand-roll `git worktree add` when the native tool is available. Keep `.claude/` a real directory (only `.claude/skills` is a symlink into `.agents/skills`) — the native tool refuses to run if `.claude` itself is a symlink.
 
 After creating a worktree, install its pre-commit hook (see the autohooks activate command in Commands). A fresh worktree has no per-worktree hooks directory, so create it first:
 
