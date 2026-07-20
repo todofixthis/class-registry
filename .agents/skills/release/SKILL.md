@@ -225,7 +225,7 @@ Only include the `[!WARNING]` block if there are breaking changes — but when i
 
 ## Writing a Migration Guide
 
-`docs/upgrading_to_v<major>.rst`, modelled on the existing `upgrading_to_v6.rst`. It stays unreachable until wired into three slots: the `docs/index.rst` toctree, and the upgrade-alert listing in **both** `docs/index.rst` and `README.rst`. Those two listings (one bullet per major upgrade) are duplicates that drift apart easily — add the new bullet to each, or the README goes stale.
+`docs/upgrading_to_v<major>.rst`, modelled on the existing `upgrading_to_v6.rst`. It stays unreachable until wired into three slots: the `docs/index.rst` toctree, and the upgrade-alert listing in **both** `docs/index.rst` and `README.rst`. Those listings (one bullet per major upgrade) are duplicates that drift apart easily — add the new bullet to each, or the README goes stale.
 
 One page covers a whole major line: the move onto it, and any break shipped later within it. Say so in the opening paragraph — someone already on v6 has no reason to guess that "Upgrading to ClassRegistry v6" is where a 6.3.0 break is written down. Breaks after the major boundary get their own `Changes in v<version>` section; the major boundary itself is the page's main content.
 
