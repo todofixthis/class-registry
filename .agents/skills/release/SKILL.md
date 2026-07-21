@@ -245,7 +245,7 @@ Then add what the fix leads them into next:
 
 Verify every code sample and every error message by running it. Prose that merely sounds right is the recurring failure in this repo's documentation, and a migration guide is the worst place for it — its readers are already stuck.
 
-Before wiring the guide in, run two passes over the draft, modelled on the audience-surrogate review and quality pass in `phx:writing-release-notes`:
+Before wiring the guide in, run two passes over the draft:
 
 ### Audience-surrogate review
 
