@@ -81,7 +81,8 @@ class ClassRegistryInstanceCache(
 
         If a key has not been accessed yet, it will not be included.
         """
-        for lookup_key in self._registry.keys():
+        for public_key in self._registry.keys():
+            lookup_key = self._registry.gen_lookup_key(public_key)
             for cache_key in self._key_map[lookup_key]:
                 yield self._cache[cache_key]
 
