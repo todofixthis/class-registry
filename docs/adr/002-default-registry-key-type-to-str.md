@@ -1,7 +1,7 @@
 ---
 status: Accepted
 date: 2026-06-27
-scope: [src/class_registry/base.py]
+scope: [src/class_registry/base.py, src/class_registry/entry_points.py]
 summary: Default the registry key TypeVar to str, not Hashable (which stays available as an opt-in), prioritising developer experience over maximal type permissiveness.
 ---
 

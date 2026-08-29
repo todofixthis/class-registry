@@ -52,6 +52,7 @@ dev = [
 ci = [
     "mypy>=2,<3",
     "pytest>=9,<10",
+    "pyyaml>=6.0.3,<7.0.0",
     "sphinx>=9,<10",
     "sphinx_rtd_theme>=3.1,<4",
     "tox-uv>=1,<2",

@@ -1,7 +1,7 @@
 ---
 status: Accepted
 date: 2026-08-29
-scope: [docs/adr/, scripts/adr/generate_index.py]
+scope: [docs/adr/, scripts/adr/generate_index.py, .autohooks/adr_index.py, .github/workflows/build.yml]
 summary: Replace ADR frontmatter's tags field with scope — the exact paths and directory prefixes a decision binds — validated by the index generator.
 ---
 
@@ -67,8 +67,8 @@ lookup mode.
 
 **Pros:** Matches `phx:writing-adrs` exactly, including its failure modes —
 a stale scope entry or an orphaned status field fails the pre-commit hook
-instead of rotting unnoticed; `--for` answers "what governs this file?" for
-an agent or reviewer who never thought to check `INDEX.md`.
+and CI alike, instead of rotting unnoticed; `--for` answers "what governs
+this file?" for an agent or reviewer who never thought to check `INDEX.md`.
 **Cons:** Larger change to `scripts/adr/generate_index.py` than Option 2,
 and requires authoring a `scope` for each existing ADR by reading what it
 actually binds, rather than a mechanical rename.
@@ -104,16 +104,20 @@ actually binds, not derived mechanically from `tags`:
   and `src/class_registry/base.py` carries the `typing_extensions` import
   shim the policy requires.
 - ADR 002 (default key type): `src/class_registry/base.py`, where the
-  `KeyType` TypeVar's default is declared.
+  `KeyType` TypeVar's default is declared, and
+  `src/class_registry/entry_points.py`, which must keep pinning `K=str`
+  per that ADR's own stated consequence.
 - ADR 003 (centralised TypeVars): `src/class_registry/`, since the
   decision binds every module in the package that could redefine a TypeVar
   instead of importing it from `base.py`.
 
 ## Consequences
 
-- A new ADR must declare `scope` (or `scope: []`); the pre-commit hook and
-  CI now reject one that still uses `tags`, is missing `scope`, or pairs a
-  status with the wrong field.
+- A new ADR must declare `scope` (or `scope: []`); the pre-commit hook and a
+  CI job that regenerates `INDEX.md` and diffs it against the committed copy
+  now reject one that still uses `tags`, is missing `scope`, or pairs a
+  status with the wrong field — catching a contributor who hasn't installed
+  the hook, or an edit made outside a local clone entirely.
 - `uv run python scripts/adr/generate_index.py --for <path>` reports which
   ADRs bind a given file, for a contributor who never thought to check
   `INDEX.md`.
