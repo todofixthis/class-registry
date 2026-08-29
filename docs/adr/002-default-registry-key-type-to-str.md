@@ -1,7 +1,7 @@
 ---
 status: Accepted
 date: 2026-06-27
-tags: [typing, generics, api-design, developer-experience, registry-keys]
+scope: [src/class_registry/base.py]
 summary: Default the registry key TypeVar to str, not Hashable (which stays available as an opt-in), prioritising developer experience over maximal type permissiveness.
 ---
 

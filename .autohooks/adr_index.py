@@ -15,7 +15,12 @@ _PROJECT_ROOT = Path(__file__).parent.parent
 if str(_PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(_PROJECT_ROOT))
 
-from scripts.adr.generate_index import INDEX_FILE, generate  # noqa: E402
+from scripts.adr.generate_index import (  # noqa: E402
+    ADR_DIR,
+    ADR_INDEX_FILENAME,
+    REPO_ROOT,
+    generate,
+)
 
 RE_STAGED_ADR = re.compile(r"docs/adr/[0-9]+-.*\.md$")
 
@@ -32,8 +37,8 @@ def precommit(
         ok("No staged ADR files.")
         return 0
 
-    result = generate()
+    result = generate(REPO_ROOT / ADR_DIR, REPO_ROOT)
     if result == 0:
-        stage_files([INDEX_FILE])
+        stage_files([ADR_DIR / ADR_INDEX_FILENAME])
         ok("Generated ADR index.")
     return result

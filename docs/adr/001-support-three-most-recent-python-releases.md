@@ -1,7 +1,7 @@
 ---
 status: Accepted
 date: 2026-06-27
-tags: [python, compatibility, dependencies, typing, typing-extensions]
+scope: [pyproject.toml, .github/workflows/build.yml, src/class_registry/base.py]
 summary: Support the three most recent Python minor releases, backporting newer typing features via typing_extensions rather than dropping the oldest early.
 ---
 

@@ -2,8 +2,9 @@
 
 # ADR Index
 
-| # | Status | Title | Tags | Summary |
-|---|--------|-------|------|---------|
-| [001](001-support-three-most-recent-python-releases.md) | Accepted | Support the Three Most Recent Python Minor Releases | python, compatibility, dependencies, typing, typing-extensions | Support the three most recent Python minor releases, backporting newer typing features via typing_extensions rather than dropping the oldest early. |
-| [002](002-default-registry-key-type-to-str.md) | Accepted | Default the Registry Key Type to `str` | typing, generics, api-design, developer-experience, registry-keys | Default the registry key TypeVar to str, not Hashable (which stays available as an opt-in), prioritising developer experience over maximal type permissiveness. |
-| [003](003-centralise-and-export-shared-typevars.md) | Accepted | Centralise and Export Shared TypeVars | api-design, generics, public-api, registry-keys, typing | Define the shared value and key TypeVars once in base.py as exported ValueType/KeyType, not as per-module T/K redefinitions. |
+| # | Status | Title | Scope | Summary | Revisit |
+|---|--------|-------|-------|---------|---------|
+| [001](001-support-three-most-recent-python-releases.md) | Accepted | Support the Three Most Recent Python Minor Releases | pyproject.toml, .github/workflows/build.yml, src/class_registry/base.py | Support the three most recent Python minor releases, backporting newer typing features via typing_extensions rather than dropping the oldest early. |  |
+| [002](002-default-registry-key-type-to-str.md) | Accepted | Default the Registry Key Type to `str` | src/class_registry/base.py | Default the registry key TypeVar to str, not Hashable (which stays available as an opt-in), prioritising developer experience over maximal type permissiveness. |  |
+| [003](003-centralise-and-export-shared-typevars.md) | Accepted | Centralise and Export Shared TypeVars | src/class_registry/ | Define the shared value and key TypeVars once in base.py as exported ValueType/KeyType, not as per-module T/K redefinitions. |  |
+| [004](004-scope-adr-frontmatter-by-bound-paths.md) | Accepted | Scope ADR Frontmatter by the Paths a Decision Binds | docs/adr/, scripts/adr/generate_index.py | Replace ADR frontmatter's tags field with scope — the exact paths and directory prefixes a decision binds — validated by the index generator. |  |
