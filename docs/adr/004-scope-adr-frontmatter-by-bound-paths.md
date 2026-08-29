@@ -1,6 +1,7 @@
 ---
-status: Accepted
+status: Archived
 date: 2026-08-29
+archived-because: phx:writing-adrs is read before any new ADR is drafted (CLAUDE.md requires it), met while the work is still being planned, defending the scope-not-tags convention this ADR adopts.
 scope: [docs/adr/, scripts/adr/generate_index.py, .autohooks/adr_index.py, .github/workflows/build.yml]
 summary: Replace ADR frontmatter's tags field with scope — the exact paths and directory prefixes a decision binds — validated by the index generator.
 ---
@@ -122,5 +123,10 @@ actually binds, not derived mechanically from `tags`:
 - A future ADR that adds a fourth frontmatter field maintained by
   `phx:writing-adrs` should extend `scripts/adr/generate_index.py` to match,
   the same way this one did.
+- Archiving removes this ADR from `INDEX.md`, but `archived-because` only
+  defends the scope-not-tags convention. The CI-enforcement decision (over
+  the rejected unvalidated-rename option) and the PyYAML-over-stdlib-parser
+  choice have no comparable defence and could regress unnoticed; accepted,
+  since neither is a decision someone reverts by accident.
 
 [`phx:writing-adrs`]: https://github.com/todofixthis/phx-claude-siat/blob/develop/skills/writing-adrs/SKILL.md
