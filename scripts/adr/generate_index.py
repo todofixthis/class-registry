@@ -115,7 +115,9 @@ def parse_adr(content: str) -> tuple[dict[str, Any], str, list[str]]:
         if status == owner and not fields.get(field):
             problems.append(f"is {owner} but declares no `{field}`")
         elif status != owner and fields.get(field):
-            problems.append(f"declares `{field}` but its status is {status!r}, not {owner}")
+            problems.append(
+                f"declares `{field}` but its status is {status!r}, not {owner}"
+            )
 
     if fields.get(REVISIT_DISCHARGED_BY_FIELD) and not fields.get(REVISIT_WHEN_FIELD):
         problems.append(
@@ -230,7 +232,9 @@ def generate(adr_dir: Path, repo_root: Path) -> int:
         # something nobody can act on. The pair stays in the ADR's own frontmatter
         # as the record.
         revisit = (
-            "" if fields.get(REVISIT_DISCHARGED_BY_FIELD) else fields.get(REVISIT_WHEN_FIELD, "")
+            ""
+            if fields.get(REVISIT_DISCHARGED_BY_FIELD)
+            else fields.get(REVISIT_WHEN_FIELD, "")
         )
 
         # RE_ADR_FILENAME already required a leading number, so this always matches.
@@ -304,7 +308,9 @@ def report_scoped_to(paths: list[str], adr_dir: Path, repo_root: Path) -> int:
         ):
             number_match = RE_FILE_NUMBER.match(path.name)
             assert number_match is not None
-            print(f"{number_match.group(1)} ({fields['status']}): {title} — docs/adr/{path.name}")
+            print(
+                f"{number_match.group(1)} ({fields['status']}): {title} — docs/adr/{path.name}"
+            )
     return 0
 
 
