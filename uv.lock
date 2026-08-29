@@ -692,6 +692,7 @@ dependencies = [
 ci = [
     { name = "mypy" },
     { name = "pytest" },
+    { name = "pyyaml" },
     { name = "sphinx" },
     { name = "sphinx-rtd-theme" },
     { name = "tox-uv" },
@@ -720,6 +721,7 @@ requires-dist = [{ name = "typing-extensions", marker = "python_full_version < '
 ci = [
     { name = "mypy", specifier = ">=2,<3" },
     { name = "pytest", specifier = ">=9,<10" },
+    { name = "pyyaml", specifier = ">=6.0.3,<7.0.0" },
     { name = "sphinx", specifier = ">=9,<10" },
     { name = "sphinx-rtd-theme", specifier = ">=3.1,<4" },
     { name = "tox-uv", specifier = ">=1,<2" },

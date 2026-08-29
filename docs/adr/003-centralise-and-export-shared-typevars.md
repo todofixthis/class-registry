@@ -1,7 +1,7 @@
 ---
 status: Accepted
 date: 2026-07-15
-tags: [api-design, generics, public-api, registry-keys, typing]
+scope: [src/class_registry/]
 summary: Define the shared value and key TypeVars once in base.py as exported ValueType/KeyType, not as per-module T/K redefinitions.
 ---
 
