@@ -84,17 +84,13 @@ its own tooling, and Option 2 keeps exactly the silent-drift problem the
 skill's validation exists to catch — accepting stale metadata to save a
 smaller diff isn't a real saving once the metadata is untrustworthy.
 
-`scripts/adr/generate_index.py` now ports the canonical script's parsing and
-validation rules — status vocabulary, the `archived-because`/`superseded-by`
-pairing, the `revisit-when`/`revisit-discharged-by` pairing, `scope`
-requiredness and path-existence checking, and `--for` — with one deliberate
-difference: it keeps parsing frontmatter with PyYAML (already a dev
-dependency here) rather than adopting the canonical script's hand-rolled,
-stdlib-only line parser. That parser exists because
-`todofixthis/phx-claude-siat` has no Python project root and cannot take a
-PyYAML dependency; neither constraint applies to this repository, and a real
-YAML parser has no truncation bug to guard against, so porting the
-workaround would add complexity without a matching problem.
+One deliberate difference from the canonical script: the generator keeps
+parsing frontmatter with PyYAML (already a dev dependency here) rather than
+adopting its hand-rolled, stdlib-only line parser. That parser exists
+because `todofixthis/phx-claude-siat` has no Python project root and cannot
+take a PyYAML dependency; neither constraint applies here, and a real YAML
+parser has no truncation bug to guard against, so porting the workaround
+would add complexity without a matching problem.
 
 `scope` for each of ADRs 001–003 was authored by reading what each decision
 actually binds, not derived mechanically from `tags`:
