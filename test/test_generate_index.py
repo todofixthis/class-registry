@@ -125,16 +125,23 @@ class TestParseAdr:
     @pytest.mark.parametrize("status, field", STATUS_FIELDS.items())
     def test_requires_the_field_each_status_owns(self, status: str, field: str) -> None:
         """Archived and Superseded each carry a field saying why; neither is optional."""
-        assert f"is {status} but declares no `{field}`" in parse_adr(adr(status=status))[2]
+        assert (
+            f"is {status} but declares no `{field}`" in parse_adr(adr(status=status))[2]
+        )
 
     def test_rejects_a_status_field_its_status_does_not_own(self) -> None:
         """A field left behind by a status change would otherwise read as current."""
         problems = parse_adr(adr(fields={"archived-because": "A comment."}))[2]
-        assert "declares `archived-because` but its status is 'Accepted', not Archived" in problems
+        assert (
+            "declares `archived-because` but its status is 'Accepted', not Archived"
+            in problems
+        )
 
     def test_accepts_a_status_carrying_its_own_field(self) -> None:
         """The pairing is required, so the valid combination must pass cleanly."""
-        assert parse_adr(adr(status="Superseded", fields={"superseded-by": 12}))[2] == []
+        assert (
+            parse_adr(adr(status="Superseded", fields={"superseded-by": 12}))[2] == []
+        )
 
     def test_accepts_a_revisit_trigger_on_its_own(self) -> None:
         """A live trigger is the ordinary case: it needs no discharge until one arrives."""
@@ -221,7 +228,10 @@ class TestRelativeToRepo:
 
     def test_leaves_a_relative_path_alone(self, tmp_path: Path) -> None:
         """Scope entries are written repo-relative, so that form is already the answer."""
-        assert relative_to_repo("src/class_registry/base.py", tmp_path) == "src/class_registry/base.py"
+        assert (
+            relative_to_repo("src/class_registry/base.py", tmp_path)
+            == "src/class_registry/base.py"
+        )
 
     def test_converts_an_absolute_path_inside_the_repo(self, tmp_path: Path) -> None:
         """An editor or an agent hands you an absolute path, which matches no scope entry."""
@@ -277,7 +287,9 @@ class TestCell:
 class TestGenerate:
     """Integration tests: the index file `generate()` writes for a directory that validates."""
 
-    def test_writes_a_row_for_each_accepted_adr(self, adr_dir: Path, repo_root: Path) -> None:
+    def test_writes_a_row_for_each_accepted_adr(
+        self, adr_dir: Path, repo_root: Path
+    ) -> None:
         """Two ADRs prove the loop covers the directory rather than stopping at the first."""
         write(adr_dir, "001-first.md", adr(title="1: Do the thing"))
         write(adr_dir, "002-second.md", adr(title="2: Do another thing"))
@@ -294,7 +306,11 @@ class TestGenerate:
     ) -> None:
         """A hidden ADR leaves the index while an accepted sibling stays in it."""
         write(adr_dir, "001-first.md", adr())
-        write(adr_dir, "002-hidden.md", adr(status=status, fields={STATUS_FIELDS[status]: 12}))
+        write(
+            adr_dir,
+            "002-hidden.md",
+            adr(status=status, fields={STATUS_FIELDS[status]: 12}),
+        )
         assert generate(adr_dir, repo_root) == 0
         assert "002-hidden.md" not in index_text(adr_dir)
         assert "001-first.md" in index_text(adr_dir)
@@ -304,10 +320,14 @@ class TestGenerate:
         write(adr_dir, "010-later.md", adr())
         write(adr_dir, "009-earlier.md", adr())
         generate(adr_dir, repo_root)
-        rows = [line for line in index_text(adr_dir).splitlines() if line.startswith("| [")]
+        rows = [
+            line for line in index_text(adr_dir).splitlines() if line.startswith("| [")
+        ]
         assert [row.split("]")[0] for row in rows] == ["| [009", "| [010"]
 
-    def test_ignores_the_index_and_dot_files(self, adr_dir: Path, repo_root: Path) -> None:
+    def test_ignores_the_index_and_dot_files(
+        self, adr_dir: Path, repo_root: Path
+    ) -> None:
         """The index must not list itself, and tooling debris is not a misfiled document."""
         write(adr_dir, "001-first.md", adr())
         write(adr_dir, ADR_INDEX_FILENAME, "untouched\n")
@@ -315,7 +335,9 @@ class TestGenerate:
         assert generate(adr_dir, repo_root) == 0
         assert "001-first.md" in index_text(adr_dir)
 
-    def test_says_so_when_there_are_no_adrs(self, adr_dir: Path, repo_root: Path) -> None:
+    def test_says_so_when_there_are_no_adrs(
+        self, adr_dir: Path, repo_root: Path
+    ) -> None:
         """An empty table reads as a truncated file, so the empty state is spelt out."""
         assert generate(adr_dir, repo_root) == 0
         assert index_text(adr_dir) == f"{INDEX_HEADER}\n{EMPTY_NOTE}"
@@ -361,7 +383,10 @@ class TestGenerate:
         write(adr_dir, "notes.md", "# Notes\n")
         write(adr_dir, ADR_INDEX_FILENAME, "untouched\n")
         assert generate(adr_dir, repo_root) == 1
-        assert f"notes.md is neither an ADR nor {ADR_INDEX_FILENAME}" in capsys.readouterr().err
+        assert (
+            f"notes.md is neither an ADR nor {ADR_INDEX_FILENAME}"
+            in capsys.readouterr().err
+        )
         assert index_text(adr_dir) == "untouched\n"
 
     def test_reports_every_bad_file(
@@ -381,7 +406,9 @@ class TestGenerate:
         """A path that moved must fail here rather than rot unnoticed in the index."""
         write(adr_dir, "001-first.md", adr(fields={SCOPE_FIELD: "[scripts/gone.py]"}))
         assert generate(adr_dir, repo_root) == 1
-        assert "scopes `scripts/gone.py`, which nothing matches" in capsys.readouterr().err
+        assert (
+            "scopes `scripts/gone.py`, which nothing matches" in capsys.readouterr().err
+        )
 
     def test_checks_the_scope_of_an_archived_adr(
         self, adr_dir: Path, repo_root: Path, capsys: pytest.CaptureFixture[str]
@@ -410,7 +437,10 @@ class TestReportScopedTo:
         """This is the only place the lookup speaks, so a silent gap reads as "nothing binds it"."""
         write(adr_dir, "001-bad.md", adr(status="Draft"))
         report_scoped_to(["scripts/versions.py"], adr_dir, repo_root)
-        assert "001-bad.md could not be read, so it binds nothing here" in capsys.readouterr().err
+        assert (
+            "001-bad.md could not be read, so it binds nothing here"
+            in capsys.readouterr().err
+        )
 
     def test_names_the_decision_binding_the_path(
         self, adr_dir: Path, repo_root: Path, capsys: pytest.CaptureFixture[str]
@@ -420,7 +450,10 @@ class TestReportScopedTo:
         (repo_root / "scripts" / "versions.py").write_text("", encoding="utf-8")
         write(adr_dir, "001-first.md", adr(fields={SCOPE_FIELD: "[scripts/]"}))
         assert report_scoped_to(["scripts/versions.py"], adr_dir, repo_root) == 0
-        assert capsys.readouterr().out == "001 (Accepted): Do the thing — docs/adr/001-first.md\n"
+        assert (
+            capsys.readouterr().out
+            == "001 (Accepted): Do the thing — docs/adr/001-first.md\n"
+        )
 
     def test_stays_silent_for_a_path_nothing_binds(
         self, adr_dir: Path, repo_root: Path, capsys: pytest.CaptureFixture[str]
