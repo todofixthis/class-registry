@@ -82,10 +82,14 @@ git checkout main && git pull
 ### 9. Build
 ```bash
 uv sync --group=dev
-rm -f dist/*
+rm -rf dist
 uv build
 ```
-Sync first — pulling `main` may have brought in dependency changes. Artefacts land in `dist/`.
+Sync first — pulling `main` may have brought in dependency changes. Artefacts
+land in `dist/`. Nothing under `dist/` is tracked, so removing the whole
+directory is safe — and necessary: under zsh `rm -f dist/*` aborts with `no
+matches found` when `dist/` is empty or absent, and otherwise skips uv's
+`.gitignore`. `uv build` recreates both.
 
 ### 10. Tag and push
 ```bash
@@ -98,7 +102,7 @@ git push origin <version>
 
 **a. Append checksums to the release notes file:**
 ```bash
-sha256sum dist/phx_class_registry-* >> release-<version>.md
+shasum -a 256 dist/phx_class_registry-* >> release-<version>.md
 ```
 
 **b. GPG-sign the document and each build artefact:**
@@ -131,14 +135,32 @@ gh release create <version> dist/* \
 
 ### 12. Upload to PyPI
 ```bash
-uv publish --username __token__
+# Publishes only if the keyring can supply the token
+keyring get https://upload.pypi.org/legacy/ __token__ >/dev/null 2>&1 && \
+  uv publish --username __token__
 ```
+The token comes from the developer's keyring: `[tool.uv]` in `pyproject.toml`
+sets `keyring-provider = "subprocess"`, so uv shells out to a `keyring`
+executable on `PATH`. Run the check first — it exits non-zero when the keyring
+cannot supply the token, and prints nothing either way. Never echo the token to
+confirm it; that puts a live credential in the transcript.
+
+**If the check fails, stop here** and ask the developer to set
+`UV_PUBLISH_TOKEN` (which takes precedence over the keyring) and run the publish
+themselves. You cannot export it into their shell, and discovering this by
+running the upload means failing the release's one irreversible step.
 
 ### 13. Clean up
 ```bash
-rm release-<version>.md release-<version>.md.asc release-<version>-body.md
+rm -f release-<version>.md release-<version>.md.asc release-<version>-body.md
+rm -rf dist
 git checkout develop && git pull
 ```
+`-f` so a re-run does not fail on a file already removed. `dist` goes too — its
+artefacts and `.sig` files are on the GitHub release and PyPI by now. To correct
+a release afterwards, fetch those assets back with `gh release download
+<version>`: a rebuilt wheel may not be byte-identical, so its checksums would
+disagree with the published notes.
 
 ### 14. Close related GitHub issues
 For every issue referenced in the release notes, close it with a comment:
