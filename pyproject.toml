@@ -66,6 +66,7 @@ pre-commit = [
     "autohooks.plugins.mypy",
     "autohooks.plugins.pytest",
     "autohooks.plugins.ruff",
+    "docs_build",
 ]
 
 [tool.hatch.build.targets.sdist]
