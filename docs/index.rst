@@ -13,9 +13,6 @@ ClassRegistry
    upgrading_to_v6
    api
 
-
-ClassRegistry
-=============
 At the intersection of the Registry and Factory patterns lies the ``ClassRegistry``:
 
 - Define global factories that generate new class instances based on configurable keys.

@@ -18,6 +18,7 @@ author = "Phoenix Zerin"
 
 extensions = [
     "sphinx.ext.autodoc",
+    "sphinx.ext.autosectionlabel",
     "sphinx.ext.intersphinx",
     "sphinx.ext.napoleon",
 ]
@@ -32,6 +33,11 @@ language = "en-nz"
 
 html_theme = "sphinx_rtd_theme"
 html_static_path = ["_static"]
+
+# -- Options for autosectionlabel extension ----------------------------------
+# https://www.sphinx-doc.org/en/master/usage/extensions/autosectionlabel.html#configuration
+# See docs/adr/005-enable-autosectionlabel-with-document-prefixed-labels.md
+autosectionlabel_prefix_document = True
 
 # -- Options for intersphinx extension ---------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/extensions/intersphinx.html#configuration
