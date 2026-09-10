@@ -1,8 +1,8 @@
 ---
 status: Accepted
 date: 2026-09-10
-scope: [docs/, .autohooks/, pyproject.toml]
-summary: Add a docs_build autohooks plugin that runs sphinx-build -W on staged docs/docstring changes, matching ReadTheDocs' fail_on_warning rather than the CI docs job's lenient build.
+scope: [docs/, .autohooks/, pyproject.toml, .readthedocs.yaml]
+summary: Add a docs_build autohooks plugin that runs sphinx-build -W -E (full re-read, not incremental) on staged docs/docstring changes, matching ReadTheDocs' fail_on_warning rather than the CI docs job's lenient build.
 ---
 
 # 006: Check the Docs Build in the Pre-Commit Hook
@@ -23,9 +23,10 @@ have caught it — and that build runs after merge, not on the pull request.
 
 So a docs change can pass every check this repo runs before merge and still
 break the published docs, discovered only by whoever next visits
-readthedocs.org. The autohooks pre-commit chain already runs mypy, ruff,
-pytest and the ADR index generator, so it's the established place to add a
-check that catches this before it leaves the developer's machine at all.
+readthedocs.org. The autohooks pre-commit chain already runs black, mypy,
+ruff, pytest and the ADR index generator, so it's the established place to
+add a check that catches this before it leaves the developer's machine at
+all.
 
 ## Options
 
@@ -51,19 +52,40 @@ this ADR exists to prevent.
 ### Option 3: Run `sphinx-build -W` on staged docs/docstring changes (Accepted)
 
 Add a `docs_build` autohooks plugin, alongside the existing `adr_index`
-one, that runs `sphinx-build -b html -W --keep-going` when a staged file
-matches `docs/*.rst`, `docs/conf.py`, or `src/*.py` — the last because
-autodoc pulls docstrings into the built API page, so a docstring change can
-break the build the same way an `.rst` change can.
-**Pros:** Verified the same way — `-W` turns both `duplicate label`
-warnings into build failures, matching what `fail_on_warning: true` does on
-ReadTheDocs. Scoping to staged
-docs-affecting files, rather than running on every commit, keeps an
-unrelated source change from paying for a Sphinx build it can't break.
-**Cons:** A network hiccup fetching `intersphinx`'s Python inventory can
-turn `-W` into a spurious failure on an otherwise-fine commit; Sphinx
-caches that inventory for `intersphinx_cache_limit` days, so this bites at
-most that often, not on every commit.
+one, that runs `sphinx-build -b html -W --keep-going -E` into a dedicated
+`docs/_build/precommit` directory — not `docs/_build/html`, which
+`CLAUDE.md`'s documented `make html` workflow also builds into — when a
+staged file matches `docs/*.rst`, `docs/conf.py`, or `src/*.py`, the last
+because autodoc pulls docstrings into the built API page, so a docstring
+change can break the build the same way an `.rst` change can. `-E` forces
+Sphinx to re-read every file rather than trust its saved environment; a
+persistent build directory needs this, verified by rebuilding twice against
+the same unfixed `docs/conf.py`/`docs/index.rst` in one directory —
+`-W --keep-going` alone catches both collisions on the first build but,
+against the second, warns on neither, because Sphinx skips re-reading a
+file it judges unchanged and reuses whatever it registered last time.
+`-E` restores both warnings on every build, cold or warm. The subprocess
+carries a timeout, so an unresponsive host (not just one that refuses the
+connection outright) can't hang a commit indefinitely.
+**Pros:** Verified the same way — `-W -E` turns both `duplicate label`
+warnings into build failures on every run, matching what
+`fail_on_warning: true` does on ReadTheDocs, where every build is already
+a fresh checkout. Scoping to staged docs-affecting files, rather than
+running on every commit, keeps an unrelated source change from paying for a
+Sphinx build it can't break. The dedicated build directory can't race a
+`make html` run in another terminal. `-E` discards Sphinx's own saved
+environment but not `intersphinx`'s fetched-inventory file, which
+`sphinx/ext/intersphinx/_load.py` reads straight off disk under the build
+directory when present and still within `intersphinx_cache_limit` days —
+so the dedicated directory persisting across commits still caps the
+network dependency below, rather than paying it on every triggered run.
+**Cons:** `-E` means every triggered run re-reads the whole docs tree
+rather than only what changed, so this hook costs a full build every time,
+not an incremental one. A network hiccup fetching `intersphinx`'s Python
+inventory can still turn `-W` into a spurious failure on an otherwise-fine
+commit; Sphinx caches that inventory for `intersphinx_cache_limit` days
+(unset here, so the Sphinx default), so this bites at most that often, not
+on every commit.
 **Risks:** The include patterns (`docs/*.rst`, `docs/conf.py`, `src/*.py`)
 are the same kind of allowlist as the existing `mypy` plugin's `include`
 config — accurate today, but a future docs source outside those three
@@ -82,7 +104,9 @@ by a docstring, so anything else pays nothing for this hook.
 ## Consequences
 
 - `.autohooks/docs_build.py` is added, following `adr_index.py`'s pattern:
-  an autohooks plugin that no-ops when nothing staged is relevant.
+  an autohooks plugin that no-ops when nothing staged is relevant. It must
+  keep `-E`: dropping it for speed would silently reopen the exact
+  incremental-build gap this ADR verified and closed.
 - `pyproject.toml`'s `[tool.autohooks]` `pre-commit` list gains
   `docs_build`.
 - A docs or docstring change that would break the ReadTheDocs build is now

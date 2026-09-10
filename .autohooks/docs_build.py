@@ -13,7 +13,10 @@ from autohooks.precommit.run import ReportProgress
 
 _PROJECT_ROOT = Path(__file__).parent.parent
 _DOCS_DIR = _PROJECT_ROOT / "docs"
-_BUILD_DIR = _DOCS_DIR / "_build" / "html"
+# A dedicated directory, not docs/_build/html, so this doesn't race a
+# concurrent `make html` in another terminal.
+_BUILD_DIR = _DOCS_DIR / "_build" / "precommit"
+_BUILD_TIMEOUT_SECONDS = 120
 
 # Docstrings under src/ are pulled into the built API page by autodoc (see
 # docs/adr/006-check-the-docs-build-in-the-pre-commit-hook.md), so they can
@@ -41,11 +44,26 @@ def precommit(
         "html",
         "-W",
         "--keep-going",
+        # Force a full re-read on every run: an unchanged file that a
+        # previous build already read keeps whatever it registered then
+        # (e.g. an autosectionlabel target), so a warning a *different*
+        # file would now raise against it can go undetected without this
+        # (see docs/adr/006-check-the-docs-build-in-the-pre-commit-hook.md).
+        "-E",
         str(_DOCS_DIR),
         str(_BUILD_DIR),
     ]
     try:
-        subprocess.run(cmd, check=True, capture_output=True, cwd=_PROJECT_ROOT)
+        subprocess.run(
+            cmd,
+            check=True,
+            capture_output=True,
+            cwd=_PROJECT_ROOT,
+            timeout=_BUILD_TIMEOUT_SECONDS,
+        )
+    except subprocess.TimeoutExpired:
+        error(f"Docs build timed out after {_BUILD_TIMEOUT_SECONDS}s.")
+        return 1
     except subprocess.CalledProcessError as e:
         error("Docs build failed:")
         output = e.stderr.decode(encoding=sys.getdefaultencoding(), errors="replace")
