@@ -1,7 +1,8 @@
 ---
-status: Accepted
+status: Archived
 date: 2026-09-10
-scope: [docs/]
+archived-because: A comment above autosectionlabel_prefix_document in docs/conf.py names this decision, met while the setting is being edited.
+scope: [docs/conf.py]
 summary: Enable sphinx.ext.autosectionlabel with autosectionlabel_prefix_document = True, not its default unprefixed labels.
 revisit-when: The section titles that currently collide with autosectionlabel's default unprefixed names (list in Context) are all renamed or removed, so prefixing no longer earns its verbosity.
 ---

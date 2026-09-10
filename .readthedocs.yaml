@@ -20,4 +20,8 @@ build:
 
 sphinx:
   configuration: docs/conf.py
+  # The pre-commit docs_build hook (see
+  # docs/adr/006-check-the-docs-build-in-the-pre-commit-hook.md) exists to
+  # catch what this setting would otherwise only catch after merge —
+  # removing it drops that guarantee for the published build.
   fail_on_warning: true
