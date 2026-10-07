@@ -8,6 +8,23 @@ permissions:
   contents: read
 
 jobs:
+  # The phx plugin's hooks check ADRs in Claude Code sessions but never block, so
+  # this is the only check a commit made elsewhere meets (ADR 007 forbids a
+  # repo-local copy of the tool). The ref is the 8.1.0 release's commit (the `^{}`
+  # line of `git ls-remote --tags`, not the tag object). When this job disagrees
+  # with an index a session wrote, bump it, the SHAs in AGENTS.md, and the release
+  # labels beside both.
+  adrs:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clone repo
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Install uv
+        uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+      - name: Check ADRs
+        run: uvx --from 'git+https://github.com/todofixthis/phx-claude-siat@0725567cec6bab6a227c2a3d569e64c226c33a4e#subdirectory=skills/writing-adrs' phx-adr check
+
   build:
     runs-on: ubuntu-latest
     strategy:
@@ -69,22 +86,3 @@ jobs:
           cd docs
           mkdir -p _static
           uv run make html
-
-  adr-index:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Clone repo
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - name: Install uv
-        uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
-      - name: Set up Python
-        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
-        with:
-          python-version-file: "pyproject.toml"
-      - name: Install dependencies
-        run: uv sync --group ci
-      - name: Regenerate the ADR index
-        run: uv run python -m scripts.adr.generate_index
-      - name: Check the index is up to date
-        run: git diff --exit-code docs/adr/INDEX.md
