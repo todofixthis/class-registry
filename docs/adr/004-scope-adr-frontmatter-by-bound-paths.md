@@ -1,9 +1,9 @@
 ---
-status: Archived
+status: Superseded
 date: 2026-08-29
-archived-because: phx:writing-adrs is read before any new ADR is drafted (CLAUDE.md requires it), met while the work is still being planned, defending the scope-not-tags convention this ADR adopts.
 scope: [docs/adr/, scripts/adr/generate_index.py, .autohooks/adr_index.py, .github/workflows/build.yml]
 summary: Replace ADR frontmatter's tags field with scope — the exact paths and directory prefixes a decision binds — validated by the index generator.
+superseded-by: 7
 ---
 
 # 004: Scope ADR Frontmatter by the Paths a Decision Binds
