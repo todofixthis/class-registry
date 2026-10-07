@@ -92,9 +92,8 @@ here: `scope` names the paths a decision binds, never `tags`.
   both when `adrs` disagrees with what a session wrote, and fix whatever the new
   release reports in the same change.
 - Neither `adrs` nor the `adr-index` job before it is a required status check on
-  `develop` or `main`, so a red run shows on a same-repository pull request but does
-  not block its merge. CI runs on push only, so a pull request from a fork gets no
-  `adrs` run, and making the job required means adding a `pull_request` trigger first.
+  `develop` or `main`, so a red run shows on a pull request but does not block its
+  merge until a maintainer adds it to the required checks.
 - ADR 004's choice of PyYAML over the skill's stdlib parser is reversed: frontmatter
   values must now meet the skill's one-line rules, which the corpus already does.
 - The plugin is Claude Code's, so an agent in another harness gets no session hooks,
