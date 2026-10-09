@@ -38,7 +38,7 @@ Based on the changes, recommend a semver bump:
 - **minor** — new features or behaviour changes, fully backwards-compatible
 - **patch** — bug fixes only
 
-Where the next version carries a pre-release segment, bump only that segment (`4.0.0a2` → `4.0.0a3`) unless the developer says otherwise.
+Where the latest release and the next version share a pre-release cycle, bump only the pre-release segment (`4.0.0a2` → `4.0.0a3`) unless the developer says otherwise.
 
 ### 5. Gate: breaking changes require a migration guide
 A **breaking change** is anything that makes previously-working code fail — at runtime, or under a type checker. Undocumented behaviour someone relied on still counts; "only a couple of users" measures blast radius, not compatibility. If this release has none, skip to the stop below.
