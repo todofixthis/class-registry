@@ -61,7 +61,10 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
-          python-version-file: "pyproject.toml"
+          # Newest supported version. Reading `requires-python` from
+          # pyproject.toml resolves to the latest CPython, which can outrun
+          # dependency wheels.
+          python-version: "3.14"
       - name: Install dependencies
         run: uv sync --group ci
       - name: Type checking
@@ -78,7 +81,10 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
-          python-version-file: "pyproject.toml"
+          # Newest supported version. Reading `requires-python` from
+          # pyproject.toml resolves to the latest CPython, which can outrun
+          # dependency wheels.
+          python-version: "3.14"
       - name: Install dependencies
         run: uv sync --group ci
       - name: Check docs build
