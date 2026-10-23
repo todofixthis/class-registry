@@ -1,5 +1,4 @@
 # Agent worktrees
-.agents/worktrees/
 .claude/worktrees/
 
 # Byte-compiled / optimized / DLL files
@@ -14,11 +13,19 @@ dist
 # dotenv
 .env
 
-# Release skill working files
-release-*.md*
+# Linting cache
+.ruff_cache
+
+# Release artefacts (local working files)
+release-*-body.md
+release-*.md
+release-*.md.asc
 
 # Sphinx documentation
 docs/_build/
 
 # Tox
 .tox
+
+# virtualenv
+venv/
