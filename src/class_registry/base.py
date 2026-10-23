@@ -42,7 +42,9 @@ KeyType = TypeVar("KeyType", bound=typing.Hashable, default=str)
 D = TypeVar("D", bound=typing.Callable[..., typing.Any])
 
 
-class BaseRegistry(ABC, typing.Generic[ValueType, KeyType]):
+# Generic stays before ABC: reordering the bases changes the MRO, which breaks
+# a subclass that also mixes in its own ``(Generic[T], ABC)`` base.
+class BaseRegistry(typing.Generic[ValueType, KeyType], ABC):  # noqa: PYI059
     """
     Base functionality for registries.
 

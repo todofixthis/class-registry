@@ -87,11 +87,12 @@ exclude = ["docs/_build"]
 
 [tool.ruff.lint]
 extend-ignore = [
-    # Registries aren't dicts: iterating one delegates to ``keys()``, which
-    # subclasses override, and ``super().keys()`` has no iteration form.
+    # Registries call ``keys()`` explicitly, since ruff can't tell a registry
+    # from a dict, and ``super().keys()`` has no iteration form at all.
     "SIM118",
+    # Generics share the TypeVars exported from base.py (docs/adr/003), and
     # PEP 695 syntax can't carry ``KeyType``'s ``default=str`` before Python
-    # 3.13, so generics stay on ``typing.Generic`` (docs/adr/001).
+    # 3.13 (docs/adr/001), so they stay on ``typing.Generic``.
     "UP046",
     "UP047",
 ]
