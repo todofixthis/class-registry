@@ -161,7 +161,7 @@ args and kwargs to the class initialiser using the registry's :py:meth:`get` met
        element = 'bug'
 
        def __init__(self, level=1):
-           super(Caterpie, self).__init__()
+           super().__init__()
            self.level = level
 
    timmy = pokedex.get('bug')

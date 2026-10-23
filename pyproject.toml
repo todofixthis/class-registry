@@ -85,6 +85,23 @@ exclude = ["docs/_build"]
 [tool.hatch.build.targets.wheel.sources]
 "src/class_registry" = "class_registry"
 
+[tool.ruff.lint]
+extend-ignore = [
+    # Registries call ``keys()`` explicitly, since ruff can't tell a registry
+    # from a dict, and ``super().keys()`` has no iteration form at all.
+    "SIM118",
+    # Generics share the TypeVars exported from base.py (docs/adr/003), and
+    # PEP 695 syntax can't carry ``KeyType``'s ``default=str`` before Python
+    # 3.13 (docs/adr/001), so they stay on ``typing.Generic``.
+    "UP046",
+    "UP047",
+]
+
+[tool.ruff.lint.per-file-ignores]
+# ``poke_type`` is branded onto the classes at runtime by the registry, so
+# mypy can't see it as an attribute: these tests reach it through getattr.
+"test/test_entry_points.py" = ["B009"]
+
 [tool.mypy]
 strict = true
 

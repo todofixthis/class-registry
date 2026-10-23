@@ -79,6 +79,7 @@ ClassRegistry v4:
 
    from class_registry import AutoRegister
 
+
    class MyBaseClass(metaclass=AutoRegister(my_registry)):
        ...
 
@@ -87,7 +88,9 @@ ClassRegistry v5:
 .. code-block:: python
 
    from abc import ABC
+
    from class_registry.base import AutoRegister
+
 
    class MyBaseClass(AutoRegister(my_registry), ABC):
        ...

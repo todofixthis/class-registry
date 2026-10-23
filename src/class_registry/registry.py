@@ -18,7 +18,7 @@ class ClassRegistry(BaseMutableRegistry[ValueType, KeyType]):
 
     def __init__(
         self,
-        attr_name: typing.Optional[str] = None,
+        attr_name: str | None = None,
         unique: bool = False,
     ) -> None:
         """
@@ -38,7 +38,7 @@ class ClassRegistry(BaseMutableRegistry[ValueType, KeyType]):
 
         self.unique = unique
 
-        self._registry: dict[typing.Hashable, typing.Type[ValueType]] = {}
+        self._registry: dict[typing.Hashable, type[ValueType]] = {}
 
     def __len__(self) -> int:
         return len(self._registry)
@@ -46,7 +46,7 @@ class ClassRegistry(BaseMutableRegistry[ValueType, KeyType]):
     def __repr__(self) -> str:
         return f"{type(self).__name__}(attr_name={self.attr_name!r}, unique={self.unique!r})"
 
-    def get_class(self, key: KeyType) -> typing.Type[ValueType]:
+    def get_class(self, key: KeyType) -> type[ValueType]:
         """
         Returns the class associated with the specified key.
         """
@@ -57,7 +57,7 @@ class ClassRegistry(BaseMutableRegistry[ValueType, KeyType]):
         except KeyError:
             return self.__missing__(lookup_key)
 
-    def _register(self, key: typing.Hashable, class_: typing.Type[ValueType]) -> None:
+    def _register(self, key: typing.Hashable, class_: type[ValueType]) -> None:
         """
         Registers a class with the registry.
 
@@ -78,7 +78,7 @@ class ClassRegistry(BaseMutableRegistry[ValueType, KeyType]):
 
         self._registry[key] = class_
 
-    def _unregister(self, key: typing.Hashable) -> typing.Type[ValueType]:
+    def _unregister(self, key: typing.Hashable) -> type[ValueType]:
         """
         Unregisters the class at the specified key.
 
@@ -99,7 +99,7 @@ class SortedClassRegistry(ClassRegistry[ValueType, KeyType]):
     def __init__(
         self,
         sort_key: typing.Any,
-        attr_name: typing.Optional[str] = None,
+        attr_name: str | None = None,
         unique: bool = False,
         reverse: bool = False,
     ) -> None:
@@ -156,8 +156,8 @@ class SortedClassRegistry(ClassRegistry[ValueType, KeyType]):
         """
 
         def sorter(
-            a: typing.Tuple[KeyType, typing.Type[ValueType], typing.Hashable],
-            b: typing.Tuple[KeyType, typing.Type[ValueType], typing.Hashable],
+            a: tuple[KeyType, type[ValueType], typing.Hashable],
+            b: tuple[KeyType, type[ValueType], typing.Hashable],
         ) -> int:
             a_attr = getattr(a[1], sort_key)
             b_attr = getattr(b[1], sort_key)
