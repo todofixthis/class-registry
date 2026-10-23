@@ -17,18 +17,16 @@ class RegistryPatcher(typing.Generic[ValueType, KeyType]):
        Only mutable registries can be patched.
     """
 
-    class DoesNotExist(object):
+    class DoesNotExist:
         """
         Used to identify a value that did not exist before we started.
         """
 
-        pass
-
     def __init__(
         self,
         registry: BaseMutableRegistry[ValueType, KeyType],
-        *args: typing.Type[ValueType],
-        **kwargs: typing.Type[ValueType],
+        *args: type[ValueType],
+        **kwargs: type[ValueType],
     ) -> None:
         """
         Args:
@@ -59,12 +57,10 @@ class RegistryPatcher(typing.Generic[ValueType, KeyType]):
 
         self.target: BaseMutableRegistry[ValueType, KeyType] = registry
 
-        self._new_values: dict[str, typing.Type[ValueType]] = kwargs
+        self._new_values: dict[str, type[ValueType]] = kwargs
         self._prev_values: dict[
             typing.Hashable,
-            typing.Union[
-                typing.Type[ValueType], typing.Type[RegistryPatcher.DoesNotExist]
-            ],
+            type[ValueType | RegistryPatcher.DoesNotExist],
         ] = {}
 
     def __enter__(self) -> None:
@@ -72,9 +68,9 @@ class RegistryPatcher(typing.Generic[ValueType, KeyType]):
 
     def __exit__(
         self,
-        exc_type: typing.Optional[typing.Type[BaseException]],
-        exc_val: typing.Optional[BaseException],
-        exc_tb: typing.Optional[TracebackType],
+        exc_type: type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: TracebackType | None,
     ) -> None:
         self.restore()
 
@@ -108,7 +104,7 @@ class RegistryPatcher(typing.Generic[ValueType, KeyType]):
             if value is not self.DoesNotExist:
                 if typing.TYPE_CHECKING:
                     # Convince mypy that ``value`` cannot be ``self.DoesNotExist``.
-                    value = typing.cast(typing.Type[ValueType], value)
+                    value = typing.cast(type[ValueType], value)
 
                 self._set_value(key, value)
 
@@ -126,7 +122,7 @@ class RegistryPatcher(typing.Generic[ValueType, KeyType]):
         except RegistryKeyError:
             return default
 
-    def _set_value(self, key: typing.Hashable, value: typing.Type[ValueType]) -> None:
+    def _set_value(self, key: typing.Hashable, value: type[ValueType]) -> None:
         # ``key`` comes from ``_new_values`` when patching, or from the
         # ``_prev_values`` backup when restoring; the target's ``register`` is
         # typed against the public ``KeyType``. The cast is runtime-erased —
