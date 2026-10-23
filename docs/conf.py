@@ -10,7 +10,7 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = "ClassRegistry"
-copyright = "2017 Phoenix Zerin"
+copyright = "2017 EFL Global"
 author = "Phoenix Zerin"
 
 # -- General configuration ---------------------------------------------------
@@ -36,7 +36,9 @@ html_static_path = ["_static"]
 
 # -- Options for autosectionlabel extension ----------------------------------
 # https://www.sphinx-doc.org/en/master/usage/extensions/autosectionlabel.html#configuration
-# See docs/adr/005-enable-autosectionlabel-with-document-prefixed-labels.md
+# Prefixed, not bare, so a label auto-generated for one page's section can't
+# collide with another page's same-titled section as the docs grow. See
+# https://github.com/todofixthis/cookiecutter-py/blob/main/docs/adr/006-enable-autosectionlabel-with-document-prefixed-labels.md
 autosectionlabel_prefix_document = True
 
 # -- Options for intersphinx extension ---------------------------------------

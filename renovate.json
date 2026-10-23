@@ -1,7 +1,32 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "constraints": {
+    "copier": ">=9,<10"
+  },
+  "customManagers": [
+    {
+      "customType": "regex",
+      "datasourceTemplate": "github-tags",
+      "depNameTemplate": "todofixthis/phx-claude-siat",
+      "description": "Bump the phx-adr pins in the adrs CI job and AGENTS.md together (ADR 009 in todofixthis/cookiecutter-py).",
+      "managerFilePatterns": [
+        "/^\\.github/workflows/build\\.yml$/",
+        "/^AGENTS\\.md$/"
+      ],
+      "matchStrings": [
+        "phx-claude-siat@(?<currentDigest>[0-9a-f]{40})#subdirectory=skills/writing-adrs'[^\\n]*# (?<currentValue>\\d+\\.\\d+\\.\\d+)",
+        "phx-claude-siat/blob/(?<currentValue>\\d+\\.\\d+\\.\\d+)/"
+      ]
+    }
+  ],
   "extends": [
     "config:recommended",
-    "helpers:pinGitHubActionDigests"
-  ]
+    "helpers:pinGitHubActionDigests",
+    "security:minimumReleaseAgePypi"
+  ],
+  "lockFileMaintenance": {
+    "automerge": true,
+    "description": "Refresh uv.lock weekly, merging once CI passes, so transitive dependencies reach the project without a direct pin (ADR 013 in todofixthis/cookiecutter-py).",
+    "enabled": true
+  }
 }
