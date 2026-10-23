@@ -18,6 +18,7 @@ Here's an example:
 .. code-block:: python
 
    from abc import ABC, abstractmethod
+
    from class_registry import ClassRegistry
    from class_registry.base import AutoRegister
 
@@ -60,6 +61,7 @@ because it is abstract.
 
       from abc import ABC
 
+
       # Declare an "abstract" class.
       class ElectricPokemon(Pokemon, ABC):
           element = 'electric'
@@ -81,6 +83,7 @@ because it is abstract.
    .. code-block:: python
 
       from inspect import isabstract
+
       assert not isabstract(ElectricPokemon)
 
 .. note::
@@ -98,12 +101,15 @@ because it is abstract.
       # Deprecated:
       from class_registry.auto_register import AutoRegister
 
+
       class MyBaseClass(metaclass=AutoRegister(my_registry)):
           ...
 
       # Update to this:
       from abc import ABC
+
       from class_registry.base import AutoRegister
+
 
       class MyBaseClass(AutoRegister(my_registry), ABC):
           ...
@@ -195,6 +201,7 @@ For example, to support aliases or translations:
 
    from class_registry import ClassRegistry
 
+
    class Pokemon:
        element: str
 
@@ -242,9 +249,9 @@ You can also change the lookup key to a different type (so long as it implements
         until the migration is complete we still have to support looking up by
         ID.
         """
-        element_from_id: dict[int, str] = {}
+        element_from_id: typing.ClassVar[dict[int, str]] = {}
 
-        def _register(self, key: typing.Hashable, class_: typing.Type[PokemonWithID]) -> None:
+        def _register(self, key: typing.Hashable, class_: type[PokemonWithID]) -> None:
             super()._register(key, class_)
             self.element_from_id[class_.pokedex_id] = typing.cast(str, key)
 
