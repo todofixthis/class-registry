@@ -74,8 +74,8 @@ def test_cmp_to_key() -> None:
         popularity: int
 
     def compare_pokemon(
-        a: typing.Tuple[typing.Hashable, typing.Type[PopularPokemon], typing.Hashable],
-        b: typing.Tuple[typing.Hashable, typing.Type[PopularPokemon], typing.Hashable],
+        a: tuple[typing.Hashable, type[PopularPokemon], typing.Hashable],
+        b: tuple[typing.Hashable, type[PopularPokemon], typing.Hashable],
     ) -> int:
         """
         Sort in descending order by popularity.
@@ -117,8 +117,8 @@ def test_gen_lookup_key_overridden() -> None:
     """
 
     def compare_by_lookup_key(
-        a: typing.Tuple[str, typing.Type[Pokemon], str],
-        b: typing.Tuple[str, typing.Type[Pokemon], str],
+        a: tuple[str, type[Pokemon], str],
+        b: tuple[str, type[Pokemon], str],
     ) -> int:
         """
         :param a: Tuple of (key, class, lookup_key)

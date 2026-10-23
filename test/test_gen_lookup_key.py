@@ -116,11 +116,9 @@ def test_use_case_multiple_types() -> None:
         ID.
         """
 
-        element_from_id: dict[int, str] = {}
+        element_from_id: typing.ClassVar[dict[int, str]] = {}
 
-        def _register(
-            self, key: typing.Hashable, class_: typing.Type[PokemonWithID]
-        ) -> None:
+        def _register(self, key: typing.Hashable, class_: type[PokemonWithID]) -> None:
             super()._register(key, class_)
             self.element_from_id[class_.pokedex_id] = typing.cast(str, key)
 

@@ -10,7 +10,8 @@ This function is deprecated; use :py:class:`class_registry.base.AutoRegister` in
 :see: https://github.com/todofixthis/class-registry/issues/14
 """
 
-from abc import ABC, abstractmethod as abstract_method
+from abc import ABC
+from abc import abstractmethod as abstract_method
 
 import pytest
 
@@ -101,9 +102,8 @@ def test_error_attr_name_missing():
     """
     registry = ClassRegistry()
 
-    with pytest.raises(ValueError):
-        # :py:func:`AutoRegister` is deprecated.
-        # :see: https://github.com/todofixthis/class-registry/issues/14
-        with pytest.deprecated_call():
-            # noinspection PyDeprecation
-            AutoRegister(registry)
+    # :py:func:`AutoRegister` is deprecated.
+    # :see: https://github.com/todofixthis/class-registry/issues/14
+    with pytest.raises(ValueError), pytest.deprecated_call():
+        # noinspection PyDeprecation
+        AutoRegister(registry)

@@ -14,7 +14,7 @@ class EntryPointClassRegistry(BaseRegistry[ValueType, str]):
     def __init__(
         self,
         group: str,
-        attr_name: typing.Optional[str] = None,
+        attr_name: str | None = None,
     ) -> None:
         """
         Args:
@@ -33,7 +33,7 @@ class EntryPointClassRegistry(BaseRegistry[ValueType, str]):
         self.attr_name = attr_name
         self.group = group
 
-        self._cache: typing.Optional[dict[str, typing.Type[ValueType]]] = None
+        self._cache: dict[str, type[ValueType]] | None = None
         """
         Caches registered classes locally, so that we don't have to keep iterating over
         entry points.
@@ -60,7 +60,7 @@ class EntryPointClassRegistry(BaseRegistry[ValueType, str]):
 
         return instance
 
-    def get_class(self, key: str) -> typing.Type[ValueType]:
+    def get_class(self, key: str) -> type[ValueType]:
         try:
             return self._get_cache()[key]
         except KeyError:
@@ -78,7 +78,7 @@ class EntryPointClassRegistry(BaseRegistry[ValueType, str]):
         """
         self._cache = None
 
-    def _get_cache(self) -> dict[str, typing.Type[ValueType]]:
+    def _get_cache(self) -> dict[str, type[ValueType]]:
         """
         Populates the cache (if necessary) and returns it.
         """

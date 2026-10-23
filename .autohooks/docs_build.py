@@ -3,7 +3,6 @@
 import subprocess
 import sys
 from pathlib import Path
-from typing import Optional
 
 from autohooks.api import error, ok, out
 from autohooks.api.git import get_staged_status
@@ -25,8 +24,8 @@ INCLUDE = ("docs/*.rst", "docs/conf.py", "src/*.py")
 
 
 def precommit(
-    config: Optional[Config] = None,
-    report_progress: Optional[ReportProgress] = None,
+    config: Config | None = None,
+    report_progress: ReportProgress | None = None,
     **kwargs: object,
 ) -> int:
     """Build the docs when a staged file could affect them."""
