@@ -52,7 +52,7 @@ If your keys vary in type, or you'd rather not name a specific key type, declare
 
 .. code-block:: python
 
-   from typing import Hashable
+   from collections.abc import Hashable
 
    pokedex: ClassRegistry[Pokemon, Hashable] = ClassRegistry('pokedex_id')
 
@@ -82,9 +82,10 @@ exactly one ``int``:
 
 .. code-block:: python
 
-   from typing import Hashable
+   from collections.abc import Hashable
 
    from class_registry import ClassRegistry
+
 
    # ClassRegistry v6+: default key type is ``str`` so we have to explicitly declare
    # the public key type as ``Hashable`` here.
