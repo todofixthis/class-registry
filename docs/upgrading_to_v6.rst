@@ -2,9 +2,12 @@ Upgrading to ClassRegistry v6
 ==============================
 
 `ClassRegistry v6 <https://github.com/todofixthis/class-registry/releases/tag/6.0.0>`_
-changes the default registry key type. This is a **type-checker-visible only** change:
-runtime behaviour is unchanged. If your type checker flags an error after upgrading,
-read on.
+changes the default registry key type, which only your type checker will notice.
+It also makes two small changes that can fail at runtime:
+
+- :py:meth:`~class_registry.base.BaseRegistry.gen_lookup_key` is now an instance
+  method (see `gen_lookup_key is now an instance method`_).
+- The ``T`` type variables are gone (see `The T type variables are gone`_).
 
 Registry keys now default to :py:class:`str`
 ----------------------------------------------
@@ -16,10 +19,27 @@ Previously, a bare ``ClassRegistry[Foo]`` resolved its key type to
 
    See :doc:`iterating_over_registries` for the full picture of how key types work.
 
-If your code registers non-:py:class:`str` keys under a bare ``ClassRegistry[Foo]``,
-your type checker will report an error such as::
+If your code uses non-:py:class:`str` keys under a bare ``ClassRegistry[Foo]``,
+or an unannotated ``ClassRegistry(...)`` (which mypy resolves to
+``ClassRegistry[Any, str]``), every call that takes a key fails type checking.
+mypy reports one of::
 
-   error: Invalid index type ... for "ClassRegistry[..., str]"; expected type "str"
+   error: Invalid index type "int" for "ClassRegistry[Pokemon, str]"; expected type "str"  [index]
+   error: Argument 1 to "get" of "BaseRegistry" has incompatible type "int"; expected "str"  [arg-type]
+   error: Argument 1 to "get_class" of "ClassRegistry" has incompatible type "int"; expected "str"  [arg-type]
+   error: Argument 1 to "unregister" of "BaseMutableRegistry" has incompatible type "int"; expected "str"  [arg-type]
+   error: Unsupported operand types for in ("int" and "ClassRegistry[Pokemon, str]")  [operator]
+   error: No overload variant of "register" of "BaseMutableRegistry" matches argument type "int"  [call-overload]
+
+The names in quotes come from your code.
+
+If you pass the registry to a ``ClassRegistryInstanceCache`` or ``RegistryPatcher``
+annotated with only a value type, mypy reports::
+
+   error: Argument 1 to "ClassRegistryInstanceCache" has incompatible type "ClassRegistry[Pokemon, int]"; expected "ClassRegistry[Pokemon, str]"  [arg-type]
+
+Both now take the key type as a second argument too, defaulting to :py:class:`str`;
+see `The T type variables are gone`_.
 
 For example:
 
@@ -77,21 +97,18 @@ value may be a completely different type.
 The public key is usually the *wider* of the two. Consider a ``Pokedex`` migrating from
 lookup by pokédex ID to lookup by name. While the migration is under way, callers pass
 either an ``int`` ID or a ``str`` name, so the public key is widened to
-:py:class:`~typing.Hashable` — yet every pokémon is still identified internally by
-exactly one ``int``:
+``int | str`` — yet every pokémon is still identified internally by exactly one
+``int``:
 
 .. code-block:: python
-
-   from collections.abc import Hashable
 
    from class_registry import ClassRegistry
 
 
-   # ClassRegistry v6+: default key type is ``str`` so we have to explicitly declare
-   # the public key type as ``Hashable`` here.
-   class Pokedex(ClassRegistry[Pokemon, Hashable]):
-       @staticmethod
-       def gen_lookup_key(key: Hashable) -> int:
+   # ClassRegistry v6+: default key type is ``str``, so we declare the public key
+   # type explicitly.
+   class Pokedex(ClassRegistry[Pokemon, int | str]):
+       def gen_lookup_key(self, key: int | str) -> int:
            # A name (``str``) is translated to its pokédex ID; an ID is already a
            # lookup key, so it passes straight through.
            if isinstance(key, str):
@@ -99,22 +116,143 @@ exactly one ``int``:
 
            return key
 
-   # ``Pokedex`` public key type is ``typing.Hashable`` — callers don't need to
-   # care how the key is translated internally.
-   red_pokedex = Pokedex('element')
-   charmander = red_pokedex['fire']
+
+   # Callers don't need to care how the key is translated internally.
+   red_pokedex = Pokedex('pokedex_id')
+   charmander = red_pokedex['charmander']
    squirtle = red_pokedex[7]
 
-.. tip::
+Declare the narrowest public key type your callers need.
+:py:class:`~typing.Hashable` also works, but then mypy can't tell that a
+non-``str`` key is an ``int``, so returning it from a hook annotated ``-> int``
+fails::
 
-   :py:class:`~typing.Hashable` may actually be too wide for your use case. Take the
-   opportunity to see if you can use a more specific key type.
+   error: Incompatible return value type (got "Hashable", expected "int")  [return-value]
 
-   For example:
+``gen_lookup_key`` is now an instance method
+--------------------------------------------
+:py:meth:`~class_registry.base.BaseRegistry.gen_lookup_key` used to be a
+``@staticmethod``. In ClassRegistry v6 it is an instance method, so that its
+argument takes the registry's key type.
 
-   .. code-block:: python
+Calling it on a registry instance works as before. Calling it on a registry
+*class* fails at runtime, unless that class (or one of its parents) overrides
+``gen_lookup_key`` with a ``@staticmethod``::
 
-      # Callers can use ``int`` or ``str`` keys to look up pokemon, not any arbitrary
-      # hashable value.
-      class Pokedex(ClassRegistry[Pokemon, int | str]):
-          # ...
+   TypeError: BaseRegistry.gen_lookup_key() missing 1 required positional argument: 'key'
+
+If your class overrides ``gen_lookup_key`` with an instance method, the message
+names your class instead of ``BaseRegistry``. mypy flags the same call before it
+runs, with a pair of errors::
+
+   error: Missing positional argument "key" in call to "gen_lookup_key" of "BaseRegistry"  [call-arg]
+   error: Argument 1 to "gen_lookup_key" of "BaseRegistry" has incompatible type "str"; expected "BaseRegistry[Never, str]"  [arg-type]
+
+Again, the names in quotes come from your code.
+
+To fix it, call the method on a registry instance:
+
+.. code-block:: python
+
+   pokedex = ClassRegistry('element')
+
+   # ClassRegistry v5 only:
+   lookup_key = ClassRegistry.gen_lookup_key('fire')
+
+   # ClassRegistry v6+:
+   lookup_key = pokedex.gen_lookup_key('fire')
+
+A ``@staticmethod`` override of ``gen_lookup_key`` still works, even called on
+your class — unless it delegates to the base implementation, which a
+``@staticmethod`` can only reach through the class:
+
+.. code-block:: python
+
+   class FoldingRegistry(ClassRegistry[Pokemon]):
+       @staticmethod
+       def gen_lookup_key(key: Hashable) -> Hashable:
+           # Fails in v6 with the TypeError above.
+           return ClassRegistry.gen_lookup_key(key.casefold())
+
+Convert an override like that to an instance method, and call
+``super().gen_lookup_key()`` instead:
+
+.. code-block:: python
+
+   class FoldingRegistry(ClassRegistry[Pokemon]):
+       def gen_lookup_key(self, key: str) -> Hashable:
+           return super().gen_lookup_key(key.casefold())
+
+Annotate ``key`` with your registry's key type: ``str`` here, since
+``ClassRegistry[Pokemon]`` defaults to it. A narrower annotation, such as ``str`` on
+a ``ClassRegistry[Pokemon, Hashable]``, fails::
+
+   error: Argument 1 of "gen_lookup_key" is incompatible with supertype "class_registry.base.BaseRegistry"; supertype defines the argument type as "Hashable"  [override]
+
+Once converted, calling it on the class itself —
+``FoldingRegistry.gen_lookup_key('Fire')`` — breaks as described above, so move
+those calls onto an instance first.
+
+The ``T`` type variables are gone
+---------------------------------
+``class_registry.base``, ``class_registry.cache`` and ``class_registry.patcher``
+each defined a private ``T`` type variable. ClassRegistry v6 replaces them with
+two type variables shared across the package, both exported from
+``class_registry.base``:
+
+- ``ValueType``: the registered class.
+- ``KeyType``: the public key type, which defaults to :py:class:`str`.
+
+Importing ``T`` now fails at runtime::
+
+   ImportError: cannot import name 'T' from 'class_registry.base'
+
+The module in the message may be ``class_registry.cache`` or
+``class_registry.patcher`` instead. mypy reports::
+
+   error: Module "class_registry.base" has no attribute "T"  [attr-defined]
+
+To fix it, import ``ValueType`` instead. If your class wraps a registry, a
+``ClassRegistryInstanceCache`` or a ``RegistryPatcher``, add ``KeyType`` too: all
+three take it as a second type argument, which silently defaults to
+:py:class:`str`, so passing in a registry with other keys fails as in
+`Registry keys now default to str`_. Your own class then behaves the same way:
+annotate code that uses it with both type arguments
+(``RegistryWrapper[Pokemon, int]``).
+
+.. code-block:: python
+
+   from typing import Generic
+
+   from class_registry import ClassRegistry
+   from class_registry.base import KeyType, ValueType
+
+
+   class RegistryWrapper(Generic[ValueType, KeyType]):
+       def __init__(self, registry: ClassRegistry[ValueType, KeyType]) -> None:
+           self.registry = registry
+
+       def first_key(self) -> KeyType:
+           return next(iter(self.registry.keys()))
+
+List ``KeyType`` after ``ValueType``, and after any of your own type variables.
+A type variable with a default can't precede one without, so
+``Generic[KeyType, ValueType]`` fails as soon as the class is defined::
+
+   TypeError: Type parameter ~ValueType without a default follows type parameter with a default
+
+Subclasses that override private members
+----------------------------------------
+Some private attributes now carry the key type too. If your subclass overrides
+one of them with :py:class:`~typing.Hashable` keys, mypy rejects the override:
+
+- ``EntryPointClassRegistry._get_cache()`` returns ``dict[str, type[ValueType]]``,
+  and ``EntryPointClassRegistry._cache`` is ``dict[str, type[ValueType]] | None``.
+- ``BaseMutableRegistry._lookup_keys`` is ``dict[KeyType, Hashable]``.
+
+For example::
+
+   error: Return type "dict[Hashable, type[Base]]" of "_get_cache" incompatible with return type "dict[str, type[Base]]" in supertype "class_registry.entry_points.EntryPointClassRegistry"  [override]
+
+To fix it, match your override's annotation to the new one. Runtime behaviour is
+unchanged.
