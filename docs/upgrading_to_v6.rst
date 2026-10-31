@@ -9,6 +9,11 @@ It also makes two small changes that can fail at runtime:
   method (see `gen_lookup_key is now an instance method`_).
 - The ``T`` type variables are gone (see `The T type variables are gone`_).
 
+One runtime change is a fix rather than a break: iterating over a
+``ClassRegistryInstanceCache`` whose registry overrides ``gen_lookup_key`` now
+yields every instance, where v5 silently skipped those whose lookup key differed
+from their key.
+
 Registry keys now default to :py:class:`str`
 ----------------------------------------------
 Previously, a bare ``ClassRegistry[Foo]`` resolved its key type to
@@ -34,9 +39,10 @@ mypy reports one of::
 The names in quotes come from your code.
 
 If you pass the registry to a ``ClassRegistryInstanceCache`` or ``RegistryPatcher``
-annotated with only a value type, mypy reports::
+annotated with only a value type, mypy reports one of::
 
    error: Argument 1 to "ClassRegistryInstanceCache" has incompatible type "ClassRegistry[Pokemon, int]"; expected "ClassRegistry[Pokemon, str]"  [arg-type]
+   error: Argument 1 to "RegistryPatcher" has incompatible type "ClassRegistry[Pokemon, int]"; expected "BaseMutableRegistry[Pokemon, str]"  [arg-type]
 
 Both now take the key type as a second argument too, defaulting to :py:class:`str`;
 see `The T type variables are gone`_.
@@ -168,9 +174,12 @@ your class — unless it delegates to the base implementation, which a
 
 .. code-block:: python
 
+   from collections.abc import Hashable
+
+
    class FoldingRegistry(ClassRegistry[Pokemon]):
        @staticmethod
-       def gen_lookup_key(key: Hashable) -> Hashable:
+       def gen_lookup_key(key: str) -> Hashable:
            # Fails in v6 with the TypeError above.
            return ClassRegistry.gen_lookup_key(key.casefold())
 
@@ -195,8 +204,8 @@ those calls onto an instance first.
 
 The ``T`` type variables are gone
 ---------------------------------
-``class_registry.base``, ``class_registry.cache`` and ``class_registry.patcher``
-each defined a private ``T`` type variable. ClassRegistry v6 replaces them with
+Each of ``class_registry.base``, ``.cache``, ``.entry_points``, ``.patcher`` and
+``.registry`` defined a private ``T`` type variable. ClassRegistry v6 replaces them with
 two type variables shared across the package, both exported from
 ``class_registry.base``:
 
@@ -207,8 +216,7 @@ Importing ``T`` now fails at runtime::
 
    ImportError: cannot import name 'T' from 'class_registry.base'
 
-The module in the message may be ``class_registry.cache`` or
-``class_registry.patcher`` instead. mypy reports::
+The module in the message may be any of the five above. mypy reports::
 
    error: Module "class_registry.base" has no attribute "T"  [attr-defined]
 
@@ -241,18 +249,32 @@ A type variable with a default can't precede one without, so
 
    TypeError: Type parameter ~ValueType without a default follows type parameter with a default
 
-Subclasses that override private members
-----------------------------------------
-Some private attributes now carry the key type too. If your subclass overrides
-one of them with :py:class:`~typing.Hashable` keys, mypy rejects the override:
+mypy reports::
 
+   error: "ValueType" cannot appear after "KeyType" in type parameter list because it has no default type  [misc]
+
+Subclasses that override methods or attributes
+----------------------------------------------
+Methods and attributes that return or store keys now use the key type. If your
+subclass, or your own :py:class:`~class_registry.base.BaseRegistry`
+implementation, annotates one of them with :py:class:`~typing.Hashable` keys, mypy
+rejects the override:
+
+- ``keys()`` returns ``Iterable[KeyType]``, and ``__iter__()`` returns
+  ``Iterator[KeyType]``.
 - ``EntryPointClassRegistry._get_cache()`` returns ``dict[str, type[ValueType]]``,
   and ``EntryPointClassRegistry._cache`` is ``dict[str, type[ValueType]] | None``.
 - ``BaseMutableRegistry._lookup_keys`` is ``dict[KeyType, Hashable]``.
 
 For example::
 
+   error: Return type "Iterable[Hashable]" of "keys" incompatible with return type "Iterable[str]" in supertype "class_registry.base.BaseRegistry"  [override]
+   error: Return type "Iterator[Hashable]" of "__iter__" incompatible with return type "Iterator[str]" in supertype "class_registry.base.BaseRegistry"  [override]
    error: Return type "dict[Hashable, type[Base]]" of "_get_cache" incompatible with return type "dict[str, type[Base]]" in supertype "class_registry.entry_points.EntryPointClassRegistry"  [override]
 
-To fix it, match your override's annotation to the new one. Runtime behaviour is
-unchanged.
+To fix it, declare the registry's key type (as in
+`Registry keys now default to str`_) and match your override's annotation to it.
+Runtime behaviour is unchanged.
+
+``EntryPointClassRegistry`` takes only a value type: entry point names are always
+:py:class:`str`, so its key type is fixed. Pass it ``str`` keys.
