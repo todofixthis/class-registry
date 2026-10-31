@@ -38,6 +38,19 @@ mypy reports one of::
 
 The names in quotes come from your code.
 
+.. warning::
+
+   mypy can't see keys that come from an ``attr_name`` attribute, so a registry
+   that only registers that way and only iterates over its keys reports nothing —
+   yet every key is now typed :py:class:`str`. For example, with
+   ``ClassRegistry[Handler]('code')`` and a handler whose ``code = 404``, mypy
+   accepts ``[k.upper() for k in handlers]``, which fails at runtime::
+
+      AttributeError: 'int' object has no attribute 'upper'
+
+   Declare the key type of every registry whose keys aren't :py:class:`str`,
+   whether or not mypy complains.
+
 If you pass the registry to a ``ClassRegistryInstanceCache`` or ``RegistryPatcher``
 annotated with only a value type, mypy reports one of::
 
