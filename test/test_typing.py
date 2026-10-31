@@ -45,6 +45,13 @@ def test_class_registry_accepts_explicit_key_type() -> None:
     typing.assert_type(next(iter(registry.keys())), int)
 
 
+def test_class_registry_fills_default_key_type_at_runtime() -> None:
+    """Subscripting with only a value type fills ``str`` in at runtime too."""
+    # Guards the typing_extensions floor on Python 3.12 (docs/adr/001): 4.11
+    # accepts ``ClassRegistry[Widget]`` without filling in the default.
+    assert typing.get_args(ClassRegistry[Widget]) == (Widget, str)
+
+
 def test_sorted_class_registry_defaults_keys_to_str() -> None:
     """``SortedClassRegistry`` inherits the default ``str`` key type."""
     registry: SortedClassRegistry[Widget] = SortedClassRegistry(sort_key="weight")

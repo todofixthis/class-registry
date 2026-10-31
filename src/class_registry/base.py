@@ -259,7 +259,7 @@ class BaseMutableRegistry(BaseRegistry[ValueType, KeyType], ABC):
         """
         warn(
             f"{type(self).__name__}.values() is deprecated and will be removed in a "
-            f"future version of ClassRegistry.  Use {type(self).__name__}.classes()"
+            f"future version of ClassRegistry.  Use `{type(self).__name__}.classes()` "
             f"instead.",
             DeprecationWarning,
         )

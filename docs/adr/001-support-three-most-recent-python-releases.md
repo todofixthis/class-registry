@@ -1,7 +1,7 @@
 ---
 status: Accepted
 date: 2026-06-27
-scope: [pyproject.toml, .github/workflows/build.yml, src/class_registry/base.py]
+scope: [pyproject.toml, .github/workflows/build.yml, src/class_registry/base.py, test/test_typing.py]
 summary: Support the three most recent Python minor releases, backporting newer typing features via typing_extensions rather than dropping the oldest early.
 ---
 
@@ -75,9 +75,16 @@ on 3.12 — which keeps the zero-to-one cost proportionate to the benefit.
 
 ## Consequences
 
-- A runtime dependency `typing_extensions>=4.6 ; python_version < '3.13'`. The
-  `default=` parameter first appeared in 4.4; the `>=4.6` floor is chosen so PEP
-  696 `TypeVar` defaults track the finalised spec.
+- A runtime dependency `typing-extensions>=4.12,<5 ; python_version < '3.13'`.
+  4.12 is the first release that fills in a `TypeVar` default when a generic class
+  is subscripted with fewer arguments: below 4.11, `ClassRegistry[Foo]` raises
+  `TypeError: Too few arguments`, and 4.11 accepts it but leaves the default out of
+  `typing.get_args()`. tox and CI install from `uv.lock`, which tracks whatever
+  version is locked rather than the floor, so they test the floor only by
+  coincidence. Whenever the floor moves, or the shim gains a new construct (give it
+  a test exercising its runtime behaviour first, or the run checks nothing), run
+  the suite at the floor:
+  `uv run --isolated --python 3.12 --with 'typing-extensions==<floor>' pytest`.
 - The packaging marker (`python_version < '3.13'`, in `pyproject.toml`) and the
   runtime import guard are distinct mechanisms: the latter branches on
   `sys.version_info >= (3, 13)` in code, not on the environment marker.
