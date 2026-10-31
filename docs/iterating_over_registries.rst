@@ -55,7 +55,9 @@ For example, to use integer keys:
 .. code-block:: python
 
    from abc import ABC
+
    from class_registry import ClassRegistry
+
 
    class Pokemon(ABC):
        pokedex_id: int
@@ -118,6 +120,7 @@ are sorted:
 .. code-block:: python
 
    from functools import cmp_to_key
+
 
    def sorter(a, b):
        """
