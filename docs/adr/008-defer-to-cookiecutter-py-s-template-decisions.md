@@ -2,7 +2,7 @@
 status: Accepted
 date: 2026-10-31
 scope: [.agents/rules/template-owned.md, .autohooks/, .readthedocs.yaml, docs/adr/, docs/conf.py, pyproject.toml]
-summary: This project follows the copier template todofixthis/cookiecutter-py, which writes and owns the files that .agents/rules/template-owned.md lists; that rule, itself written by the template and changed only there, says how to change one; cookiecutter-py ADRs 006 and 007 replace this project's 005 and 006, the recorded python_version answer sets this project's ADR 001 range; a change right for every generated project goes to cookiecutter-py, and diverging from a template decision on purpose needs an ADR here naming the cookiecutter-py ADR it departs from.
+summary: This project follows the copier template todofixthis/cookiecutter-py, which writes and owns the files that .agents/rules/template-owned.md lists; that rule, itself written by the template and changed only there, says how to change one; cookiecutter-py ADRs 006 and 007 replace this project's 005 and 006, the recorded python_version answer sets this project's ADR 001 range; a change the rule marks as a template candidate goes to cookiecutter-py, and diverging from a template decision on purpose needs an ADR here naming the cookiecutter-py ADR it departs from.
 revisit-when: This project stops taking template updates; a cookiecutter-py ADR decides reliance on the phx plugin, so 007 can give way to it; the template supersedes or renumbers one of the ADRs named here; cookiecutter-py stops being readable to this project's readers.
 ---
 
@@ -86,9 +86,8 @@ that prefixing proved not worth its verbosity.
 
 ## Consequences
 
-- A change right for every generated project starts in cookiecutter-py, under
-  its ADRs. A change right for this project only follows
-  `.agents/rules/template-owned.md`.
+- `.agents/rules/template-owned.md` decides whether a change to a template-owned
+  file is made here or is a template candidate for cookiecutter-py.
 - Diverging from a template decision on purpose needs its own ADR here, naming
   the template ADR it departs from.
 
