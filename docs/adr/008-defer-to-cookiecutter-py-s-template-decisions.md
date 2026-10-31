@@ -1,8 +1,8 @@
 ---
 status: Accepted
 date: 2026-10-31
-scope: [.autohooks/, .readthedocs.yaml, docs/adr/, docs/conf.py, pyproject.toml]
-summary: The template's ADRs 006 and 007 replace this project's ADRs 005 and 006, and its Python range comes from the template's recorded python_version answer rather than ADR 001; change one of these upstream in cookiecutter-py, or record a deliberate divergence here as an ADR naming the template ADR it departs from.
+scope: [.agents/rules/template-owned.md, .autohooks/, .readthedocs.yaml, docs/adr/, docs/conf.py, pyproject.toml]
+summary: This project follows the copier template todofixthis/cookiecutter-py, which writes and owns the files that .agents/rules/template-owned.md lists; that rule, itself written by the template and changed only there, says how to change one; cookiecutter-py ADRs 006 and 007 replace this project's 005 and 006, the recorded python_version answer sets this project's ADR 001 range; a change right for every generated project goes to cookiecutter-py, and diverging from a template decision on purpose needs an ADR here naming the cookiecutter-py ADR it departs from.
 revisit-when: This project stops taking template updates; a cookiecutter-py ADR decides reliance on the phx plugin, so 007 can give way to it; the template supersedes or renumbers one of the ADRs named here; cookiecutter-py stops being readable to this project's readers.
 ---
 
@@ -13,7 +13,9 @@ revisit-when: This project stops taking template updates; a cookiecutter-py ADR 
 This project now takes its tooling from [cookiecutter-py's copier template][],
 recorded in `.copier-answers.yml`, and each template release arrives as a
 Renovate PR running `copier update` ([cookiecutter-py ADR 008][]). The files
-copier writes are template-owned: `.agents/rules/template-owned.md` lists them.
+copier writes are template-owned: `.agents/rules/template-owned.md` lists them
+and says how to change one. That rule is template-owned too: the template
+generates it, so a change to it starts in cookiecutter-py, never here.
 
 Several of this project's ADRs decided things the template now decides for
 every library, in files it now owns:
