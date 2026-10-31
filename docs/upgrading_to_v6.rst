@@ -2,7 +2,8 @@ Upgrading to ClassRegistry v6
 ==============================
 
 `ClassRegistry v6 <https://github.com/todofixthis/class-registry/releases/tag/6.0.0>`_
-changes the default registry key type, which only your type checker will notice.
+changes the default registry key type. That affects only type checking, but mypy
+doesn't always report it (see the warning under `Registry keys now default to str`_).
 It also makes two small changes that can fail at runtime:
 
 - :py:meth:`~class_registry.base.BaseRegistry.gen_lookup_key` is now an instance
@@ -37,6 +38,29 @@ mypy reports one of::
    error: No overload variant of "register" of "BaseMutableRegistry" matches argument type "int"  [call-overload]
 
 The names in quotes come from your code.
+
+.. warning::
+
+   mypy can't see keys that come from an ``attr_name`` attribute, so a registry
+   that only registers that way and only iterates over its keys reports nothing
+   after upgrading — yet every key is now typed :py:class:`str`. Your code still
+   runs, but mypy now gets it wrong in two ways. With
+   ``ClassRegistry[Handler]('code')`` and a handler whose ``code = 404``:
+
+   - mypy now accepts ``[k.upper() for k in handlers]``, which v5 rejected, and
+     which fails at runtime as it always did::
+
+        AttributeError: 'int' object has no attribute 'upper'
+
+   - an existing ``if isinstance(k, int):`` branch becomes unreachable, so mypy
+     silently skips checking it. Only ``--warn-unreachable`` (which ``--strict``
+     doesn't enable) reports it::
+
+        error: Subclass of "str" and "int" cannot exist: have distinct disjoint bases  [unreachable]
+        error: Statement is unreachable  [unreachable]
+
+   Declare the key type of every registry whose keys aren't :py:class:`str`,
+   whether or not mypy complains.
 
 If you pass the registry to a ``ClassRegistryInstanceCache`` or ``RegistryPatcher``
 annotated with only a value type, mypy reports one of::
