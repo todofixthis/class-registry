@@ -28,4 +28,4 @@ docs/_build/
 .tox
 
 # virtualenv
-venv/
+.venv.*/
