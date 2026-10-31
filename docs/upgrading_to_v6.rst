@@ -41,12 +41,22 @@ The names in quotes come from your code.
 .. warning::
 
    mypy can't see keys that come from an ``attr_name`` attribute, so a registry
-   that only registers that way and only iterates over its keys reports nothing —
-   yet every key is now typed :py:class:`str`. For example, with
-   ``ClassRegistry[Handler]('code')`` and a handler whose ``code = 404``, mypy
-   accepts ``[k.upper() for k in handlers]``, which fails at runtime::
+   that only registers that way and only iterates over its keys reports nothing
+   after upgrading — yet every key is now typed :py:class:`str`. Code that passed
+   mypy under v5 still runs, but mypy stops checking it properly. With
+   ``ClassRegistry[Handler]('code')`` and a handler whose ``code = 404``:
 
-      AttributeError: 'int' object has no attribute 'upper'
+   - mypy now accepts ``[k.upper() for k in handlers]``, which v5 rejected, and
+     which fails at runtime as it always did::
+
+        AttributeError: 'int' object has no attribute 'upper'
+
+   - an existing ``if isinstance(k, int):`` branch becomes unreachable, so mypy
+     silently skips checking it. Only ``--warn-unreachable`` (which ``--strict``
+     doesn't enable) reports it::
+
+        error: Subclass of "str" and "int" cannot exist: have distinct disjoint bases  [unreachable]
+        error: Statement is unreachable  [unreachable]
 
    Declare the key type of every registry whose keys aren't :py:class:`str`,
    whether or not mypy complains.
