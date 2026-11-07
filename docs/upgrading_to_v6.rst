@@ -44,23 +44,56 @@ The names in quotes come from your code.
    mypy can't see keys that come from an ``attr_name`` attribute, so a registry
    that only registers that way and only iterates over its keys reports nothing
    after upgrading — yet every key is now typed :py:class:`str`. Your code still
-   runs, but mypy now gets it wrong in two ways. With
-   ``ClassRegistry[Handler]('code')`` and a handler whose ``code = 404``:
+   runs, but mypy now gets it wrong in two ways:
 
-   - mypy now accepts ``[k.upper() for k in handlers]``, which v5 rejected, and
-     which fails at runtime as it always did::
+   .. code-block:: python
+
+      from class_registry import ClassRegistry
+
+
+      class Handler:
+          code: int
+
+
+      # No key type declared, so v6 types every key as ``str``.
+      handlers: ClassRegistry[Handler] = ClassRegistry('code')
+
+
+      @handlers.register
+      class NotFound(Handler):
+          code = 404
+
+
+      for key in handlers:
+          # mypy rejected this under v5 but accepts it under v6; it fails at runtime.
+          print(key.upper())
+
+      for key in handlers:
+          # v6 deems this branch unreachable, so mypy stops checking it.
+          if isinstance(key, int):
+              print(key + 1)
+
+   - mypy accepts ``key.upper()``, which v5 rejected, and which fails at runtime
+     as it always did::
 
         AttributeError: 'int' object has no attribute 'upper'
 
-   - an existing ``if isinstance(k, int):`` branch becomes unreachable, so mypy
-     silently skips checking it. Only ``--warn-unreachable`` (which ``--strict``
-     doesn't enable) reports it::
+   - mypy silently skips the ``isinstance(key, int)`` branch. Only
+     ``--warn-unreachable`` (which ``--strict`` doesn't enable) reports it::
 
         error: Subclass of "str" and "int" cannot exist: have distinct disjoint bases  [unreachable]
         error: Statement is unreachable  [unreachable]
 
    Declare the key type of every registry whose keys aren't :py:class:`str`,
-   whether or not mypy complains.
+   whether or not mypy complains:
+
+   .. code-block:: python
+
+      handlers: ClassRegistry[Handler, int] = ClassRegistry('code')
+
+   mypy then rejects ``key.upper()`` and checks the ``isinstance`` branch again::
+
+      error: "int" has no attribute "upper"  [attr-defined]
 
 If you pass the registry to a ``ClassRegistryInstanceCache`` or ``RegistryPatcher``
 annotated with only a value type, mypy reports one of::
