@@ -6,7 +6,8 @@ whilst the former returns a base class).
 :see: https://github.com/todofixthis/class-registry/issues/14
 """
 
-from abc import ABC, abstractmethod as abstract_method
+from abc import ABC
+from abc import abstractmethod as abstract_method
 
 import pytest
 

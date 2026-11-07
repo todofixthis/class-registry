@@ -20,8 +20,9 @@ class DummyDistributionFinder(DistributionFinder):
         for finder in sys.meta_path:
             if isinstance(finder, cls):
                 # If we've already installed an instance of the class, then
-                # something is probably wrong with our tests.
-                raise ValueError(f"{cls.__name__} is already installed")
+                # something is probably wrong with our tests. The type matched,
+                # so this reports bad state rather than a bad type: ValueError.
+                raise ValueError(f"{cls.__name__} is already installed")  # noqa: TRY004
 
         sys.meta_path.append(cls())
 
@@ -31,10 +32,9 @@ class DummyDistributionFinder(DistributionFinder):
             if isinstance(finder, cls):
                 sys.meta_path.pop(i)
                 return
-        else:
-            # If we didn't find an installed instance of the class, then
-            # something is probably wrong with our tests.
-            raise ValueError(f"{cls.__name__} was not installed")
+        # If we didn't find an installed instance of the class, then
+        # something is probably wrong with our tests.
+        raise ValueError(f"{cls.__name__} was not installed")
 
     # ``context`` should be a ``DistributionFinder.Context``, but that type isn't
     # compatible with ``EllipsisType``, and mypy isn't having any of it, so :shrug:

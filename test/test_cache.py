@@ -1,3 +1,5 @@
+import typing
+
 import pytest
 
 from class_registry import ClassRegistry
@@ -81,3 +83,24 @@ def test_len(
     cache.__getitem__("grass")
 
     assert len(cache) == 2
+
+
+def test_iter_with_customised_lookup_key() -> None:
+    """
+    Iterating over a cache still yields cached instances when the wrapped
+    registry overrides ``gen_lookup_key`` with a non-identity function.
+    """
+
+    class FoldingRegistry(ClassRegistry[Pokemon]):
+        def gen_lookup_key(self, key: typing.Hashable) -> typing.Hashable:
+            return key.casefold() if isinstance(key, str) else key
+
+    registry = FoldingRegistry()
+    registry.register("Grass")(Bulbasaur)
+    registry.register("Water")(Squirtle)
+
+    cache = ClassRegistryInstanceCache[Pokemon](registry)
+    cache.__getitem__("Grass")
+    cache.__getitem__("Water")
+
+    assert {type(instance) for instance in cache} == {Bulbasaur, Squirtle}

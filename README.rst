@@ -13,14 +13,19 @@ At the intersection of the Registry and Factory patterns lies the ``ClassRegistr
   extensible by 3rd-party libraries!
 - And more!
 
-Upgrading from ClassRegistry v4
--------------------------------
-.. important::
+Upgrading from an Earlier Version
+----------------------------------
+.. warning::
 
-   ClassRegistry v5 introduces some changes that can break code that was previously
-   using ClassRegistry v4.  If you are upgrading from ClassRegistry v4 to ClassRegistry
-   v5, please read `Upgrading to ClassRegistry v5 <./docs/upgrading_to_v5.rst>`_.
+   Major releases of ClassRegistry introduce breaking changes. If you are upgrading to a
+   new major version of ClassRegistry, please consult the migration docs.
 
+   If you are upgrading through more than one major version (e.g. v4 -> v6), it's
+   usually easier to upgrade through each major release incrementally (e.g. v4 -> v5 ->
+   v6) rather than make all the changes for each major release all at once.
+
+   - v5 -> v6: `Upgrading to ClassRegistry v6 <docs/upgrading_to_v6.rst>`_
+   - v4 -> v5: `Upgrading to ClassRegistry v5 <docs/upgrading_to_v5.rst>`_
 
 Getting Started
 ---------------

@@ -1,0 +1,13 @@
+{
+  "enabledPlugins": {
+    "phx@todofixthis": true
+  },
+  "extraKnownMarketplaces": {
+    "todofixthis": {
+      "source": {
+        "source": "github",
+        "repo": "todofixthis/phx-claude-siat"
+      }
+    }
+  }
+}

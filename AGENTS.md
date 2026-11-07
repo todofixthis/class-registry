@@ -8,7 +8,7 @@ Before writing code, check:
 
 ## Architecture Decision Records
 
-When making significant decisions — choosing between libraries, patterns, tools, or conventions — you **must** write an ADR before implementing the decision. Use the `writing-adrs` skill for the format and conventions. ADRs live in `docs/adr/`. Before writing, run `ls docs/adr/` to find the highest existing number and increment it.
+When making significant decisions — choosing between libraries, patterns, tools, or conventions — you **must** write an ADR before implementing the decision. Use the [`phx:writing-adrs`](https://github.com/todofixthis/phx-claude-siat/blob/0725567cec6bab6a227c2a3d569e64c226c33a4e/skills/writing-adrs/SKILL.md) skill (from the phx plugin, which `.claude/settings.json` enables) for the format, conventions and tooling: its `adr.py` allocates the number, generates `docs/adr/INDEX.md` and validates the corpus. Outside Claude Code, run the same tool as `phx-adr` (see Commands). Don't hand-edit the index or add a repo-local ADR script (ADR 007). ADRs live in `docs/adr/`.
 
 If you find yourself about to establish a new cross-cutting pattern (something that will affect multiple domains or files, e.g. a testing convention, a shared utility, an error-handling approach), stop and write an ADR first even if the immediate task feels local. A pattern adopted once becomes the template for everything that follows.
 
@@ -28,19 +28,32 @@ uv run ruff check                                      # lint
 uv run make -C docs clean && uv run make -C docs html  # build docs
 ```
 
+The phx plugin's ADR tool (release 8.1.0), for use outside Claude Code. Keep the ref in step with the `adrs` CI job; `phx-adr --help` lists the rest (`for <path>`, `supersede`, `discharge`, `renumber`):
+
+```bash
+# Scaffold the next ADR
+uvx --from 'git+https://github.com/todofixthis/phx-claude-siat@0725567cec6bab6a227c2a3d569e64c226c33a4e#subdirectory=skills/writing-adrs' phx-adr new "Title" --summary "…" --scope path/
+# Regenerate docs/adr/INDEX.md
+uvx --from 'git+https://github.com/todofixthis/phx-claude-siat@0725567cec6bab6a227c2a3d569e64c226c33a4e#subdirectory=skills/writing-adrs' phx-adr index
+# Validate, as CI does
+uvx --from 'git+https://github.com/todofixthis/phx-claude-siat@0725567cec6bab6a227c2a3d569e64c226c33a4e#subdirectory=skills/writing-adrs' phx-adr check
+```
+
+**In a worktree:** the shell can silently reset to the main checkout, so always prefix state-mutating commands (`uv add`/`sync`/`run`) with `cd <worktree> &&` to ensure they hit the worktree.
+
 ## Architecture
 
 The package is in `src/class_registry/`. The public API (`__init__.py`) exports only `ClassRegistry` and `RegistryKeyError`.
 
 **Class hierarchy:**
 
-- `base.BaseRegistry[T]` — read-only abstract base; defines `__getitem__`/`get`/`get_class`/`keys`/`classes`, plus extension points `gen_lookup_key` and `create_instance`.
-- `base.BaseMutableRegistry[T]` — extends `BaseRegistry` with `register`/`unregister` (and deprecated `items`/`values`).
-- `registry.ClassRegistry[T]` — the main concrete implementation; stores classes in a dict, supports `unique` mode to prevent key collisions.
-- `registry.SortedClassRegistry[T]` — extends `ClassRegistry`; overrides `keys()` to sort by a `sort_key` attribute or callable.
-- `entry_points.EntryPointClassRegistry[T]` — extends `BaseRegistry` (read-only); discovers classes via setuptools entry points, lazily cached.
-- `cache.ClassRegistryInstanceCache[T]` — wraps a `ClassRegistry`, caching instantiated objects rather than classes (for service-registry use cases).
-- `patcher.RegistryPatcher[T]` — context manager that temporarily patches a `BaseMutableRegistry`, then restores the original state on exit.
+- `base.BaseRegistry[ValueType, KeyType]` — read-only abstract base; defines `__getitem__`/`get`/`get_class`/`keys`/`classes`, plus extension points `gen_lookup_key` and `create_instance`.
+- `base.BaseMutableRegistry[ValueType, KeyType]` — extends `BaseRegistry` with `register`/`unregister` (and deprecated `items`/`values`).
+- `registry.ClassRegistry[ValueType, KeyType]` — the main concrete implementation; stores classes in a dict, supports `unique` mode to prevent key collisions.
+- `registry.SortedClassRegistry[ValueType, KeyType]` — extends `ClassRegistry`; overrides `keys()` to sort by a `sort_key` attribute or callable.
+- `entry_points.EntryPointClassRegistry[ValueType]` — extends `BaseRegistry`, pinning its key type to `str` (read-only); discovers classes via setuptools entry points, lazily cached.
+- `cache.ClassRegistryInstanceCache[ValueType, KeyType]` — wraps a `ClassRegistry`, caching instantiated objects rather than classes (for service-registry use cases).
+- `patcher.RegistryPatcher[ValueType, KeyType]` — context manager that temporarily patches a `BaseMutableRegistry`, then restores the original state on exit.
 
 **`AutoRegister`:**
 - `base.AutoRegister(registry)` — current API; returns a **base class** whose non-abstract subclasses auto-register. Requires `registry.attr_name` to be set.
@@ -54,6 +67,10 @@ The package is in `src/class_registry/`. The public API (`__init__.py`) exports 
 ## Docstrings
 
 Google/Napoleon format (`Args:`, `Returns:`, `Note:`) — not Sphinx `:param:` style. Max 80 chars per line. Escape backslashes (e.g. `'\\n'` not `'\n'`). Blank line before lists inside `Args:` sections to avoid Sphinx indentation warnings. ReadTheDocs treats all Sphinx warnings as errors — resolve them before pushing.
+
+## Tests
+
+Every test function has a one-line docstring stating the behaviour it verifies.
 
 ## Code Comments
 
@@ -78,6 +95,10 @@ Place comments on the line preceding the code they document, not as trailing com
 
 ## Git Worktrees
 
-Use `.worktrees/` for isolated workspaces (project-local, gitignored).
+Use the `using-git-worktrees` skill; it creates worktrees via the native `EnterWorktree` tool under `.claude/worktrees/` (gitignored). Don't hand-roll `git worktree add` when the native tool is available. Keep `.claude/` a real directory (only `.claude/skills` is a symlink into `.agents/skills`) — the native tool refuses to run if `.claude` itself is a symlink.
 
-After switching to a worktree, run the autohooks activate command (see Commands) to install the pre-commit hook for that worktree.
+After creating a worktree, install its pre-commit hook (see the autohooks activate command in Commands). A fresh worktree has no per-worktree hooks directory, so create it first:
+
+```bash
+mkdir -p "$(git rev-parse --git-dir)/hooks"
+```

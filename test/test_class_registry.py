@@ -1,5 +1,3 @@
-import typing
-
 import pytest
 
 from class_registry import ClassRegistry, RegistryKeyError
@@ -124,7 +122,7 @@ def test_unregister() -> None:
 
     # Note that you must unregister the KEY, not the CLASS.
     with pytest.raises(KeyError):
-        registry.unregister(Squirtle)
+        registry.unregister(Squirtle)  # type: ignore[arg-type]
 
     # If you try to unregister a key that isn't registered, you'll
     # get an error.
@@ -172,7 +170,7 @@ def test_register_function() -> None:
     registry = ClassRegistry[Pokemon]()
 
     @registry.register("fire")
-    def pokemon_factory(name: typing.Optional[str] = None) -> Charmeleon:
+    def pokemon_factory(name: str | None = None) -> Charmeleon:
         return Charmeleon(name=name)
 
     # Alternate syntax (rarely used; mostly just here to give mypy more to work with):
@@ -201,7 +199,7 @@ def test_regression_contains_when_class_init_requires_arguments() -> None:
         element = "bug"
 
         def __init__(self, name: str):
-            super(Butterfree, self).__init__(name)
+            super().__init__(name)
 
     # This line would raise a TypeError in a previous version of ClassRegistry.
     assert "bug" in registry

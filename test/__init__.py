@@ -1,6 +1,3 @@
-import typing
-
-
 class Pokemon:
     """
     A basic class with some attributes that we can use to test out class
@@ -9,10 +6,10 @@ class Pokemon:
 
     element: str
 
-    def __init__(self, name: typing.Optional[str] = None):
+    def __init__(self, name: str | None = None):
         super().__init__()
 
-        self.name: typing.Optional[str] = name
+        self.name: str | None = name
 
 
 # Define some classes that we can register.
@@ -51,5 +48,5 @@ class PokemonFactory:
     """
 
     @classmethod
-    def create_psychic_pokemon(cls, name: typing.Optional[str] = None) -> Mew:
+    def create_psychic_pokemon(cls, name: str | None = None) -> Mew:
         return Mew(name)

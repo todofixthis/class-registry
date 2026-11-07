@@ -74,8 +74,8 @@ def test_cmp_to_key() -> None:
         popularity: int
 
     def compare_pokemon(
-        a: typing.Tuple[typing.Hashable, typing.Type[PopularPokemon], typing.Hashable],
-        b: typing.Tuple[typing.Hashable, typing.Type[PopularPokemon], typing.Hashable],
+        a: tuple[typing.Hashable, type[PopularPokemon], typing.Hashable],
+        b: tuple[typing.Hashable, type[PopularPokemon], typing.Hashable],
     ) -> int:
         """
         Sort in descending order by popularity.
@@ -117,8 +117,8 @@ def test_gen_lookup_key_overridden() -> None:
     """
 
     def compare_by_lookup_key(
-        a: typing.Tuple[str, typing.Type[Pokemon], str],
-        b: typing.Tuple[str, typing.Type[Pokemon], str],
+        a: tuple[str, type[Pokemon], str],
+        b: tuple[str, type[Pokemon], str],
     ) -> int:
         """
         :param a: Tuple of (key, class, lookup_key)
@@ -127,8 +127,7 @@ def test_gen_lookup_key_overridden() -> None:
         return (a[2] > b[2]) - (a[2] < b[2])
 
     class TestRegistry(SortedClassRegistry[Pokemon]):
-        @staticmethod
-        def gen_lookup_key(key: typing.Hashable) -> typing.Hashable:
+        def gen_lookup_key(self, key: typing.Hashable) -> typing.Hashable:
             """
             Simple override of `gen_lookup_key`, to ensure the sorting
             behaves as expected when the lookup key is different.
