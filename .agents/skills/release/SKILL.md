@@ -1,6 +1,6 @@
 ---
 name: release
-description: Use when preparing or publishing a new release of class-registry — covers release notes, version bump, build, PyPI upload, and GitHub release creation
+description: Use when preparing or publishing a new release of ClassRegistry — covers release notes, version bump, build, PyPI upload, and GitHub release creation
 ---
 # Release
 
@@ -30,7 +30,7 @@ gh issue view <number> --json title,body,labels
 ```
 
 ### 3. Draft release notes
-Using the commit list, PR descriptions, and issue context, draft the release notes following the _Writing Release Notes_ guide below. When a bullet relates to a GitHub issue, prefix it with `[#number]`. Run the `nz-english` skill on the draft, then present it to the developer for review and incorporate feedback before proceeding.
+Using the commit list, PR descriptions, and issue context, draft the release notes following the _Writing Release Notes_ guide below, and write them to `release-<version>.md` in the repo root (gitignored; steps 7 and 11 read it). Name it for the likely version, and rename it if the version confirmed at the Phase 1 stop differs. When a bullet relates to a GitHub issue, prefix it with `[#number]`. Run the `nz-english` skill on the draft, then present it to the developer for review and incorporate feedback before proceeding.
 
 ### 4. Recommend version number
 Based on the changes, recommend a semver bump:
@@ -48,7 +48,7 @@ A **breaking change** is anything that makes previously-working code fail — at
 **Then the guide.** One guide per major line, `docs/upgrading_to_v<major>.rst` — never a per-minor page. `<major>` is the major being released, or, for a break shipped in a minor or patch, the major line it lands on.
 
 It must:
-- **cover *this* release's breaking change.** A guide left over from an earlier release satisfies nothing — its existence is what makes this the easy check to fake. A break shipped in 6.3.0 gets its own section in `upgrading_to_v6.rst`, headed by the version that introduced it.
+- **cover *this* release's breaking change.** A guide left over from an earlier release satisfies nothing — its existence is what makes this the easy check to fake. A break shipped in a `.3.0` gets its own section in `upgrading_to_v<major>.rst`, headed by the version that introduced it.
 - exist, be listed in the `docs/index.rst` toctree, and be linked from the upgrade-alert listing in **both** `docs/index.rst` and `README.rst` — the two carry the same listing and drift apart easily. The link syntax differs by file: `docs/index.rst` uses a Sphinx `:doc:` role targeting `upgrading_to_v<major>`; `README.rst` uses a relative link to the source, `` `Upgrading to ClassRegistry v<major> <docs/upgrading_to_v<major>.rst>`_ `` — the `:doc:` role renders as raw text on GitHub, where the README is read.
 - follow _Writing a Migration Guide_ below.
 
@@ -70,10 +70,9 @@ Then read the guide and confirm it covers this release's break. No command check
 ## Phase 2 — Publish (after confirmation)
 
 ### 6. Bump version on `develop`
-```bash
-uv version <version>
-```
-This updates `pyproject.toml` and re-locks `uv.lock` in one step. Commit both files and push to `develop`.
+Edit `__version__` in `src/class_registry/__init__.py`
+directly — Hatch reads the version from there, since `pyproject.toml`
+declares it `dynamic`. Commit the file and push to `develop`.
 
 ### 7. Open release PR
 ```bash
@@ -103,7 +102,9 @@ matches found` when `dist/` is empty or absent, and otherwise skips uv's
 git tag -a <version> -m "Release <version>"
 git push origin <version>
 ```
-`<version>` must match `pyproject.toml`.
+`<version>` must match `__version__` in
+`src/class_registry/__init__.py`; `pyproject.toml` declares
+the version dynamic and does not carry it.
 
 ### 11. Create GitHub release
 
@@ -112,13 +113,36 @@ git push origin <version>
 shasum -a 256 dist/phx_class_registry-* >> release-<version>.md
 ```
 
-**b. GPG-sign the document and each build artefact:**
+**b. GPG-sign the build artefacts and the notes, publishing the signing key's fingerprint.** Run this as one command, since each part needs the variables the one before it sets:
 ```bash
 GPG_KEY=$(git config user.email)
-gpg --local-user "$GPG_KEY" --clearsign release-<version>.md   # → release-<version>.md.asc
-for f in dist/phx_class_registry-*; do gpg --local-user "$GPG_KEY" --detach-sign "$f"; done
-# Creates dist/phx_class_registry-*.sig alongside each artefact
+pkg=dist/phx_class_registry
+# --yes overwrites signatures left by an earlier, interrupted run
+for f in "$pkg"-*.whl "$pkg"-*.tar.gz; do gpg --yes --local-user "$GPG_KEY" --detach-sign "$f"; done
+
+# The primary-key fingerprint of the key that signed, read from a signature,
+# since several keys can share one email address
+sig=$(ls "$pkg"-*.whl.sig | head -n 1)
+GPG_FINGERPRINT=$(gpg --status-fd 1 --verify "$sig" "${sig%.sig}" 2>/dev/null | awk '$2 == "VALIDSIG" {print $12}')
+
+# Users import the key from GitHub, so it must be published there
+if curl -fsSL https://github.com/todofixthis.gpg \
+  | gpg --show-keys --with-colons \
+  | awk -F: '$1 == "fpr" {print $10}' \
+  | grep -qx "$GPG_FINGERPRINT"; then
+  # Removes any copy signed by an earlier run, so a failed signing leaves none
+  rm -f release-<version>.md.asc
+  # Writes release-<version>.md.asc
+  sed -i.bak "s/<fingerprint>/$GPG_FINGERPRINT/" release-<version>.md \
+    && rm release-<version>.md.bak \
+    && gpg --yes --local-user "$GPG_KEY" --clearsign release-<version>.md \
+    && echo "✅ Signed with $GPG_FINGERPRINT, published on GitHub" \
+    || echo "❌ Couldn't fill in or sign release-<version>.md"
+else
+  echo "❌ Signing key '$GPG_FINGERPRINT' isn't published at https://github.com/todofixthis.gpg"
+fi
 ```
+On ❌, stop and pass the message on to the developer. If the signing key isn't published, users couldn't verify the release, since they import the key from that URL; that message names the fingerprint, which is empty if signing failed or GitHub couldn't be reached. Once it's fixed, re-run this step alone: step a has already added the checksums.
 
 **c. Build the release body** — concatenate the notes and the signed copy:
 ```
@@ -215,12 +239,23 @@ Because `develop` now contains all of `main`'s commits, the histories no longer 
 > 2. Download the `.whl` or `.tar.gz` and its matching `.sig` file from the release assets
 > 3. Verify: `gpg --verify phx_class_registry-<version>-py3-none-any.whl.sig phx_class_registry-<version>-py3-none-any.whl`
 >
-> Key fingerprint: `457997A2A506270F918D7BD1925CC6E316680401`
+> Key fingerprint: `<fingerprint>`
 
 # SHA256 Checksums
 ```
 
 Lead every pre-release's notes with the `[!CAUTION]` block, verbatim, directly under the title: a pre-release is any `0.y.z` version, or one with a pre-release segment (`4.0.0a1`, `2.0.0rc1`, `1.1.0.dev1`). Omit it from every other release. Only include the `[!WARNING]` block if there are breaking changes — but when it is present, the migration guide link is **required**, not optional. Omit any section that has no entries.
+
+A filled-in breaking changes alert:
+```markdown
+> [!WARNING]
+> **Breaking changes**
+> - `SomeClass.old_method()` removed
+>   - Replace with `SomeClass.new_method()`
+>   - You'll know you need to migrate if you see: `AttributeError: 'SomeClass' object has no attribute 'old_method'`
+>
+> Full migration guide: [Upgrading to ClassRegistry v{major}](https://class-registry.readthedocs.io/en/latest/upgrading_to_v{major}.html)
+```
 
 ### Grouping related items
 - **2–4 related bullets:** nest as a hierarchical sublist under the parent bullet
@@ -245,24 +280,13 @@ Lead every pre-release's notes with the `[!CAUTION]` block, verbatim, directly u
 - Formatting, linting, minor refactoring
 - Test coverage updates
 
-### Breaking changes alert
-```markdown
-> [!WARNING]
-> **Breaking changes**
-> - `SomeClass.old_method()` removed
->   - Replace with `SomeClass.new_method()`
->   - You'll know you need to migrate if you see: `AttributeError: 'SomeClass' object has no attribute 'old_method'`
->
-> Full migration guide: [Upgrading to ClassRegistry v6](https://class-registry.readthedocs.io/en/latest/upgrading_to_v6.html)
-```
-
 ---
 
 ## Writing a Migration Guide
 
-`docs/upgrading_to_v<major>.rst`, modelled on the existing `upgrading_to_v6.rst`. It stays unreachable until wired into three slots: the `docs/index.rst` toctree, and the upgrade-alert listing in **both** `docs/index.rst` and `README.rst`. The two listings (one bullet per major upgrade) drift apart easily — add the bullet to each, or the README goes stale. Their link syntax differs: `docs/index.rst` uses a Sphinx `:doc:` role targeting `upgrading_to_v<major>`; `README.rst` uses a relative link to the source, `` `Upgrading to ClassRegistry v<major> <docs/upgrading_to_v<major>.rst>`_ `` — `:doc:` renders as raw text on GitHub, where the README is read.
+`docs/upgrading_to_v<major>.rst`. It stays unreachable until wired into three slots: the `docs/index.rst` toctree, and the upgrade-alert listing in **both** `docs/index.rst` and `README.rst`. The two listings (one bullet per major upgrade) drift apart easily — add the bullet to each, or the README goes stale. Their link syntax differs: `docs/index.rst` uses a Sphinx `:doc:` role targeting `upgrading_to_v<major>`; `README.rst` uses a relative link to the source, `` `Upgrading to ClassRegistry v<major> <docs/upgrading_to_v<major>.rst>`_ `` — `:doc:` renders as raw text on GitHub, where the README is read.
 
-One page covers a whole major line: the move onto it, and any break shipped later within it. Say so in the opening paragraph — someone already on v6 has no reason to guess that "Upgrading to ClassRegistry v6" is where a 6.3.0 break is written down. Breaks after the major boundary get their own `Changes in v<version>` section; the major boundary itself is the page's main content.
+One page covers a whole major line: the move onto it, and any break shipped later within it. Say so in the opening paragraph — someone already on the new major has no reason to guess that "Upgrading to ClassRegistry v<major>" is where a later break within it is written down. Breaks after the major boundary get their own `Changes in v<version>` section; the major boundary itself is the page's main content.
 
 Write for someone who upgraded, hit an error, and does not yet know a release caused it. They arrive by searching the error text — not by reading release notes.
 
@@ -278,7 +302,7 @@ Then add what the fix leads them into next:
 - **Second-order traps.** A fix that lands people in a subtler failure needs that failure documented beside it, with its error text.
 - **Facts stranded in ADRs.** ADRs are not in the toctree and readers never see them. If an ADR holds the only explanation of something a migrating developer needs, the guide is where it goes.
 
-Verify every code sample and every error message by running it. Prose that merely sounds right is the recurring failure in this repo's documentation, and a migration guide is the worst place for it — its readers are already stuck.
+Verify every code sample and every error message by running it.
 
 Before wiring the guide in, run two passes over the draft:
 
@@ -288,4 +312,4 @@ Dispatch one subagent on the main model (a reasoning task, not a cheap one), giv
 
 ### Conciseness pass
 
-Tighten the reviewed draft: cut repetition, merge overlapping fixes, drop hedging and prose that restates a code sample. The surrogate review optimises for completeness and leaves the draft longer than it needs to be, so weigh each addition and keep only what earns its place. Never trim two things for length: **verbatim error text and code fixes** — readers match on them — and any **migration step**. Then, since this repo uses NZ English, run `phx:nz-english` over the result.
+Tighten the reviewed draft: cut repetition, merge overlapping fixes, drop hedging and prose that restates a code sample. The surrogate review optimises for completeness and leaves the draft longer than it needs to be, so weigh each addition and keep only what earns its place. Never trim two things for length: **verbatim error text and code fixes** — readers match on them — and any **migration step**. Then, since this project uses NZ English, run `phx:nz-english` over the result.

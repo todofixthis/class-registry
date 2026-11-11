@@ -4,12 +4,14 @@ build-backend = "hatchling.build"
 
 [project]
 name = "phx-class-registry"
-version = "6.0.0"
+dynamic = ["version"]
 description = "Factory+Registry pattern for Python classes"
 authors = [{ name = "Phoenix Zerin", email = "phx@phx.nz" }]
 requires-python = ">=3.12"
 readme = "README.rst"
 license = "MIT"
+
+# :see: https://pypi.org/classifiers/
 keywords = [
     "design pattern",
     "factory pattern",
@@ -32,14 +34,15 @@ Changelog = "https://github.com/todofixthis/class-registry/releases"
 Issues = "https://github.com/todofixthis/class-registry/issues"
 
 [dependency-groups]
+# I'm only one person, so to keep from getting overwhelmed, I'm only committing
+# to supporting the 3 most recent versions of Python (see
+# https://github.com/todofixthis/cookiecutter-py/blob/main/docs/adr/008-propagate-template-changes-with-copier-and-renovate.md).
 dev = [
     "autohooks>=26,<27",
     "autohooks-plugin-black>=23,<24",
     "autohooks-plugin-mypy>=23,<24",
     "autohooks-plugin-pytest>=23,<24",
     "autohooks-plugin-ruff>=25,<26",
-    # >=3.29 fixes an OSError on Docker/macOS volume mounts (fcntl file locking)
-    "filelock>=3.29",
     "mypy>=2,<3",
     "pytest>=9,<10",
     "sphinx>=9,<10",
@@ -47,9 +50,13 @@ dev = [
     "tox>=4,<5",
     "tox-uv>=1,<2",
 ]
+
+# Used by GitHub Actions and ReadTheDocs.
 ci = [
+    "black>=26,<27",
     "mypy>=2,<3",
     "pytest>=9,<10",
+    "ruff>=0.17,<0.18",
     "sphinx>=9,<10",
     "sphinx_rtd_theme>=3.1,<4",
     "tox-uv>=1,<2",
@@ -63,10 +70,20 @@ pre-commit = [
     "autohooks.plugins.pytest",
     "autohooks.plugins.ruff",
     # Runs a strict, full-reread Sphinx build on staged docs/docstring
-    # changes (see docs/adr/006-check-the-docs-build-in-the-pre-commit-hook.md)
+    # changes (see
+    # https://github.com/todofixthis/cookiecutter-py/blob/main/docs/adr/007-check-the-docs-build-in-the-pre-commit-hook.md)
     # — removing this reopens a gap neither CI nor the pre-commit chain
     # otherwise catches.
     "docs_build",
+]
+
+[tool.black]
+# Explicit, because black otherwise infers every version `requires-python`
+# allows, including ones newer than the running interpreter can parse.
+target-version = [
+    "py314",
+    "py313",
+    "py312",
 ]
 
 [tool.hatch.build.targets.sdist]
@@ -85,6 +102,15 @@ exclude = ["docs/_build"]
 [tool.hatch.build.targets.wheel.sources]
 "src/class_registry" = "class_registry"
 
+[tool.hatch.version]
+path = "src/class_registry/__init__.py"
+
+[tool.mypy]
+strict = true
+
+[tool.pytest.ini_options]
+testpaths = ["test"]
+
 [tool.ruff.lint]
 extend-ignore = [
     # Registries call ``keys()`` explicitly, since ruff can't tell a registry
@@ -102,19 +128,17 @@ extend-ignore = [
 # mypy can't see it as an attribute: these tests reach it through getattr.
 "test/test_entry_points.py" = ["B009"]
 
-[tool.mypy]
-strict = true
-
-[tool.pytest.ini_options]
-testpaths = ["test"]
-
 [tool.tox]
-env_list = ["py314", "py313", "py312"]
+env_list = [
+    "py314",
+    "py313",
+    "py312",
+]
 
 [tool.tox.env_run_base]
 commands = [
     ["pytest"],
-    ["mypy", "src", "test"]
+    ["mypy", "src", "test"],
 ]
 runner = "uv-venv-lock-runner"
 
@@ -122,3 +146,8 @@ runner = "uv-venv-lock-runner"
 keyring-provider = "subprocess"
 # Fix SSL errors when running in Leash containers
 system-certs = true
+# Resolve only releases at least 3 days old, so a broken or malicious release
+# is usually yanked before a lock refresh picks it up (ADR 013 in
+# todofixthis/cookiecutter-py). Exempt one package with
+# `exclude-newer-package = { <package> = false }`.
+exclude-newer = "3 days"

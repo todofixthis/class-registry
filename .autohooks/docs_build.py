@@ -17,9 +17,8 @@ _DOCS_DIR = _PROJECT_ROOT / "docs"
 _BUILD_DIR = _DOCS_DIR / "_build" / "precommit"
 _BUILD_TIMEOUT_SECONDS = 120
 
-# Docstrings under src/ are pulled into the built API page by autodoc (see
-# docs/adr/006-check-the-docs-build-in-the-pre-commit-hook.md), so they can
-# break the build the same way an .rst change can.
+# Docstrings under src/ are pulled into the built API page by autodoc, so
+# they can break the build the same way an .rst change can.
 INCLUDE = ("docs/*.rst", "docs/conf.py", "src/*.py")
 
 
@@ -46,8 +45,9 @@ def precommit(
         # Force a full re-read on every run: an unchanged file that a
         # previous build already read keeps whatever it registered then
         # (e.g. an autosectionlabel target), so a warning a *different*
-        # file would now raise against it can go undetected without this
-        # (see docs/adr/006-check-the-docs-build-in-the-pre-commit-hook.md).
+        # file would now raise against it can go undetected without this.
+        # See
+        # https://github.com/todofixthis/cookiecutter-py/blob/main/docs/adr/007-check-the-docs-build-in-the-pre-commit-hook.md
         "-E",
         str(_DOCS_DIR),
         str(_BUILD_DIR),

@@ -1,0 +1,16 @@
+# Changes here will be overwritten by Copier
+_commit: 1.1.0
+_src_path: https://github.com/todofixthis/cookiecutter-py
+author_email: phx@phx.nz
+author_name: Phoenix Zerin
+copyright_holder: EFL Global
+copyright_year: 2017
+github_project_name: class-registry
+github_username: todofixthis
+package_name: class_registry
+project_name: ClassRegistry
+project_short_description: Factory+Registry pattern for Python classes
+pypi_project_name: phx-class-registry
+python_version: '3.14'
+readthedocs_slug: class-registry
+version: 5.2.2

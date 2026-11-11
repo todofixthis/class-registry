@@ -6,6 +6,10 @@ resolution-markers = [
     "python_full_version < '3.15'",
 ]
 
+[options]
+exclude-newer = "0001-01-01T00:00:00Z" # This has no effect and is included for backwards compatibility when using relative exclude-newer values.
+exclude-newer-span = "P3D"
+
 [[package]]
 name = "alabaster"
 version = "1.0.0"
@@ -681,7 +685,6 @@ wheels = [
 
 [[package]]
 name = "phx-class-registry"
-version = "6.0.0"
 source = { editable = "." }
 dependencies = [
     { name = "typing-extensions", version = "4.12.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.13'" },
@@ -689,8 +692,10 @@ dependencies = [
 
 [package.dev-dependencies]
 ci = [
+    { name = "black" },
     { name = "mypy" },
     { name = "pytest" },
+    { name = "ruff" },
     { name = "sphinx" },
     { name = "sphinx-rtd-theme" },
     { name = "tox-uv" },
@@ -701,7 +706,6 @@ dev = [
     { name = "autohooks-plugin-mypy" },
     { name = "autohooks-plugin-pytest" },
     { name = "autohooks-plugin-ruff" },
-    { name = "filelock" },
     { name = "mypy" },
     { name = "pytest" },
     { name = "sphinx" },
@@ -715,8 +719,10 @@ requires-dist = [{ name = "typing-extensions", marker = "python_full_version < '
 
 [package.metadata.requires-dev]
 ci = [
+    { name = "black", specifier = ">=26,<27" },
     { name = "mypy", specifier = ">=2,<3" },
     { name = "pytest", specifier = ">=9,<10" },
+    { name = "ruff", specifier = ">=0.17,<0.18" },
     { name = "sphinx", specifier = ">=9,<10" },
     { name = "sphinx-rtd-theme", specifier = ">=3.1,<4" },
     { name = "tox-uv", specifier = ">=1,<2" },
@@ -727,7 +733,6 @@ dev = [
     { name = "autohooks-plugin-mypy", specifier = ">=23,<24" },
     { name = "autohooks-plugin-pytest", specifier = ">=23,<24" },
     { name = "autohooks-plugin-ruff", specifier = ">=25,<26" },
-    { name = "filelock", specifier = ">=3.29" },
     { name = "mypy", specifier = ">=2,<3" },
     { name = "pytest", specifier = ">=9,<10" },
     { name = "sphinx", specifier = ">=9,<10" },

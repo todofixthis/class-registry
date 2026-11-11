@@ -7,34 +7,23 @@ on:
 permissions:
   contents: read
 
+# Every uv command here leaves out the default `dev` group, whose tooling
+# (autohooks → pontos → lxml) can lack wheels for a new Python. A flag on
+# `uv sync` alone isn't enough: each `uv run` would install `dev` again.
+env:
+  UV_NO_DEFAULT_GROUPS: "1"
+
 jobs:
-  # The phx plugin's hooks check ADRs in Claude Code sessions but never block, so
-  # this is the only check a commit made elsewhere meets (ADR 007 forbids a
-  # repo-local copy of the tool). The ref is the 8.1.0 release's commit (the `^{}`
-  # line of `git ls-remote --tags`, not the tag object). When this job disagrees
-  # with an index a session wrote, bump it, the SHAs in AGENTS.md, and the release
-  # labels beside both.
-  adrs:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Clone repo
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - name: Install uv
-        uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
-      - name: Check ADRs
-        run: uvx --from 'git+https://github.com/todofixthis/phx-claude-siat@0725567cec6bab6a227c2a3d569e64c226c33a4e#subdirectory=skills/writing-adrs' phx-adr check
-
-  build:
+  test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
         python-version:
           # Note: Use quotes to avoid float cast - especially important if the
           # version number ends with 0!
-          - "3.12"
-          - "3.13"
           - "3.14"
+          - "3.13"
+          - "3.12"
 
     steps:
       - name: Clone repo
@@ -61,14 +50,32 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
-          # Newest version in the build matrix. Reading `requires-python` from
-          # pyproject.toml resolves to the latest CPython, which can outrun
-          # dependency wheels.
           python-version: "3.14"
       - name: Install dependencies
         run: uv sync --group ci
       - name: Type checking
         run: uv run mypy src test
+
+  # The pre-commit hook lints and formats too, but a commit made without it (a
+  # bare `git commit`, GitHub's web editor, a Renovate PR) skips that.
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clone repo
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Install uv
+        uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+      - name: Set up Python
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.14"
+      - name: Install dependencies
+        run: uv sync --group ci
+      - name: Lint
+        run: uv run ruff check
+      - name: Check formatting
+        run: uv run black --check .
 
   docs:
     runs-on: ubuntu-latest
@@ -81,9 +88,6 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
-          # Newest version in the build matrix. Reading `requires-python` from
-          # pyproject.toml resolves to the latest CPython, which can outrun
-          # dependency wheels.
           python-version: "3.14"
       - name: Install dependencies
         run: uv sync --group ci
@@ -92,3 +96,32 @@ jobs:
           cd docs
           mkdir -p _static
           uv run make html
+
+  # The phx plugin's hooks check ADRs in Claude Code sessions but never block,
+  # so this is the only check a commit made elsewhere meets (ADR 009 in
+  # todofixthis/cookiecutter-py forbids a repo-local copy of the tool). Renovate
+  # bumps the pinned release here and in AGENTS.md together; keep the trailing
+  # version comment it matches on.
+  adrs:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clone repo
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Install uv
+        uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+      - name: Check ADRs
+        run: uvx --from 'git+https://github.com/todofixthis/phx-claude-siat@0725567cec6bab6a227c2a3d569e64c226c33a4e#subdirectory=skills/writing-adrs' phx-adr check # 8.1.0
+
+  # The single required status check. Depending on every job here collapses
+  # their results into one, so branch protection requires only `gate`. A
+  # skipped job fails it, so a job silently skipped cannot pass unnoticed.
+  gate:
+    needs: [adrs, docs, lint, test, type-check]
+    if: always()
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Fail if any check did not succeed
+        if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') || contains(needs.*.result, 'skipped')
+        run: exit 1
