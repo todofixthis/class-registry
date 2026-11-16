@@ -111,7 +111,7 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
       - name: Check ADRs
-        run: uvx --from 'git+https://github.com/todofixthis/phx-claude-siat@0725567cec6bab6a227c2a3d569e64c226c33a4e#subdirectory=skills/writing-adrs' phx-adr check # 8.1.0
+        run: uvx --from 'git+https://github.com/todofixthis/phx-claude-siat@6e2f4c48a80ad5018963b2a2e8f02d47bdc8807e#subdirectory=skills/writing-adrs' phx-adr check # 9.0.0
 
   # The single required status check. Depending on every job here collapses
   # their results into one, so branch protection requires only `gate`. A

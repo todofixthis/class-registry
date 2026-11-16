@@ -36,7 +36,7 @@ Issues = "https://github.com/todofixthis/class-registry/issues"
 [dependency-groups]
 # I'm only one person, so to keep from getting overwhelmed, I'm only committing
 # to supporting the 3 most recent versions of Python (see
-# https://github.com/todofixthis/cookiecutter-py/blob/main/docs/adr/008-propagate-template-changes-with-copier-and-renovate.md).
+# https://github.com/todofixthis/cookiecutter-py/blob/main/docs/adr/015-propagate-template-changes-with-copier-and-rotate-python-from-agent-sessions.md).
 dev = [
     "autohooks>=26,<27",
     "autohooks-plugin-black>=23,<24",

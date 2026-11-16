@@ -28,5 +28,12 @@
     "automerge": true,
     "description": "Refresh uv.lock weekly, merging once CI passes, so transitive dependencies reach the project without a direct pin (ADR 013 in todofixthis/cookiecutter-py).",
     "enabled": true
-  }
+  },
+  "packageRules": [
+    {
+      "description": "Never bump Python: an agent session rotates it with the rotate-python-versions skill, which also removes compat code (ADR 015 in todofixthis/cookiecutter-py).",
+      "enabled": false,
+      "matchDepNames": ["python"]
+    }
+  ]
 }

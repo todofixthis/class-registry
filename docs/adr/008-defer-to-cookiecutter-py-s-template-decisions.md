@@ -90,6 +90,11 @@ that prefixing proved not worth its verbosity.
   file is made here or is a template candidate for cookiecutter-py.
 - Diverging from a template decision on purpose needs its own ADR here, naming
   the template ADR it departs from.
+- Template 1.2.0 met the trigger on superseded template ADRs: its
+  [cookiecutter-py ADR 015][] supersedes cookiecutter-py ADR 008, restating its
+  copier and Renovate decision and adding a Python policy that agent sessions
+  here rotate to. This project adopted 1.2.0 with the deferral unchanged; the
+  links above stay pinned to 1.1.0, the release this ADR was written against.
 
 [001-support-three-most-recent-python-releases.md]: 001-support-three-most-recent-python-releases.md
 [005-enable-autosectionlabel-with-document-prefixed-labels.md]: 005-enable-autosectionlabel-with-document-prefixed-labels.md
@@ -99,4 +104,5 @@ that prefixing proved not worth its verbosity.
 [cookiecutter-py ADR 007]: https://github.com/todofixthis/cookiecutter-py/blob/1.1.0/docs/adr/007-check-the-docs-build-in-the-pre-commit-hook.md
 [cookiecutter-py ADR 008]: https://github.com/todofixthis/cookiecutter-py/blob/1.1.0/docs/adr/008-propagate-template-changes-with-copier-and-renovate.md
 [cookiecutter-py ADR 009]: https://github.com/todofixthis/cookiecutter-py/blob/1.1.0/docs/adr/009-gate-adr-ci-and-the-phx-pin.md
+[cookiecutter-py ADR 015]: https://github.com/todofixthis/cookiecutter-py/blob/1.2.0/docs/adr/015-propagate-template-changes-with-copier-and-rotate-python-from-agent-sessions.md
 [cookiecutter-py's copier template]: https://github.com/todofixthis/cookiecutter-py

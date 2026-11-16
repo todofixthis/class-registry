@@ -12,6 +12,7 @@ paths:
   - ".claude/skills/rotate-python-versions/SKILL.md"
   - ".copier-answers.yml"
   - ".github/workflows/build.yml"
+  - ".github/workflows/python-policy.yml"
   - ".gitignore"
   - ".readthedocs.yaml"
   - "AGENTS.md"
@@ -49,21 +50,34 @@ A value derived from a copier answer, such as the supported Python range,
 changes by re-answering with `copier update --data`, as the
 `rotate-python-versions` skill does: never by hand, and never upstream.
 
-Before changing any other listed file, ask whether the change would be right
-for every project generated from the template. If it would, don't make it
-here: stop and tell the maintainer, giving the change as a proposal for the
-same file under cookiecutter-py's `template/` directory (where it may carry a
-`.jinja` suffix). This list already answers whether the file is template-owned,
-so don't go looking for cookiecutter-py to check; open the PR there yourself
-only if this session already has it checked out. If this project can't wait
-for the release,
-stop and ask the maintainer rather than editing here: a hand copy that
-differs from the released change turns the next update PR into a merge
-conflict.
+Before changing any other listed file, ask whether the reason for the change
+depends on something specific to this project: its code, the dependencies it
+added itself (not the template's tooling, such as pytest, ruff or mypy), or
+its users. Answer from this project alone; don't go looking for
+cookiecutter-py.
 
-If the change is right for this project only, make it here. A rule for this
-project goes in `.agents/rules/project.md`, never in a templated rules file;
-an extra CI job goes in its own workflow file.
+If it does, make the change here. A rule for this project goes in
+`.agents/rules/project.md`, never in a templated rules file; an extra CI job
+goes in its own workflow file.
+
+If it doesn't, the change is a template candidate, however local the symptom
+that brought it up: a fix for a problem any generated project could hit is a
+candidate even when only this one has hit it. Don't make it here: stop and
+tell the person you're working with, giving the change as a proposal for the
+same file under cookiecutter-py's `template/` directory (where it may carry a
+`.jinja` suffix). Open the PR there yourself only if this session already has
+it checked out.
+
+Make a candidate here only when the rest of the task can't proceed without it
+(the candidate is a step towards the task, not the task itself), or when the
+person you're working with asks for it here knowing it's a candidate. Keep it
+to what the task needs, and list each such file under a "Template candidates"
+heading, with the reason: in the PR description, or in the commit message when
+there's no PR. If you leave the change uncommitted, put the list in your
+report and ask the person you're working with to carry it into the commit
+message. The template's maintainer is then asked to port the committed
+change upstream verbatim, placement included, so the release makes the same
+change and the next update PR merges cleanly.
 
 To resolve a conflict in a template-update PR, keep this project's
 project-only changes and take the template's side for everything else,
