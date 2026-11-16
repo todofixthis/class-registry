@@ -1,0 +1,36 @@
+# Fails while this project supports an older Python range than the template's
+# policy, as a nudge to rotate with the `rotate-python-versions` skill, which
+# also removes compat code no tool can (ADR 015 in todofixthis/cookiecutter-py).
+# A workflow of its own, outside build.yml's `gate`, so it never blocks a merge
+# and leaves build.yml's README badge alone.
+name: Python policy
+
+# Branches only, so a release tag on a lagging project doesn't go red.
+on:
+  push:
+    branches: ["**"]
+
+permissions: {}
+
+jobs:
+  python-policy:
+    # Renovate automerges a PR only once no check has failed, and counts a
+    # skipped check as passing, so this skips every Renovate branch (its lock
+    # refresh, and any this project sets to automerge) but the template-update
+    # one, which a person reviews and whose name carries the template's.
+    if: ${{ !startsWith(github.ref_name, 'renovate/') || contains(github.ref_name, 'cookiecutter-py') }}
+    runs-on: ubuntu-latest
+
+    steps:
+      # Compares minor versions only, as the template's range never crosses a
+      # major version. Negating `-ge` fails on a value that isn't a number,
+      # where `-lt` would pass it.
+      - name: Compare python_version with the template's policy
+        run: |
+          project="3.14"
+          policy="3.14"
+          if ! [ "${project#*.}" -ge "${policy#*.}" ]; then
+            echo "::error::❌ python_version is ${project}, behind the template's policy of ${policy}: rotate with the rotate-python-versions skill."
+            exit 1
+          fi
+          echo "✅ python_version ${project} meets the template's policy of ${policy}."

@@ -4,24 +4,26 @@ version: 2
 build:
   os: ubuntu-24.04
   tools:
-    python: "latest"
+    # The newest version CI tests: "latest" can outrun dependency wheels.
+    python: "3.14"
 
-  # Install the package, so that Sphinx can generate autodocs.
-  # https://docs.readthedocs.io/en/stable/build-customization.html#install-dependencies-with-poetry
   jobs:
     post_create_environment:
       # Install uv
-      # https://github.com/astral-sh/uv/issues/10074#issuecomment-2593075059
       - pip install uv
     post_install:
-      # Virtualenv path needs to be set manually for now.
+      # Install dependencies with the 'ci' dependency group.
+      # The virtualenv path needs to be set manually for now.
       # See https://github.com/readthedocs/readthedocs.org/pull/11152/
-      - UV_PROJECT_ENVIRONMENT=$READTHEDOCS_VIRTUALENV_PATH uv sync --group ci
+      # and https://github.com/astral-sh/uv/issues/10074#issuecomment-2593075059
+      # --no-default-groups keeps out `dev`, as CI does.
+      - UV_PROJECT_ENVIRONMENT=$READTHEDOCS_VIRTUALENV_PATH uv sync --no-default-groups --group ci
 
 sphinx:
   configuration: docs/conf.py
-  # The pre-commit docs_build hook (see
-  # docs/adr/006-check-the-docs-build-in-the-pre-commit-hook.md) exists to
-  # catch what this setting would otherwise only catch after merge —
-  # removing it drops that guarantee for the published build.
+  # Required for autosectionlabel to be worth enabling (see
+  # https://github.com/todofixthis/cookiecutter-py/blob/main/docs/adr/006-enable-autosectionlabel-with-document-prefixed-labels.md)
+  # — without this, a duplicate-label warning never breaks the published
+  # build, and the pre-commit docs_build hook loses the ReadTheDocs
+  # behaviour it exists to match.
   fail_on_warning: true

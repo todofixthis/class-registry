@@ -1,9 +1,9 @@
 ---
-status: Archived
+status: Superseded
 date: 2026-09-10
-archived-because: Comments in .autohooks/docs_build.py, pyproject.toml's autohooks pre-commit list, and .readthedocs.yaml each name this decision, met while any of the three is being edited.
 scope: [.autohooks/, pyproject.toml, .readthedocs.yaml]
 summary: Add a docs_build autohooks plugin that runs sphinx-build -W -E (full re-read, not incremental) on staged docs/docstring changes, matching ReadTheDocs' fail_on_warning rather than the CI docs job's lenient build.
+superseded-by: 8
 ---
 
 # 006: Check the Docs Build in the Pre-Commit Hook

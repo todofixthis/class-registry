@@ -217,9 +217,9 @@ class BaseMutableRegistry(BaseRegistry[ValueType, KeyType], ABC):
 
         self.attr_name = attr_name
 
-        # Map lookup keys to readable keys.
-        # Only needed when :py:meth:`gen_lookup_key` is overridden, but I'm not good
-        # enough at reflection black magic to figure out how to do that (:
+        # Maps each public key to its lookup key. ``_registry`` is keyed by lookup
+        # keys, so this is the only record of the public keys: :py:meth:`keys`
+        # returns them from here, in registration order.
         self._lookup_keys: dict[KeyType, typing.Hashable] = {}
 
     def __repr__(self) -> str:
