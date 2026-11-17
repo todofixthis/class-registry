@@ -12,7 +12,7 @@ This project is generated from the copier template `todofixthis/cookiecutter-py`
 
 ## Architecture Decision Records
 
-When making significant decisions — choosing between libraries, patterns, tools, or conventions — you **must** write an ADR before implementing the decision. Use the `phx:writing-adrs` skill (from the phx plugin, which `.claude/settings.json` enables) for the format, conventions and tooling: its `adr.py` allocates the number, generates `docs/adr/INDEX.md` and validates the corpus. Where the skill isn't available (outside Claude Code, or the plugin isn't loaded), read the [skill](https://github.com/todofixthis/phx-claude-siat/blob/9.0.0/skills/writing-adrs/SKILL.md) and run the same tool as `phx-adr` (see Commands). Don't hand-edit the index, or add a repo-local ADR script, pre-commit hook or vendored copy of the tool. ADRs live in `docs/adr/`.
+When making significant decisions — choosing between libraries, patterns, tools, or conventions — you **must** write an ADR before implementing the decision. Use the `phx:writing-adrs` skill (from the phx plugin, which `.claude/settings.json` enables) for the format, conventions and tooling: its `adr.py` allocates the number, generates `docs/adr/INDEX.md` and validates the corpus. Where the skill isn't available (outside Claude Code, or the plugin isn't loaded), read the [skill](https://github.com/todofixthis/phx-claude-siat/blob/9.0.1/skills/writing-adrs/SKILL.md) and run the same tool as `phx-adr` (see Commands). Don't hand-edit the index, or add a repo-local ADR script, pre-commit hook or vendored copy of the tool. ADRs live in `docs/adr/`.
 
 If you find yourself about to establish a new cross-cutting pattern (something that will affect multiple domains or files, e.g. a testing convention, a shared utility, an error-handling approach), stop and write an ADR first even if the immediate task feels local. A pattern adopted once becomes the template for everything that follows.
 
@@ -53,15 +53,15 @@ The phx plugin's ADR tool, for use where the skill isn't available. Renovate bum
 
 ```bash
 # Scaffold the next ADR
-uvx --from 'git+https://github.com/todofixthis/phx-claude-siat@6e2f4c48a80ad5018963b2a2e8f02d47bdc8807e#subdirectory=skills/writing-adrs' phx-adr new "Title" --summary "…" --scope path/ # 9.0.0
+uvx --from 'git+https://github.com/todofixthis/phx-claude-siat@9b2367c1cd38734433e2be57727cde6d2d68f36a#subdirectory=skills/writing-adrs' phx-adr new "Title" --summary "…" --scope path/ # 9.0.1
 # List the decisions binding a path, before changing it
-uvx --from 'git+https://github.com/todofixthis/phx-claude-siat@6e2f4c48a80ad5018963b2a2e8f02d47bdc8807e#subdirectory=skills/writing-adrs' phx-adr for path/to/file # 9.0.0
+uvx --from 'git+https://github.com/todofixthis/phx-claude-siat@9b2367c1cd38734433e2be57727cde6d2d68f36a#subdirectory=skills/writing-adrs' phx-adr for path/to/file # 9.0.1
 # Mark an ADR superseded
-uvx --from 'git+https://github.com/todofixthis/phx-claude-siat@6e2f4c48a80ad5018963b2a2e8f02d47bdc8807e#subdirectory=skills/writing-adrs' phx-adr supersede OLD --by NEW # 9.0.0
+uvx --from 'git+https://github.com/todofixthis/phx-claude-siat@9b2367c1cd38734433e2be57727cde6d2d68f36a#subdirectory=skills/writing-adrs' phx-adr supersede OLD --by NEW # 9.0.1
 # Regenerate docs/adr/INDEX.md
-uvx --from 'git+https://github.com/todofixthis/phx-claude-siat@6e2f4c48a80ad5018963b2a2e8f02d47bdc8807e#subdirectory=skills/writing-adrs' phx-adr index # 9.0.0
+uvx --from 'git+https://github.com/todofixthis/phx-claude-siat@9b2367c1cd38734433e2be57727cde6d2d68f36a#subdirectory=skills/writing-adrs' phx-adr index # 9.0.1
 # Validate, as CI does
-uvx --from 'git+https://github.com/todofixthis/phx-claude-siat@6e2f4c48a80ad5018963b2a2e8f02d47bdc8807e#subdirectory=skills/writing-adrs' phx-adr check # 9.0.0
+uvx --from 'git+https://github.com/todofixthis/phx-claude-siat@9b2367c1cd38734433e2be57727cde6d2d68f36a#subdirectory=skills/writing-adrs' phx-adr check # 9.0.1
 ```
 
 If CI reports a stale index the session's own tool can't reproduce, the installed plugin (which tracks phx-claude-siat's `main`) and the pinned release differ. Compare the two versions: if the installed one is newer, merge Renovate's pending bump, or bump by hand: each pin to the release's commit, and its comment and the skill link above to the release's version. The commit is the `refs/tags/<version>^{}` line of `git ls-remote --tags https://github.com/todofixthis/phx-claude-siat`, not the tag object above it. Otherwise update the plugin.
