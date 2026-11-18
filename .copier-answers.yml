@@ -1,10 +1,11 @@
 # Changes here will be overwritten by Copier
-_commit: 1.2.0
+_commit: 1.3.0
 _src_path: https://github.com/todofixthis/cookiecutter-py
 author_email: phx@phx.nz
 author_name: Phoenix Zerin
 copyright_holder: EFL Global
 copyright_year: 2017
+docs_site: true
 github_project_name: class-registry
 github_username: todofixthis
 package_name: class_registry

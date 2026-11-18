@@ -41,7 +41,7 @@ uv run mypy src test
 uv run ruff check
 # Check formatting (the pre-commit hook reformats; CI only checks)
 uv run black --check .
-# Build docs
+# Build docs: skip unless .readthedocs.yaml exists (a project without its own docs site has no Sphinx files)
 uv run make -C docs clean && uv run make -C docs html
 ```
 
@@ -68,7 +68,7 @@ If CI reports a stale index the session's own tool can't reproduce, the installe
 
 ## Docstrings
 
-Google/Napoleon format (`Args:`, `Returns:`, `Note:`) — not Sphinx `:param:` style. Max 80 chars per line. Escape backslashes (e.g. `'\\n'` not `'\n'`). Blank line before lists inside `Args:` sections to avoid Sphinx indentation warnings. ReadTheDocs treats all Sphinx warnings as errors — resolve them before pushing.
+Google/Napoleon format (`Args:`, `Returns:`, `Note:`) — not Sphinx `:param:` style. Max 80 chars per line. Escape backslashes (e.g. `'\\n'` not `'\n'`). Blank line before lists inside `Args:` sections to avoid Sphinx indentation warnings. Where the project has its own docs site (`.readthedocs.yaml` exists), ReadTheDocs treats all Sphinx warnings as errors — resolve them before pushing.
 
 ## Code Comments
 
