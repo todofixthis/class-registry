@@ -8,7 +8,7 @@
       "customType": "regex",
       "datasourceTemplate": "github-tags",
       "depNameTemplate": "todofixthis/phx-claude-siat",
-      "description": "Bump the phx-adr pins in the adrs CI job and AGENTS.md together (ADR 009 in todofixthis/cookiecutter-py).",
+      "description": "Bump the phx-adr pins in the adrs CI job and AGENTS.md together (ADR 018 in todofixthis/cookiecutter-py).",
       "managerFilePatterns": [
         "/^\\.github/workflows/build\\.yml$/",
         "/^AGENTS\\.md$/"
