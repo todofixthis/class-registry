@@ -41,13 +41,12 @@ def precommit(
         "-b",
         "html",
         "-W",
-        "--keep-going",
         # Force a full re-read on every run: an unchanged file that a
         # previous build already read keeps whatever it registered then
         # (e.g. an autosectionlabel target), so a warning a *different*
         # file would now raise against it can go undetected without this.
         # See
-        # https://github.com/todofixthis/cookiecutter-py/blob/main/docs/adr/007-check-the-docs-build-in-the-pre-commit-hook.md
+        # https://github.com/todofixthis/cookiecutter-py/blob/main/docs/adr/020-fail-generated-docs-builds-on-sphinx-warnings-in-ci-and-before-commit.md
         "-E",
         str(_DOCS_DIR),
         str(_BUILD_DIR),

@@ -71,9 +71,8 @@ pre-commit = [
     "autohooks.plugins.ruff",
     # Runs a strict, full-reread Sphinx build on staged docs/docstring
     # changes (see
-    # https://github.com/todofixthis/cookiecutter-py/blob/main/docs/adr/007-check-the-docs-build-in-the-pre-commit-hook.md)
-    # — removing this reopens a gap neither CI nor the pre-commit chain
-    # otherwise catches.
+    # https://github.com/todofixthis/cookiecutter-py/blob/main/docs/adr/020-fail-generated-docs-builds-on-sphinx-warnings-in-ci-and-before-commit.md)
+    # — removing this leaves a docs warning to CI, a push later.
     "docs_build",
 ]
 

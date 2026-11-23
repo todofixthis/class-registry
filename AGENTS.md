@@ -42,7 +42,7 @@ uv run ruff check
 # Check formatting (the pre-commit hook reformats; CI only checks)
 uv run black --check .
 # Build docs: skip unless .readthedocs.yaml exists (a project without its own docs site has no Sphinx files)
-uv run make -C docs clean && uv run make -C docs html
+uv run make -C docs clean && uv run make -C docs html SPHINXOPTS=-W
 ```
 
 uv resolves only releases at least 3 days old (`exclude-newer` under `[tool.uv]` in `pyproject.toml`), so "latest" above means the latest that old. To take a newer release of one package, exempt it there with `exclude-newer-package = { <package> = false }`, and remove the exemption once the release is 3 days old.

@@ -110,6 +110,7 @@ ClassRegistry is known to be compatible with the following Python versions:
 - 3.13
 - 3.12
 
+<<<<<<< before updating
 .. note::
 
    I'm only one person, so to keep from getting overwhelmed, I'm only committing to
@@ -128,3 +129,7 @@ Install the latest stable version via pip::
    Make sure to install `phx-class-registry`, **not** `class-registry`.  I created the
    latter at a previous job years ago, and after I left they never touched that project
    again and stopped responding to my emails — so in the end I had to fork it 🤷
+=======
+I'm only one person, so to keep from getting overwhelmed, I'm only committing to
+supporting the 3 most recent versions of Python.
+>>>>>>> after updating
