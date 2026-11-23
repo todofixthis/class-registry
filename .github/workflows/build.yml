@@ -98,10 +98,11 @@ jobs:
           uv run make html
 
   # The phx plugin's hooks check ADRs in Claude Code sessions but never block,
-  # so this is the only check a commit made elsewhere meets (ADR 009 in
-  # todofixthis/cookiecutter-py forbids a repo-local copy of the tool). Renovate
-  # bumps the pinned release here and in AGENTS.md together; keep the trailing
-  # version comment it matches on.
+  # so this is the only check a commit made elsewhere meets (ADR 019 in
+  # todofixthis/cookiecutter-py forbids a repo-local copy of the tool, or a
+  # pre-commit hook running ADR tooling). Renovate bumps the pinned release
+  # here and in AGENTS.md together (ADR 018 in todofixthis/cookiecutter-py);
+  # keep the trailing version comment it matches on.
   adrs:
     runs-on: ubuntu-latest
 
