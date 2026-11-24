@@ -1,7 +1,7 @@
 # Agent worktrees
 .claude/worktrees/
 
-# Byte-compiled / optimized / DLL files
+# Byte-compiled / optimised / DLL files
 __pycache__
 *.pyc
 

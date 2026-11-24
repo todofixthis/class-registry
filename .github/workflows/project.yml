@@ -1,0 +1,34 @@
+# This project's own CI jobs. build.yml calls this workflow, and its `gate`
+# job requires the call, so a job here blocks merges like any template job.
+# copier writes this file once; template updates never touch it (ADR 021 in
+# todofixthis/cookiecutter-py). Another workflow of this project's, such as a
+# scheduled one, can call it too.
+#
+# Keep this file and at least one job in it: without them build.yml is
+# invalid and none of its jobs run, `gate` included. Ask for no permission
+# beyond `contents: read`, which build.yml grants its call; asking for more
+# fails build.yml's run the same way. A job that may have nothing to do
+# skips its steps, never itself: `gate` sees only this workflow's overall
+# result, which a skipped job doesn't fail.
+name: Project CI
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+
+# build.yml's own env doesn't reach a called workflow, so this repeats it:
+# every uv command leaves out the default `dev` group, whose tooling can lack
+# wheels for a new Python.
+env:
+  UV_NO_DEFAULT_GROUPS: "1"
+
+jobs:
+  # Replace this placeholder with the project's own jobs.
+  placeholder:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Report no project jobs
+        run: echo "⏭️ No project-specific CI jobs."

@@ -91,11 +91,15 @@ jobs:
           python-version: "3.14"
       - name: Install dependencies
         run: uv sync --group ci
+      # -W fails the job on a Sphinx warning, as ReadTheDocs'
+      # fail_on_warning does after merge. A bot PR, such as Renovate's
+      # automerged lock refresh, never runs the pre-commit docs build, so
+      # this is its only check (ADR 020 in todofixthis/cookiecutter-py).
       - name: Check docs build
         run: |
           cd docs
           mkdir -p _static
-          uv run make html
+          uv run make html SPHINXOPTS=-W
 
   # The phx plugin's hooks check ADRs in Claude Code sessions but never block,
   # so this is the only check a commit made elsewhere meets (ADR 019 in
@@ -114,11 +118,17 @@ jobs:
       - name: Check ADRs
         run: uvx --from 'git+https://github.com/todofixthis/phx-claude-siat@c47fe62f483efa75e953d6a221306f552f362349#subdirectory=skills/writing-adrs' phx-adr check # 9.1.0
 
+  # This project's own jobs, in project.yml, which copier writes once and the
+  # project then owns (ADR 021 in todofixthis/cookiecutter-py).
+  project:
+    uses: ./.github/workflows/project.yml
+    secrets: inherit
+
   # The single required status check. Depending on every job here collapses
   # their results into one, so branch protection requires only `gate`. A
   # skipped job fails it, so a job silently skipped cannot pass unnoticed.
   gate:
-    needs: [adrs, docs, lint, test, type-check]
+    needs: [adrs, docs, lint, project, test, type-check]
     if: always()
     runs-on: ubuntu-latest
 

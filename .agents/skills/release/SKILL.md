@@ -59,7 +59,7 @@ Release notes do not satisfy this gate. They are read once, by people who alread
 ```bash
 ls docs/upgrading_to_v<major>.rst                        # exists
 rg 'upgrading_to_v<major>' docs/index.rst README.rst     # index: toctree + alert; README: alert
-uv run make -C docs clean && uv run make -C docs html    # builds, and it isn't orphaned
+uv run make -C docs clean && uv run make -C docs html SPHINXOPTS=-W    # builds, and it isn't orphaned
 ```
 Then read the guide and confirm it covers this release's break. No command checks that for you.
 

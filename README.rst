@@ -169,7 +169,7 @@ To build the documentation locally:
 
 #. Build the documentation::
 
-    uv run make html
+    uv run make html SPHINXOPTS=-W
 
 Releases
 --------
