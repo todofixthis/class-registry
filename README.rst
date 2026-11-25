@@ -197,10 +197,17 @@ One-time Setup
    Paste the ``pypi-...`` token when prompted.
 
 1. Build the Project
+<<<<<<< before updating
 ~~~~~~~~~~~~~~~~~~~~
 #. Set ``__version__`` in ``src/class_registry/__init__.py`` to the new version, and merge
    that change into ``main`` through ``develop``. Hatch reads the version from there,
    since ``pyproject.toml`` declares it dynamic.
+=======
+~~~~~~~~~~~~~~~~~~~~~
+#. Set ``__version__`` in ``src/class_registry/__init__.py`` to the new version,
+   and merge that change into ``main`` through ``develop``. Hatch reads the version
+   from there, since ``pyproject.toml`` declares it dynamic.
+>>>>>>> after updating
 
 #. Check out ``main`` and pull, so the build and the tag below both carry the new
    version::
