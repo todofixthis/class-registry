@@ -9,7 +9,9 @@
 # beyond `contents: read`, which build.yml grants its call; asking for more
 # fails build.yml's run the same way. A job that may have nothing to do
 # skips its steps, never itself: `gate` sees only this workflow's overall
-# result, which a skipped job doesn't fail.
+# result, which a skipped job doesn't fail. Skip them only on an explicit
+# negative output (`!= 'false'`, never `== 'true'`), so a missing or misspelt
+# output runs them rather than passing unchecked.
 name: Project CI
 
 on:
