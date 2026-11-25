@@ -90,7 +90,7 @@ because it is abstract.
 
    In previous versions of ClassRegistry, ``AutoRegister`` returned a metaclass instead
    of a base class. The metaclass version of the function still exists at
-   :py:func:`class_registry.auto_register.AutoRegister`, but
+   ``class_registry.auto_register.AutoRegister``, but
    `it is deprecated and will be removed in a future version of ClassRegistry <https://github.com/todofixthis/class-registry/issues/14>`_.
 
    If your code is still using the old ``AutoRegister`` function, you can change it like
@@ -120,7 +120,7 @@ From time to time, you might need to register classes temporarily. For example, 
 might need to patch a global class registry in a unit test, ensuring that the extra
 classes are removed when the test finishes.
 
-ClassRegistry provides a :py:class:`RegistryPatcher` that you can use for just such a
+ClassRegistry provides a :py:class:`.RegistryPatcher` that you can use for just such a
 purpose:
 
 .. code-block:: python
@@ -178,10 +178,10 @@ already registered.
 .. important::
 
    Only mutable registries can be patched (any class that extends
-   :py:class:`BaseMutableRegistry`).
+   :py:class:`.BaseMutableRegistry`).
 
-   In particular, this means that :py:class:`EntryPointClassRegistry` can not be patched
-   using :py:class:`RegistryPatcher`.
+   In particular, this means that :py:class:`.EntryPointClassRegistry` can not be
+   patched using :py:class:`.RegistryPatcher`.
 
 
 .. _overriding-lookup-keys:

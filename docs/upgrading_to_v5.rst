@@ -10,7 +10,7 @@ Type Parameters
 ---------------
 I thought I'd start this off with some good news 😺
 
-If a :py:class:`ClassRegistry` always returns objects derived from a particular
+If a :py:class:`.ClassRegistry` always returns objects derived from a particular
 base class, you can now provide a
 `type parameter <https://typing.readthedocs.io/en/latest/source/generics.html#generics>`_
 to help with type checking, autocomplete, etc.:
@@ -23,9 +23,9 @@ to help with type checking, autocomplete, etc.:
    # Your IDE will automatically infer that ``fighter1`` is a ``Pokemon``.
    fighter1 = pokedex['fire']
 
-:py:class:`ClassRegistryInstanceCache` now inherits the
+:py:class:`.ClassRegistryInstanceCache` now inherits the
 `type parameter <https://typing.readthedocs.io/en/latest/source/generics.html#generics>`_
-from the :py:class:`ClassRegistry` that it wraps in order to help with type checking,
+from the :py:class:`.ClassRegistry` that it wraps in order to help with type checking,
 autocompletion, etc.:
 
 .. code-block:: python
@@ -41,7 +41,7 @@ autocompletion, etc.:
    fire_fighter = pokedex['fire']
 
 Alternatively, you can apply the type parameter to the
-:py:class:`ClassRegistryInstanceCache` directly:
+:py:class:`.ClassRegistryInstanceCache` directly:
 
 .. code-block:: python
 
@@ -55,23 +55,23 @@ In ClassRegistry v5 many symbols were removed from the top-level ``class_registr
 namespace.  The table below shows how to import each symbol in ClassRegistry v5 in your
 code:
 
-======================================  ===================================================================
-Symbol                                  How to Import in ClassRegistry v5
-======================================  ===================================================================
-:py:func:`AutoRegister`                 ``from class_registry.base import AutoRegister``
-:py:class:`ClassRegistry`               ``from class_registry import ClassRegistry`` (unchanged)
-:py:class:`ClassRegistryInstanceCache`  ``from class_registry.cache import ClassRegistryInstanceCache``
-:py:class:`EntryPointClassRegistry`     ``from class_registry.entry_points import EntryPointClassRegistry``
-:py:class:`RegistryKeyError`            ``from class_registry import RegistryKeyError`` (unchanged)
-:py:class:`RegistryPatcher`             ``from class_registry.patcher import RegistryPatcher``
-:py:class:`SortedClassRegistry`         ``from class_registry.registry import SortedClassRegistry``
-======================================  ===================================================================
+=======================================  ===================================================================
+Symbol                                   How to Import in ClassRegistry v5
+=======================================  ===================================================================
+:py:func:`.AutoRegister`                 ``from class_registry.base import AutoRegister``
+:py:class:`.ClassRegistry`               ``from class_registry import ClassRegistry`` (unchanged)
+:py:class:`.ClassRegistryInstanceCache`  ``from class_registry.cache import ClassRegistryInstanceCache``
+:py:class:`.EntryPointClassRegistry`     ``from class_registry.entry_points import EntryPointClassRegistry``
+:py:class:`.RegistryKeyError`            ``from class_registry import RegistryKeyError`` (unchanged)
+:py:class:`.RegistryPatcher`             ``from class_registry.patcher import RegistryPatcher``
+:py:class:`.SortedClassRegistry`         ``from class_registry.registry import SortedClassRegistry``
+=======================================  ===================================================================
 
 AutoRegister
 ------------
-In ClassRegistry v5, :py:func:`AutoRegister` now returns a base class instead of a
+In ClassRegistry v5, :py:func:`.AutoRegister` now returns a base class instead of a
 metaclass.  The example below shows how to update classes that use
-:py:func:`AutoRegister`:
+:py:func:`.AutoRegister`:
 
 ClassRegistry v4:
 
@@ -98,10 +98,10 @@ ClassRegistry v5:
 .. note::
 
    If this is a non-trivial change for your code, you can continue to use the
-   (deprecated) metaclass version of :py:func:`AutoRegister` which is located at
+   (deprecated) metaclass version of ``AutoRegister`` which is located at
    ``class_registry.auto_register.AutoRegister``.
 
-   The metaclass version of :py:func:`AutoRegister` will be removed in a future version
+   The metaclass version of ``AutoRegister`` will be removed in a future version
    of ClassRegistry, so it's recommended that you update your code.  If you need help,
    `post in the ClassRegistry issue tracker <https://github.com/todofixthis/class-registry/issues>`_,
    and I'll have a look 🙂
@@ -113,7 +113,7 @@ BaseRegistry
 ^^^^^^^^^^^^
 
 .. important::
-   :py:class:`BaseRegistry` no longer implements :py:class:`typing.Mapping` due to
+   :py:class:`.BaseRegistry` no longer implements :py:class:`typing.Mapping` due to
    violations of the Liskov Substitutability Principle:
 
    .. code-block:: python
@@ -128,8 +128,8 @@ BaseRegistry
 Additionally, the following methods have been deprecated and will be removed in a future
 version:
 
-- :py:meth:`BaseRegistry.items` is deprecated. If you still need this functionality, use
-  the following workaround:
+- :py:meth:`.BaseMutableRegistry.items` is deprecated, and :py:class:`.BaseRegistry` no
+  longer has it. If you still need this functionality, use the following workaround:
 
   ClassRegistry v4:
 
@@ -143,7 +143,8 @@ version:
 
      zip(registry.keys(), registry.classes())
 
-- :py:meth:`BaseRegistry.values` is now renamed to :py:meth:`BaseRegistry.classes`:
+- :py:meth:`.BaseMutableRegistry.values` is now renamed to :py:meth:`.BaseRegistry.classes`,
+  and :py:class:`.BaseRegistry` no longer has it:
 
   ClassRegistry v4:
 
@@ -161,7 +162,7 @@ BaseMutableRegistry
 ^^^^^^^^^^^^^^^^^^^
 
 .. important::
-   :py:class:`BaseMutableRegistry` no longer implements
+   :py:class:`.BaseMutableRegistry` no longer implements
    :py:class:`typing.MutableMapping` due to violations of the Liskov Substitutability
    Principle:
 
@@ -206,7 +207,7 @@ BaseMutableRegistry
 
   .. note::
 
-     If you initialised the :py:class:`ClassRegistry` with ``unique=True``, you will
+     If you initialised the :py:class:`.ClassRegistry` with ``unique=True``, you will
      need to ``unregister()`` the key first:
 
      .. code-block:: python
@@ -226,5 +227,6 @@ New Methods
 -----------
 The following methods have been added:
 
-- :py:meth:`BaseRegistry.__dir__` method returns the list of registered keys as strings.
-- :py:meth:`BaseRegistry.__len__` method returns the number of registered symbols.
+- :py:meth:`.BaseRegistry.__dir__` method returns the list of registered keys as
+  strings.
+- :py:meth:`.BaseRegistry.__len__` method returns the number of registered symbols.

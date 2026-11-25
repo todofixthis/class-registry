@@ -109,7 +109,8 @@ class ClassRegistryInstanceCache(
         .. note::
 
            This method has no effect for any classes added to the wrapped
-           :py:class:`ClassRegistry` after calling ``warm_cache``.
+           :py:class:`~class_registry.registry.ClassRegistry` after calling
+           ``warm_cache``.
         """
         for key in self._registry.keys():
             self.__getitem__(key)
@@ -127,7 +128,7 @@ class ClassRegistryInstanceCache(
     def get_class_key(self, key: typing.Hashable) -> typing.Hashable:
         """
         Generates a key that can be used to store/lookup values in the wrapped
-        :py:class:`ClassRegistry` instance.
+        :py:class:`~class_registry.registry.ClassRegistry` instance.
 
         This method is only invoked in the event of a cache miss.
 

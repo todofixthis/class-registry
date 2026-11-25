@@ -24,8 +24,9 @@ class ClassRegistry(BaseMutableRegistry[ValueType, KeyType]):
         """
         Args:
             attr_name:
-                If provided, :py:meth:`register` will automatically detect the key to
-                use when registering new classes.
+                If provided, :py:meth:`~.BaseMutableRegistry.register` will
+                automatically detect the key to use when registering new
+                classes.
 
             unique:
                 Determines what happens when two classes are registered with the same
@@ -112,8 +113,9 @@ class SortedClassRegistry(ClassRegistry[ValueType, KeyType]):
 
                 You can also use :py:func:`functools.cmp_to_key`.
             attr_name:
-                If provided, :py:meth:`register` will automatically detect the key to
-                use when registering new classes.
+                If provided, :py:meth:`~.BaseMutableRegistry.register` will
+                automatically detect the key to use when registering new
+                classes.
             unique:
                 Determines what happens when two classes are registered with the same
                 key:

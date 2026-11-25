@@ -58,7 +58,7 @@ Let's see what happens once the ``pokemon-generation-2`` package is installed::
     <class 'gen2.pokemon.Cyndaquil'>,
     <class 'gen2.pokemon.Totodile'>]
 
-Simply declare an :py:class:`EntryPointClassRegistry` instance, and it will
+Simply declare an :py:class:`.EntryPointClassRegistry` instance, and it will
 automatically find any classes registered to that entry point group across every
 installed project in your virtualenv!
 
@@ -67,10 +67,10 @@ Reverse Lookups
 From time to time, you may need to perform a "reverse lookup":  Given a class or
 instance, you want to determine which registry key is associated with it.
 
-For :py:class:`ClassRegistry`, performing a reverse lookup is simple because the
+For :py:class:`.ClassRegistry`, performing a reverse lookup is simple because the
 registry key is (usually) defined by an attribute on the class itself.
 
-However, :py:class:`EntryPointClassRegistry` uses an external source to define the
+However, :py:class:`.EntryPointClassRegistry` uses an external source to define the
 registry keys, so it's a bit tricky to go back and find the registry key for a given
 class.
 
@@ -95,7 +95,7 @@ registry to "brand" every object it returns with the corresponding registry key.
    Out[6]: 'water'
 
 We set ``attr_name='element'`` when initializing the
-:py:class:`EntryPointClassRegistry`, so it set the ``element`` attribute on every class
+:py:class:`.EntryPointClassRegistry`, so it set the ``element`` attribute on every class
 and instance that it returned.
 
 .. caution::

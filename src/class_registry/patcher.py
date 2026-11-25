@@ -31,7 +31,7 @@ class RegistryPatcher(typing.Generic[ValueType, KeyType]):
         """
         Args:
             registry:
-                A :py:class:`MutableRegistry` instance to patch.
+                A :py:class:`~.BaseMutableRegistry` instance to patch.
 
             args:
                 Classes to add to the registry.
