@@ -32,13 +32,16 @@ class RegistryKeyError(KeyError):
     """
 
 
+#: The base type of a registry's classes, and of the instances it creates.
 ValueType = TypeVar("ValueType")
 
 # ``KeyType`` parametrises the public/human-readable key. Lookup keys (produced
 # by ``gen_lookup_key``) stay ``Hashable`` — see docs/adr/002.
+#: The public key a registry looks classes up by; defaults to :py:class:`str`.
 KeyType = TypeVar("KeyType", bound=typing.Hashable, default=str)
 
 # [#53] Fix incorrect return type from ``register``
+#: The class that ``register`` decorates and returns unchanged.
 D = TypeVar("D", bound=typing.Callable[..., typing.Any])
 
 
@@ -139,7 +142,7 @@ class BaseRegistry(typing.Generic[ValueType, KeyType], ABC):  # noqa: PYI059
                 function.
 
         References:
-          - :py:meth:`__init__`
+          - :py:meth:`~.BaseRegistry.create_instance`
         """
         return self.create_instance(self.get_class(key), *args, **kwargs)
 
@@ -215,6 +218,7 @@ class BaseMutableRegistry(BaseRegistry[ValueType, KeyType], ABC):
         """
         super().__init__()
 
+        #: The class attribute that :py:meth:`register` reads keys from, if set.
         self.attr_name = attr_name
 
         # Maps each public key to its lookup key. ``_registry`` is keyed by lookup
@@ -235,7 +239,8 @@ class BaseMutableRegistry(BaseRegistry[ValueType, KeyType], ABC):
         """
         .. warning::
 
-           DEPRECATED: use :py:meth:`keys` or :py:meth:`classes` instead.
+           DEPRECATED: use :py:meth:`keys` or :py:meth:`~BaseRegistry.classes`
+           instead.
 
         Returns the collection of registered key-class pairs, in the order that they
         were registered.
@@ -252,7 +257,7 @@ class BaseMutableRegistry(BaseRegistry[ValueType, KeyType], ABC):
         """
         .. warning::
 
-           DEPRECATED: use :py:meth:`classes` instead.
+           DEPRECATED: use :py:meth:`~BaseRegistry.classes` instead.
 
         Returns the collection of registered classes, in the order that they were
         registered.

@@ -71,7 +71,7 @@ To create a class instance from a registry, use the subscript operator:
 
 .. tip::
 
-   If a :py:class:`ClassRegistry` always returns objects derived from a
+   If a :py:class:`.ClassRegistry` always returns objects derived from a
    particular base class, you can provide a
    `type parameter <https://typing.readthedocs.io/en/latest/source/generics.html#generics>`_
    to help with type checking, autocomplete, etc.:

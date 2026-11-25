@@ -1,10 +1,10 @@
 Iterating Over Registries
 =========================
 Sometimes, you want to iterate over all of the classes registered in a
-:py:class:`ClassRegistry`.  There are two methods included to help you do this:
+:py:class:`.ClassRegistry`.  There are two methods included to help you do this:
 
-- :py:meth:`keys` iterates over the registry keys.
-- :py:meth:`classes` iterates over the registered classes.
+- :py:meth:`~.BaseRegistry.keys` iterates over the registry keys.
+- :py:meth:`~.BaseRegistry.classes` iterates over the registered classes.
 
 Here's an example:
 
@@ -31,9 +31,10 @@ Here's an example:
 
 .. tip::
 
-   Tired of having to add the :py:meth:`register` decorator to every class?
+   Tired of having to add the :py:meth:`~.BaseMutableRegistry.register` decorator to
+   every class?
 
-   You can use :py:func:`AutoRegister` to generate a base class that automatically
+   You can use :py:func:`.AutoRegister` to generate a base class that automatically
    registers all non-abstract subclasses of a particular base class.  See
    :doc:`advanced_topics` for more information.
 
@@ -43,7 +44,7 @@ By default, registry keys are typed as :py:class:`str`.  This means that
 ``registry.keys()`` and ``for key in registry`` both yield :py:class:`str`
 values — no explicit ``str()`` coercion needed.
 
-:py:class:`ClassRegistry` accepts an optional second type argument for the key
+:py:class:`.ClassRegistry` accepts an optional second type argument for the key
 type.  The first argument is always the value type:
 
 .. code-block:: python
@@ -85,7 +86,7 @@ Changing the Sort Order
 As you probably noticed, these functions iterate over classes in the order that they are
 registered.
 
-If you'd like to customise this ordering, use :py:class:`SortedClassRegistry`:
+If you'd like to customise this ordering, use :py:class:`.SortedClassRegistry`:
 
 .. code-block:: python
 
@@ -167,14 +168,14 @@ are sorted:
    assert list(pokedex.keys()) == ['poison', 'electric', 'water']
    assert list(pokedex.classes()) == [Koffing, Voltorb, Horsea]
 
-This time, the :py:class:`SortedClassRegistry` used our custom sorter function, so that
+This time, the :py:class:`.SortedClassRegistry` used our custom sorter function, so that
 the classes were sorted descending by weight, with the registry key used as a
 tiebreaker.
 
 .. important::
 
    Note that we had to pass the sorter function through :py:func:`functools.cmp_to_key`
-   before providing it to the :py:class:`SortedClassRegistry` initialiser.
+   before providing it to the :py:class:`.SortedClassRegistry` initialiser.
 
    This is necessary because of how sorting works in Python.  See
    `Sorting HOW TO <https://docs.python.org/3/howto/sorting.html#key-functions>`_ for

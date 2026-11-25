@@ -1,18 +1,19 @@
 Creating Service Registries
 ===========================
-Despite its name, :py:class:`ClassRegistry` also has aspects in common with the Factory
+Despite its name, :py:class:`.ClassRegistry` also has aspects in common with the Factory
 pattern.  Most notably, accessing a registry key automatically creates a new instance of
 the corresponding class.
 
-But, what if you want a :py:class:`ClassRegistry` to behave more strictly like a service
-registry — always returning the the `same` instance each time the same key is accessed?
+But, what if you want a :py:class:`.ClassRegistry` to behave more strictly like a
+service registry — always returning the `same` instance each time the same key is
+accessed?
 
-This is where :py:class:`ClassRegistryInstanceCache` comes into play.  It wraps a
-:py:class:`ClassRegistry` and provides a caching mechanism, so that each time your code
+This is where :py:class:`.ClassRegistryInstanceCache` comes into play.  It wraps a
+:py:class:`.ClassRegistry` and provides a caching mechanism, so that each time your code
 accesses a particular key, it always returns the same instance for that key.
 
 Let's see what this looks like in action.  First, we'll create a
-:py:class:`ClassRegistry`:
+:py:class:`.ClassRegistry`:
 
 .. code-block:: python
 
@@ -33,7 +34,7 @@ Let's see what this looks like in action.  First, we'll create a
    pika_2 = pokedex['electric']
    assert pika_1 is not pika_2
 
-Next we'll wrap the registry in a :py:class:`ClassRegistryInstanceCache`:
+Next we'll wrap the registry in a :py:class:`.ClassRegistryInstanceCache`:
 
 .. code-block:: python
 
@@ -47,14 +48,14 @@ Next we'll wrap the registry in a :py:class:`ClassRegistryInstanceCache`:
    anakin_skywalker = fighters['psychic']
    assert darth_vader is anakin_skywalker
 
-Note in the above example that the :py:class:`ClassRegistryInstanceCache` always returns
-the same instance every time its ``psychic`` key is accessed.
+Note in the above example that the :py:class:`.ClassRegistryInstanceCache` always
+returns the same instance every time its ``psychic`` key is accessed.
 
 Typed Service Registries
 ------------------------
-:py:class:`ClassRegistryInstanceCache` inherits the
+:py:class:`.ClassRegistryInstanceCache` inherits the
 `type parameter <https://typing.readthedocs.io/en/latest/source/generics.html#generics>`_
-from the :py:class:`ClassRegistry` that it wraps in order to help with type checking,
+from the :py:class:`.ClassRegistry` that it wraps in order to help with type checking,
 autocompletion, etc.:
 
 .. code-block:: python
@@ -70,7 +71,7 @@ autocompletion, etc.:
    fire_fighter = pokedex['fire']
 
 Alternatively, you can apply the type parameter to the
-:py:class:`ClassRegistryInstanceCache` directly:
+:py:class:`.ClassRegistryInstanceCache` directly:
 
 .. code-block:: python
 

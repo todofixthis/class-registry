@@ -1,9 +1,9 @@
 Getting Started
 ===============
 As you saw in the :doc:`introduction </index>`, you can create a new registry using the
-:py:class:`class_registry.ClassRegistry` class.
+:py:class:`class_registry.ClassRegistry <.ClassRegistry>` class.
 
-:py:class:`ClassRegistry` defines a ``register`` method that you can use as a decorator
+:py:class:`.ClassRegistry` defines a ``register`` method that you can use as a decorator
 to add classes to the registry:
 
 .. code-block:: python
@@ -27,7 +27,7 @@ corresponding registry key:
 Note in the above example that ``sparky`` is an `instance` of ``Charizard``.
 
 If you try to access a registry key that has no classes registered, it will raise a
-:py:class:`class_registry.RegistryKeyError`:
+:py:class:`class_registry.RegistryKeyError <.RegistryKeyError>`:
 
 .. code-block:: python
 
@@ -40,7 +40,7 @@ If you try to access a registry key that has no classes registered, it will rais
 
 Typed Registries
 ----------------
-If a :py:class:`ClassRegistry` always returns objects derived from a particular
+If a :py:class:`.ClassRegistry` always returns objects derived from a particular
 base class, you can provide a
 `type parameter <https://typing.readthedocs.io/en/latest/source/generics.html#generics>`_
 to help with type checking, autocomplete, etc.:
@@ -64,7 +64,7 @@ Auto-Detecting Registry Keys
 By default, you have to provide the registry key whenever you register a new class.
 But, there's an easier way to do it!
 
-When you initialise your :py:class:`ClassRegistry`, provide an ``attr_name`` parameter.
+When you initialise your :py:class:`.ClassRegistry`, provide an ``attr_name`` parameter.
 When you register new classes, your registry will automatically extract the registry key
 using that attribute:
 
@@ -111,7 +111,8 @@ registered last will override any of the other(s).
     want to rely on this behaviour!
 
 If you want to prevent collisions, you can pass ``unique=True`` to the
-:py:class:`ClassRegistry` initialiser to raise an exception whenever a collision occurs:
+:py:class:`.ClassRegistry` initialiser to raise an exception whenever a collision
+occurs:
 
 .. code-block:: python
 
@@ -133,13 +134,13 @@ If you want to prevent collisions, you can pass ``unique=True`` to the
    janet = pokedex['grass']
    assert isinstance(janet, Bulbasaur)
 
-Because we passed ``unique=True`` to the :py:class:`ClassRegistry` initialiser,
+Because we passed ``unique=True`` to the :py:class:`.ClassRegistry` initialiser,
 attempting to register ``Ivysaur`` with the same registry key as ``Bulbasaur`` raised a
-:py:class:`RegistryKeyError`, so it didn't override ``Bulbasaur``.
+:py:class:`.RegistryKeyError`, so it didn't override ``Bulbasaur``.
 
 Init Params
 -----------
-Every time you access a registry key in a :py:class:`ClassRegistry`, it creates a new
+Every time you access a registry key in a :py:class:`.ClassRegistry`, it creates a new
 instance:
 
 .. code-block:: python
@@ -150,7 +151,8 @@ instance:
    assert marlene is not charlene
 
 Since you're creating a new instance every time, you also have the option of providing
-args and kwargs to the class initialiser using the registry's :py:meth:`get` method:
+args and kwargs to the class initialiser using the registry's
+:py:meth:`~.BaseRegistry.get` method:
 
 .. code-block:: python
 
@@ -173,11 +175,11 @@ args and kwargs to the class initialiser using the registry's :py:meth:`get` met
    tammy = pokedex.get('bug', level=42)
    assert tammy.level == 42
 
-Any arguments that you provide to :py:meth:`get` will be passed directly to the
-corresponding class' initialiser.
+Any arguments that you provide to :py:meth:`~.BaseRegistry.get` will be passed directly
+to the corresponding class' initialiser.
 
 .. hint::
 
    You can create a service registry that always returns the same instance per registry
-   key by wrapping it in a :py:class:`ClassRegistryInstanceCache`.  See
+   key by wrapping it in a :py:class:`.ClassRegistryInstanceCache`.  See
    :doc:`service_registries` for more information.
