@@ -3,7 +3,8 @@ status: Accepted
 date: 2026-10-31
 scope: [.agents/rules/template-owned.md, .autohooks/, .readthedocs.yaml, docs/adr/, docs/conf.py, pyproject.toml]
 summary: This project follows the copier template todofixthis/cookiecutter-py, which writes and owns the files that .agents/rules/template-owned.md lists; that rule, itself written by the template and changed only there, says how to change one; cookiecutter-py ADRs 006 and 007 replace this project's 005 and 006, the recorded python_version answer sets this project's ADR 001 range; a change the rule marks as a template candidate goes to cookiecutter-py, and diverging from a template decision on purpose needs an ADR here naming the cookiecutter-py ADR it departs from.
-revisit-when: This project stops taking template updates; a cookiecutter-py ADR decides reliance on the phx plugin, so 007 can give way to it; the template supersedes or renumbers one of the ADRs named here; cookiecutter-py stops being readable to this project's readers.
+revisit-when: This project stops taking template updates; the template supersedes or renumbers one of the ADRs named here; cookiecutter-py stops being readable to this project's readers.
+revisit-discharged-by: [9]
 ---
 
 # 008: Defer to cookiecutter-py's Template Decisions
@@ -34,9 +35,10 @@ those comments to cite its own ADRs, so the defence each names now points
 elsewhere.
 
 [007-rely-on-the-phx-plugin-for-adr-tooling.md][] overlaps the template only
-in part: [cookiecutter-py ADR 009][] decides the CI job and its pin, but no
+in part: [cookiecutter-py ADR 009][] decides the CI job and its pin, ~~but no
 template ADR decides 007's core, relying on the phx plugin rather than a
-repo-local or vendored tool.
+repo-local or vendored tool~~ (cookiecutter-py ADR 019 since decides it; see
+[009-defer-adr-tooling-to-cookiecutter-py.md][]).
 
 ## Options
 
@@ -76,8 +78,8 @@ a second copy here can only fall behind.
 001 stays in force, since only its range clause moved: the range is set by
 re-answering `python_version` through copier, never by hand, and 001's
 backport of newer typing features through `typing_extensions` is this
-project's own. 007 stays in force too, until a template ADR decides plugin
-reliance.
+project's own. ~~007 stays in force too, until a template ADR decides plugin
+reliance.~~ Spent by 009, which supersedes 007 with cookiecutter-py ADRs 018 and 019.
 
 005's `revisit-when` named this project's own colliding section titles. It does
 not carry over: cookiecutter-py ADR 006 is template-wide, and its trigger asks
@@ -95,14 +97,24 @@ that prefixing proved not worth its verbosity.
   copier and Renovate decision and adding a Python policy that agent sessions
   here rotate to. This project adopted 1.2.0 with the deferral unchanged; the
   links above stay pinned to 1.1.0, the release this ADR was written against.
+- Templates 1.3.1 and 1.4.0 met the same trigger: [cookiecutter-py ADR 018][]
+  supersedes cookiecutter-py ADR 009, restating its `adrs` job and pin and
+  adding a release check required on the template's own `main`, and
+  [cookiecutter-py ADR 020][] supersedes cookiecutter-py ADR 007, keeping its
+  `docs_build` hook and adding `-W` to the CI docs build. This project
+  adopted both with the deferral unchanged; 009 cites 018 for the `adrs` job,
+  and the links above stay pinned to 1.1.0.
 
 [001-support-three-most-recent-python-releases.md]: 001-support-three-most-recent-python-releases.md
 [005-enable-autosectionlabel-with-document-prefixed-labels.md]: 005-enable-autosectionlabel-with-document-prefixed-labels.md
 [006-check-the-docs-build-in-the-pre-commit-hook.md]: 006-check-the-docs-build-in-the-pre-commit-hook.md
 [007-rely-on-the-phx-plugin-for-adr-tooling.md]: 007-rely-on-the-phx-plugin-for-adr-tooling.md
+[009-defer-adr-tooling-to-cookiecutter-py.md]: 009-defer-adr-tooling-to-cookiecutter-py.md
 [cookiecutter-py ADR 006]: https://github.com/todofixthis/cookiecutter-py/blob/1.1.0/docs/adr/006-enable-autosectionlabel-with-document-prefixed-labels.md
 [cookiecutter-py ADR 007]: https://github.com/todofixthis/cookiecutter-py/blob/1.1.0/docs/adr/007-check-the-docs-build-in-the-pre-commit-hook.md
 [cookiecutter-py ADR 008]: https://github.com/todofixthis/cookiecutter-py/blob/1.1.0/docs/adr/008-propagate-template-changes-with-copier-and-renovate.md
 [cookiecutter-py ADR 009]: https://github.com/todofixthis/cookiecutter-py/blob/1.1.0/docs/adr/009-gate-adr-ci-and-the-phx-pin.md
 [cookiecutter-py ADR 015]: https://github.com/todofixthis/cookiecutter-py/blob/1.2.0/docs/adr/015-propagate-template-changes-with-copier-and-rotate-python-from-agent-sessions.md
+[cookiecutter-py ADR 018]: https://github.com/todofixthis/cookiecutter-py/blob/1.3.1/docs/adr/018-require-gate-everywhere-and-the-release-check-on-main.md
+[cookiecutter-py ADR 020]: https://github.com/todofixthis/cookiecutter-py/blob/1.4.0/docs/adr/020-fail-generated-docs-builds-on-sphinx-warnings-in-ci-and-before-commit.md
 [cookiecutter-py's copier template]: https://github.com/todofixthis/cookiecutter-py
