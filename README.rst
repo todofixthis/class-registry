@@ -198,6 +198,15 @@ One-time Setup
 
 1. Build the Project
 ~~~~~~~~~~~~~~~~~~~~
+#. Set ``__version__`` in ``src/class_registry/__init__.py`` to the new version, and merge
+   that change into ``main`` through ``develop``. Hatch reads the version from there,
+   since ``pyproject.toml`` declares it dynamic.
+
+#. Check out ``main`` and pull, so the build and the tag below both carry the new
+   version::
+
+      git checkout main && git pull
+
 #. Delete artefacts from previous builds, if applicable::
 
     rm dist/*
@@ -211,10 +220,6 @@ One-time Setup
 
 2. Upload to PyPI
 ~~~~~~~~~~~~~~~~~
-#. Bump the version (also updates ``uv.lock``)::
-
-      uv version <version>
-
 #. Upload build artefacts to PyPI::
 
     uv publish --username __token__
@@ -226,11 +231,14 @@ One-time Setup
       git tag -a <version> -m "Release <version>"
       git push origin <version>
 
+   ``<version>`` must match ``__version__`` on ``main``.
+
 #. Go to the `Releases page for the repo`_.
 #. Click ``Draft a new release``.
-#. Select the tag that you created in step 1.
+#. Select the tag that you created above.
 #. Specify the title of the release (e.g., ``ClassRegistry v1.2.3``).
 #. Write a description for the release.  Make sure to include:
+
    - Credit for code contributed by community members.
    - Significant functionality that was added/changed/removed.
    - Any backwards-incompatible changes and/or migration instructions.
