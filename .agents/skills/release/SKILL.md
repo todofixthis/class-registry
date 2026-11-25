@@ -49,7 +49,7 @@ A **breaking change** is anything that makes previously-working code fail — at
 
 It must:
 - **cover *this* release's breaking change.** A guide left over from an earlier release satisfies nothing — its existence is what makes this the easy check to fake. A break shipped in a `.3.0` gets its own section in `upgrading_to_v<major>.rst`, headed by the version that introduced it.
-- exist, be listed in the `docs/index.rst` toctree, and be linked from the upgrade-alert listing in **both** `docs/index.rst` and `README.rst` — the two carry the same listing and drift apart easily. The link syntax differs by file: `docs/index.rst` uses a Sphinx `:doc:` role targeting `upgrading_to_v<major>`; `README.rst` uses a relative link to the source, `` `Upgrading to ClassRegistry v<major> <docs/upgrading_to_v<major>.rst>`_ `` — the `:doc:` role renders as raw text on GitHub, where the README is read.
+- exist, be listed in the `docs/index.rst` toctree, and be linked from the upgrade-alert listing in **both** `docs/index.rst` and `README.rst` — the two carry the same listing and drift apart easily. The link syntax differs by file: `docs/index.rst` uses a Sphinx `:doc:` role targeting `upgrading_to_v<major>`; `README.rst` uses an absolute link to the published page, `` `Upgrading to ClassRegistry v<major> <https://class-registry.readthedocs.io/en/latest/upgrading_to_v<major>.html>`_ `` — the `:doc:` role renders as raw text on GitHub, where the README is read, and a relative link breaks on PyPI, which renders it too.
 - follow _Writing a Migration Guide_ below.
 
 **If any of that is missing, the release stops here** — write it first.
@@ -70,13 +70,17 @@ Then read the guide and confirm it covers this release's break. No command check
 ## Phase 2 — Publish (after confirmation)
 
 ### 6. Bump version on `develop`
-Edit `__version__` in `src/class_registry/__init__.py`
-directly — Hatch reads the version from there, since `pyproject.toml`
-declares it `dynamic`. Commit the file and push to `develop`.
+On a branch off an up-to-date `develop` (`git checkout develop && git pull`),
+edit `__version__` in `src/class_registry/__init__.py` directly — Hatch
+reads the version from there, since `pyproject.toml` declares it `dynamic`.
+Commit the file, push the branch and open a pull request into `develop`: a
+ruleset requiring pull requests rejects a direct push.
+**Stop here. Wait for the user to confirm the PR is merged before continuing**,
+so the release PR carries the bump.
 
 ### 7. Open release PR
 ```bash
-gh pr create --base main --title "Release v<version>" --body-file release-<version>.md
+gh pr create --base main --head develop --title "Release v<version>" --body-file release-<version>.md
 ```
 **Stop here. Wait for the user to confirm the PR is merged before continuing.**
 
@@ -200,13 +204,6 @@ For every issue referenced in the release notes, close it with a comment:
 gh issue close <number> --comment "Implemented in [v<version>](https://github.com/todofixthis/class-registry/releases/tag/<version>)."
 ```
 
-### 15. Rebase `develop` onto `main`
-```bash
-git rebase origin/main
-git push
-```
-Because `develop` now contains all of `main`'s commits, the histories no longer diverge and a regular (non-force) push succeeds.
-
 ---
 
 ## Writing Release Notes
@@ -284,7 +281,7 @@ A filled-in breaking changes alert:
 
 ## Writing a Migration Guide
 
-`docs/upgrading_to_v<major>.rst`. It stays unreachable until wired into three slots: the `docs/index.rst` toctree, and the upgrade-alert listing in **both** `docs/index.rst` and `README.rst`. The two listings (one bullet per major upgrade) drift apart easily — add the bullet to each, or the README goes stale. Their link syntax differs: `docs/index.rst` uses a Sphinx `:doc:` role targeting `upgrading_to_v<major>`; `README.rst` uses a relative link to the source, `` `Upgrading to ClassRegistry v<major> <docs/upgrading_to_v<major>.rst>`_ `` — `:doc:` renders as raw text on GitHub, where the README is read.
+`docs/upgrading_to_v<major>.rst`. It stays unreachable until wired into three slots: the `docs/index.rst` toctree, and the upgrade-alert listing in **both** `docs/index.rst` and `README.rst`. The two listings (one bullet per major upgrade) drift apart easily — add the bullet to each, or the README goes stale. Their link syntax differs: `docs/index.rst` uses a Sphinx `:doc:` role targeting `upgrading_to_v<major>`; `README.rst` uses an absolute link to the published page, `` `Upgrading to ClassRegistry v<major> <https://class-registry.readthedocs.io/en/latest/upgrading_to_v<major>.html>`_ `` — `:doc:` renders as raw text on GitHub, where the README is read, and a relative link breaks on PyPI, which renders it too.
 
 One page covers a whole major line: the move onto it, and any break shipped later within it. Say so in the opening paragraph — someone already on the new major has no reason to guess that "Upgrading to ClassRegistry v<major>" is where a later break within it is written down. Breaks after the major boundary get their own `Changes in v<version>` section; the major boundary itself is the page's main content.
 

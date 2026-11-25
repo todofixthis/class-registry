@@ -64,6 +64,24 @@ jobs:
     steps:
       - name: Clone repo
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      # A conflicted template update commits its markers, and nothing else in
+      # `gate` reads a file such as README.rst (ADR 022 in
+      # todofixthis/cookiecutter-py). The `=======` separator is left out, as a
+      # reStructuredText heading underline can be the same line, and -I skips
+      # binary files. Exit code 1 from `git grep` means no match; anything
+      # above it is an error, which must fail rather than pass.
+      - name: Check for conflict markers
+        run: |
+          status=0
+          git grep -nIE '^(<{7}|>{7})( |$)' || status=$?
+          if [ "$status" -eq 0 ]; then
+            echo "❌ Conflict markers committed on the lines above"
+            exit 1
+          elif [ "$status" -ne 1 ]; then
+            echo "❌ git grep failed with exit code $status"
+            exit "$status"
+          fi
+          echo "✅ No conflict markers"
       - name: Install uv
         uses: astral-sh/setup-uv@1db35dd8eee11c5894872e0b383ae6c406cf738d # v10.4.0
       - name: Set up Python

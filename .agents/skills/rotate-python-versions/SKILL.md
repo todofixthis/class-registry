@@ -5,7 +5,7 @@ description: Use when adding or dropping Python version support, or when the pyt
 
 # Rotate Python Versions
 
-The project supports three Python releases: `python_version` in `.copier-answers.yml`, the newest, and the two before it. The template `todofixthis/cookiecutter-py` derives `requires-python`, the classifiers, the tox environments, the CI matrix and the version lists in `README.rst` and `docs/` from that answer, so a rotation re-answers it through copier rather than editing those files by hand. The range always moves as a whole: dropping the oldest version means raising `python_version` by one, which also adds a version. When the user asks only to drop one, say so and confirm before going ahead.
+The project supports three Python releases: `python_version` in `.copier-answers.yml`, the newest, and the two before it. The template `todofixthis/cookiecutter-py` derives `requires-python`, the tox environments, the CI matrix and the version lists in `README.rst` and `docs/` from that answer, so a rotation re-answers it through copier rather than editing those files by hand. The range always moves as a whole: dropping the oldest version means raising `python_version` by one, which also adds a version. When the user asks only to drop one, say so and confirm before going ahead.
 
 The template sets the target: CI's `python-policy` job fails while `python_version` is behind the template's policy, which its `run:` step in `.github/workflows/python-policy.yml` names. Work on the branch that carries the template release raising the policy (its Renovate update PR, or the default branch once that has merged): elsewhere the job still shows the old policy. Rotate to the policy unless the user names another version. Renovate never moves Python (ADR 015 in todofixthis/cookiecutter-py), because a rotation also removes compat code, which only a session can do.
 
@@ -26,7 +26,7 @@ uvx "copier>=9,<10" update --defaults --vcs-ref=:current: --data python_version=
 Then run `uv lock` and commit `uv.lock` with the rest: a stale lock no longer matches `pyproject.toml`, so CI's `uv sync` silently re-resolves it and tests dependencies nobody committed (`uv lock --check` confirms it is current).
 
 copier doesn't reach everything. Check by hand:
-- **`pyproject.toml`** — `requires-python` changes only its lower bound and keeps the rest of the specifier (e.g. a `, <4` cap); use `>=X.Y`, never `~=X.Y` without a patch version, which is ambiguous and triggers a uv warning
+- **`pyproject.toml`** — `requires-python` changes only its lower bound and keeps the rest of the specifier (e.g. a `, <4` cap); use `>=X.Y`, never `~=X.Y` without a patch version, which is ambiguous and triggers a uv warning. The template renders no Python version classifiers, so update any this project added itself: drop each dropped version and add each new one, which the search below can't flag as missing
 - **`docs/` and `README.rst`** — any version list this project wrote itself (not ADRs under `docs/adr/`, which record the versions at the time of each decision)
 - **`.agents/rules/project.md`** — any version range this project's own rules mention
 

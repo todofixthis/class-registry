@@ -18,6 +18,10 @@ keywords = [
     "registry pattern",
     "service registry",
 ]
+
+# Leave out `Development Status`: the version's pre-release segment states it,
+# and a hand-kept classifier goes stale (see
+# https://github.com/todofixthis/cookiecutter-py/blob/main/docs/adr/023-leave-the-development-status-classifier-out-of-generated-projects.md).
 classifiers = [
     "Intended Audience :: Developers",
     "Topic :: Software Development :: Libraries :: Python Modules",
@@ -63,15 +67,20 @@ ci = [
 
 [tool.autohooks]
 mode = "pythonpath"
+# Comment on an entry here, above `pre-commit`, never inside the array:
+# `autohooks activate --force` rewrites the array sorted onto one line,
+# dropping any comment inside it. Hooks run in list order, but that sort
+# discards the order, so no hook may rely on running before another.
+#
+# `docs_build` runs a strict, full-reread Sphinx build on staged docs and
+# docstring changes (see
+# https://github.com/todofixthis/cookiecutter-py/blob/main/docs/adr/020-fail-generated-docs-builds-on-sphinx-warnings-in-ci-and-before-commit.md)
+# — removing it leaves a docs warning to CI, a push later.
 pre-commit = [
     "autohooks.plugins.black",
     "autohooks.plugins.mypy",
     "autohooks.plugins.pytest",
     "autohooks.plugins.ruff",
-    # Runs a strict, full-reread Sphinx build on staged docs/docstring
-    # changes (see
-    # https://github.com/todofixthis/cookiecutter-py/blob/main/docs/adr/020-fail-generated-docs-builds-on-sphinx-warnings-in-ci-and-before-commit.md)
-    # — removing this leaves a docs warning to CI, a push later.
     "docs_build",
 ]
 
