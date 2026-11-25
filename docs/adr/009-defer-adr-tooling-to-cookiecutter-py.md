@@ -3,7 +3,7 @@ status: Accepted
 date: 2026-11-25
 scope: [.agents/skills/, .autohooks/, .claude/settings.json, .github/workflows/build.yml, AGENTS.md, docs/adr/, pyproject.toml, renovate.json]
 summary: "This project relies on the phx plugin for ADR tooling as cookiecutter-py ADR 019 decides for every generated project, with the adrs CI job and its Renovate-bumped pin as cookiecutter-py ADR 018 decides, restating neither here: never a repo-local generator, vendored copy of the tool or pre-commit hook running ADR tooling."
-revisit-when: A cookiecutter-py release supersedes its ADR 018 or 019 with a decision that no longer covers plugin reliance or the adrs job; a condition in cookiecutter-py ADR 018's or 019's revisit-when arises in this project.
+revisit-when: A cookiecutter-py release supersedes its ADR 018 or 019 with a decision that no longer covers plugin reliance or the adrs job; a condition in cookiecutter-py ADR 019's revisit-when arises in this project.
 ---
 
 # 009: Defer ADR Tooling to cookiecutter-py
@@ -73,6 +73,9 @@ is this project's own, so nothing is restated here.
   naming 019 or 018, as 008 requires of any template decision.
 - 007's history, the ported generator that fought the plugin over the index,
   stays in 007 and in 019's Context.
+- A condition from cookiecutter-py ADR 019's `revisit-when` seen here goes to
+  cookiecutter-py as a `docs/backlog/` item (its ADR 011), unless the reason is
+  specific to this project, which needs its own ADR here naming ADR 019.
 
 [ADR 004]: 004-scope-adr-frontmatter-by-bound-paths.md
 [ADR 007]: 007-rely-on-the-phx-plugin-for-adr-tooling.md

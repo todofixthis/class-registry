@@ -75,11 +75,11 @@ here, which nothing prompts.
 Option 2. The template owns these files, so it owns the decisions about them;
 a second copy here can only fall behind.
 
-001 stays in force, since only its range clause moved: the range is set by
-re-answering `python_version` through copier, never by hand, and 001's
-backport of newer typing features through `typing_extensions` is this
-project's own. ~~007 stays in force too, until a template ADR decides plugin
-reliance.~~ Spent by 009, which supersedes 007 with cookiecutter-py ADRs 018 and 019.
+001 stays in force, since only its range clause moved: the range is set by re-
+answering `python_version` through copier, never by hand, and 001's backport
+of newer typing features through `typing_extensions` is this project's own.
+~~007 stays in force too, until a template ADR decides plugin reliance.~~
+Spent by 009, which supersedes 007 with cookiecutter-py ADRs 018 and 019.
 
 005's `revisit-when` named this project's own colliding section titles. It does
 not carry over: cookiecutter-py ADR 006 is template-wide, and its trigger asks
