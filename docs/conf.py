@@ -40,7 +40,11 @@ language = "en-nz"
 # own: keep them through a template-update conflict (see
 # https://github.com/todofixthis/cookiecutter-py/blob/main/docs/adr/024-fail-generated-docs-builds-on-unresolved-cross-references.md).
 nitpicky = True
-nitpick_ignore: list[tuple[str, str]] = []
+nitpick_ignore: list[tuple[str, str]] = [
+    # typeshed's private protocol, from sorted()'s signature: no inventory
+    # documents it.
+    ("py:class", "SupportsAllComparisons"),
+]
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
