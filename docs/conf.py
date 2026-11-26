@@ -28,6 +28,20 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
 language = "en-nz"
 
+# Fail the strict build (-W) on a Python cross-reference Sphinx can't resolve,
+# which otherwise renders as plain text with no warning. Fix a warning about
+# the project's own object in its docs: `.. autodata:: pkg.mod.T` with
+# `:no-value:` for a TypeVar, a hand-written `.. py:data::` for a PEP 695 type
+# parameter and `.. py:type::` for an alias, never an entry here. Map a
+# dependency that publishes Sphinx docs in intersphinx_mapping below. List here
+# only a third-party target no mapped inventory resolves, as (role, target)
+# copied from the warning, e.g. ("py:class", "_regex.Pattern"), and remove it
+# once one does. Entries here and in intersphinx_mapping are this project's
+# own: keep them through a template-update conflict (see
+# https://github.com/todofixthis/cookiecutter-py/blob/main/docs/adr/024-fail-generated-docs-builds-on-unresolved-cross-references.md).
+nitpicky = True
+nitpick_ignore: list[tuple[str, str]] = []
+
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
