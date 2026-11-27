@@ -134,7 +134,7 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@1db35dd8eee11c5894872e0b383ae6c406cf738d # v10.4.0
       - name: Check ADRs
-        run: uvx --from 'git+https://github.com/todofixthis/phx-claude-siat@c47fe62f483efa75e953d6a221306f552f362349#subdirectory=skills/writing-adrs' phx-adr check # 9.1.0
+        run: uvx --from 'git+https://github.com/todofixthis/phx-claude-siat@86f320fb6af2894dafd30cbd1e0dc1cbdb5c4575#subdirectory=skills/writing-adrs' phx-adr check # 9.2.0
 
   # This project's own jobs, in project.yml, which copier writes once and the
   # project then owns (ADR 021 in todofixthis/cookiecutter-py).
