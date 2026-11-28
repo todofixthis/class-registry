@@ -24,6 +24,11 @@ release-*.md.asc
 # Sphinx documentation
 docs/_build/
 
+# Terraform (state stays on the maintainer's machine; the lock is committed)
+.terraform/
+.terraform.tfstate.lock.info
+terraform.tfstate*
+
 # Tox
 .tox
 

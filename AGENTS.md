@@ -106,6 +106,12 @@ re-check that it still applies, and delete it if not.
 - NZ English; incorporate Te Reo Māori where natural (e.g. "mahi", "kaupapa")
 - Use "Initialises" not "Initializes"
 
+## GitHub settings
+
+`infra/github/` manages this repo's GitHub settings through the todofixthis Terraform module, `todofixthis/terraform-github-repository` (ADR 025 in todofixthis/cookiecutter-py), so never change them in the GitHub UI. `main.tf` is template-owned; this project's own values (description, homepage, topics) live in `terraform.tfvars`, and `.terraform.lock.hcl`, which `terraform init` writes, is the project's own too. A Renovate PR bumping the module or provider in `main.tf` is not a template candidate: Renovate bumps the same pin in the template too. Where a template update then conflicts on that line, keep the higher version, whichever side it's on, rather than taking the template's side; the resolved PR needs a plan like any other.
+
+State lives only on the maintainer's machine (`infra/github/terraform.tfstate`, gitignored), and CI runs no plan. So never run `terraform apply`, `terraform import` or the module's adoption steps: the maintainer applies after an infra PR merges, from an up-to-date `develop`. A PR changing `main.tf` or `terraform.tfvars`, and any Renovate PR updating the module or the provider, even one changing only `.terraform.lock.hcl`, needs a plan before it merges. Renovate's weekly lock-file maintenance PR, the one on the branch `renovate/lock-file-maintenance` (its title usually says "Lock file maintenance", but the branch decides), is the exception: it refreshes every lock file at once, automerges, and needs none. A PR bumping the provider's major version shouldn't appear, since `renovate.json` disables those (the module owns that constraint): if one does, close it rather than plan it. If this checkout has the state file, run `terraform -chdir=infra/github plan` and report what it changes; otherwise tell the maintainer the PR needs a local plan, run with `gh pr checkout <n> && terraform -chdir=infra/github plan`. A checkout without the state file is normal and doesn't mean the repo is unmanaged.
+
 ## Branches
 
 - `main` — releases only; merge from `develop` via PR
